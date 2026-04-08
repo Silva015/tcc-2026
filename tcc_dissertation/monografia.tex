@@ -1,0 +1,258 @@
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Classe do documento
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+% Opções:
+%  - Graduação: bacharelado|engenharia|licenciatura
+%  - Pós-graduação: [qualificacao], mestrado|doutorado, ppca|ppginf
+
+% \documentclass[engenharia]{UnB-CIC}%
+\documentclass[bacharelado]{UnB-CIC-English}%
+
+\usepackage{pdfpages}% incluir PDFs, usado no apêndice
+
+% Custom (general)
+\usepackage{graphicx}
+\usepackage{subcaption}
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{adjustbox}
+\usepackage{multirow}
+\usepackage{booktabs}
+\usepackage[acronym]{glossaries}
+\makeglossaries
+
+\usepackage{xcolor}
+\newcommand{\red}[1]{\textcolor{red}{#1}}
+
+% Results section
+\usepackage{makecell}
+\usepackage{arydshln}
+\usepackage{pifont}
+\newcommand{\cmark}{\ding{51}} % ✔
+\newcommand{\xmark}{\ding{55}} % ✘
+\usepackage{rotating}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Acronyms
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+% University-related
+\newacronym{UnB}{UnB}{University of Brasília}
+\newacronym{PIBIC}{PIBIC}{Programa Institucional de Bolsas de Iniciação Científica}
+\newacronym{BCE}{BCE}{Biblioteca Central}
+\newacronym{CIC}{CIC}{Departamento de Ciência da Computação}
+\newacronym{CTAN}{CTAN}{Comprehensive \TeX\ Archive Network}
+\newacronym{CEP}{CEP}{Comissão de Ética Pública}
+\newacronym{CAPES}{CAPES}{Coordenação de Aperfeiçoamento de Pessoal de Nível Superior}
+
+% General
+\newacronym{AVC}{AVC}{Advanced Video Coding}
+\newacronym{AAC}{AAC}{Advanced Audio Coding}
+\newacronym{ACR}{ACR}{Absolute Category Rating}
+\newacronym{BDTVS}{BDTVS}{Brazilian Digital TV System}
+\newacronym{DL}{DL}{Deep Learning}
+\newacronym{CfP}{CfP}{Call for Proposals}
+\newacronym{CRF}{CRF}{Constant Rate Factor}
+\newacronym{fps}{fps}{Frames per Second}
+\newacronym{HDR}{HDR}{High Dynamic Range}
+\newacronym{ISDB}{ISDB}{Integrated Services Digital Broadcasting}
+\newacronym{ITU}{ITU}{International Telecommunication Union}
+\newacronym{LCEVC}{LCEVC}{Low Complexity Enhancement Video Coding}
+\newacronym{MPEG}{MPEG}{Moving Picture Experts Group}
+\newacronym{PVS}{PVS}{Processed Video Sequence}
+\newacronym{SDR}{SDR}{Standard Dynamic Range}
+\newacronym{SDI}{SDI}{Serial Digital Interface}
+\newacronym{SMPTE}{SMPTE}{Society of Motion Picture and Television Engineers}
+\newacronym{TV}{TV}{television}
+\newacronym{VUT}{VUT}{Video Under Test}
+\newacronym{VVC}{VVC}{Versatile Video Coding}
+\newacronym{UHD}{UHD}{Ultra-High Definition}
+\newacronym[longplural={Light Fields}, plural=LFs]{LF}{LF}{Light Field}
+\newacronym{IMEx}{IMEx}{Immersive Media Experiences}
+\newacronym{VR}{VR}{Virtual Reality}
+\newacronym{AR}{AR}{Augmented Reality}
+\newacronym{QoE}{QoE}{Quality of Experience}
+\newacronym{SOTA}{SOTA}{state-of-the-art}
+\newacronym{LiDAR}{LiDAR}{Light Detection and Ranging}
+\newacronym{HVS}{HVS}{Human Visual System}
+\newacronym{RGB}{RGB}{Red, Green, Blue}
+\newacronym{CAD}{CAD}{Computer-Aided Design}
+\newacronym{VGG}{VGG}{Visual Geometry Group}
+\newacronym{YCbCr}{YCbCr}{Luminance and Chrominance Color Space}
+\newacronym{KD-Tree}{KD-Tree}{K-Dimensional Tree}
+\newacronym{ECDF}{ECDF}{Empirical Cumulative Distribution Function}
+\newacronym{3D}{3D}{three-dimensional}
+\newacronym{2D}{2D}{bidimensional}
+\newacronym{VQA}{VQA}{Volumetric Quality Assessment}
+\newacronym{CAGR}{CAGR}{Compound Annual Growth Rate}
+\newacronym{DNN}{DNN}{Deep Neural Network}
+\newacronym{sRGB}{sRGB}{Standard Red Green Blue}
+\newacronym{texel}{texel}{texture pixel}
+
+% MAPPE / MeQA
+\newacronym{MAPPE}{MAPPE}{Mesh Assessment via Point Cloud and Projection Estimators}
+\newacronym{MeQA}{MeQA}{Mesh Quality Assessment}
+\newacronym{TAPS}{TAPS}{Triangular Area-Adaptive Point Sampling}
+\newacronym{VoSS}{VoSS}{Voxelization-based Spatial Sampling}
+
+% PCA
+\newacronym{PCA}{PCA}{Principal Component Analysis}
+
+% Point Clouds / PCQA
+\newacronym[longplural={Point Clouds}, plural=PCs]{PC}{PC}{Point Cloud}
+\newacronym{PCQA}{PCQA}{Point Cloud Quality Assessment}
+\newacronym[longplural={Processed point clouds}, plural=PPCs]{PPC}{PPC}{Processed point cloud}
+\newacronym{P2P}{P2P}{point-to-point}
+\newacronym{P2Pl}{P2Pl}{point-to-plane}
+\newacronym{Pl2Pl}{Pl2Pl}{plane-to-plane}
+\newacronym{P2D}{P2D}{point-to-distribution}
+\newacronym{LBP}{LBP}{local binary patterns}
+\newacronym{LLP}{LLP}{local luminance patterns}
+\newacronym{NN}{NN}{nearest neighbor}
+\newacronym{KNN}{KNN}{$k$ nearest neighbor}
+\newacronym{RPC}{RPC}{Reference Point Cloud}
+\newacronym{DPC}{DPC}{Distorted Point Cloud}
+\newacronym{PCC}{PCC}{Point Cloud Compression}
+\newacronym{GPCC}{G-PCC}{Geometry-based Point Cloud Compression}
+\newacronym{VPCC}{V-PCC}{Video-based Point Cloud Compression}
+\newacronym{RAHT}{RAHT}{Region-Adaptive Hierarchical Transform}
+
+% Quality Assessment in general
+\newacronym{MOS}{MOS}{Mean Opinion Score}
+\newacronym{FR}{FR}{full-reference}
+\newacronym{RR}{RR}{reduced-reference}
+\newacronym{NR}{NR}{no-reference}
+\newacronym{MSE}{MSE}{Mean Square Error}
+\newacronym{PLCC}{PLCC}{Pearson Linear Correlation Coefficient}
+\newacronym{SROCC}{SROCC}{Spearman Rank Correlation Coefficient}
+\newacronym{RMSE}{RMSE}{Root-Mean-Square Error}
+\newacronym{IQA}{IQA}{Image Quality Assessment}
+\newacronym{PO}{PO}{Projections only}
+\newacronym{QP}{QP}{Quantization Parameter}
+\newacronym{KST}{KST}{Kolmogorov-Smirnov test}
+\newacronym{SfM}{SfM}{Structure from Motion}
+\newacronym{PCL}{PCL}{Point Cloud Library}
+\newacronym{UV}{UV}{texture coordinate}
+\newacronym{GCN}{GCN}{Graph Convolutional Network}
+\newacronym{CNN}{CNN}{Convolutional Neural Network}
+\newacronym{RFE}{RFE}{Recursive Feature Elimination}
+\newacronym{LOCO}{LOCO}{Leave-One-Content-Out}
+\newacronym{GKF}{GKF}{Group K-Fold}
+\newacronym{SAMVIQ}{SAMVIQ}{Subjective Assessment Methodology for Video Quality}
+\newacronym{DSIS}{DSIS}{Double Stimulus Impairment Scale}
+\newacronym{ACR-HR}{ACR-HR}{Absolute Category Rating with Hidden Reference}
+
+% Metrics
+\newacronym{DISTS}{DISTS}{Deep Image Structure and Texture Similarity}
+\newacronym{HD}{HD}{Hausdorff Distance}
+\newacronym{MSDM2}{MSDM2}{Mesh Structural Distortion Measure Metric}
+\newacronym{FMPD}{FMPD}{Fast Mesh Perceptual Distance}
+\newacronym{GePSIM}{GePSIM}{Geodesic Patch Similarity}
+\newacronym{PSNR}{PSNR}{Peak Signal-to-Noise Ratio}
+\newacronym{SSIM}{SSIM}{Structural Similarity Index Measure}
+\newacronym{MS-SSIM}{MS-SSIM}{Multi-Scale Structural Similarity Index Measure}
+\newacronym{GraLPIPS}{GraLPIPS}{Graphics-LPIPS}
+\newacronym{VIF}{VIF}{Visual Information Fidelity}
+\newacronym{VSI}{VSI}{Visual Saliency-based Index}
+\newacronym{LPIPS}{LPIPS}{Learned Perceptual Image Patch Similarity}
+\newacronym{3D-PSSIM}{3D-PSSIM}{3D Projective Structural Similarity Index}
+\newacronym{PCQM}{PCQM}{Point Cloud Quality Metric}
+\newacronym{pSSIM}{pSSIM}{Perceptual Structural Similarity}
+\newacronym{WS-PSNR}{WS-PSNR}{Weighted-to-Spherically-Uniform PSNR}
+\newacronym{PointSSIM}{PointSSIM}{Point Cloud Structural Similarity}
+\newacronym{HybridMQA}{HybridMQA}{Hybrid Mesh Quality Assessment}
+\newacronym{GEOCNN}{GEOCNN}{Geometry-based Convolutional Neural Network}
+\newacronym{PQA-Net}{PQA-Net}{Perceptual Quality Assessment Network}
+\newacronym{GraphSIM}{GraphSIM}{Graph Similarity}
+\newacronym{CMDM}{CMDM}{Color Mesh Distortion Metric}
+\newacronym{GMS-3DQA}{GMS-3DQA}{Grid Mini-patch Sampling for 3D Quality Assessment}
+\newacronym{FMQM}{FMQM}{Field-based Mesh Quality Metric}
+\newacronym{FSR}{FSR}{Frequency Selective Reconstruction}
+\newacronym{IT-PCQA}{IT-PCQA}{Image Transferred Point Cloud Quality Assessment}
+\newacronym{MM-PCQA}{MM-PCQA}{Multi-Modal Point Cloud Quality Assessment}
+
+% Regressors
+\newacronym{ETR}{ETR}{ExtraTreesRegressor}
+\newacronym{ABR}{ABR}{AdaBoostRegressor}
+\newacronym{LGBMR}{LGBMR}{LGBMRegressor}
+\newacronym{OMP}{OMP}{OrthogonalMatchingPursuitCV}
+\newacronym{SVR}{SVR}{Support Vector Regression}
+\newacronym{NuSVR}{NuSVR}{Nu-Support Vector Regression}
+\newacronym{BayR}{BayR}{BayesianRidge}
+\newacronym{GBR}{GBR}{GradientBoostingRegressor}
+\newacronym{RFR}{RFR}{RandomForestRegressor}
+\newacronym{HGBR}{HGBR}{HistGradientBoostingRegressor}
+
+% Mesh datasets
+\newacronym{TMQ}{TMQ}{Textured Mesh Quality assessment dataset}
+\newacronym{SJTU}{SJTU}{Shanghai Jiao Tong University's mesh quality assessment dataset}
+\newacronym{TSMD}{TSMD}{Tencent Static Mesh Dataset}
+
+% Point Cloud datasets
+\newacronym{M-PCCD}{M-PCCD}{MPEG Point Cloud Compression Dataset}
+\newacronym{APSIPA}{APSIPA}{Asia-Pacific Signal and Information Processing Association}
+\newacronym{ICIP}{ICIP}{International Conference on Image Processing}
+\newacronym{WPC}{WPC}{Waterloo Point Cloud}
+\newacronym{BASICS}{BASICS}{Broad Quality Assessment of Static Point Clouds in a Compression Scenario}
+
+% Software and File formats
+\newacronym{ASCII}{ASCII}{American Standard Code for Information Interchange}
+\newacronym{JPEG}{JPEG}{Joint Photographic Experts Group}
+\newacronym{DRACO}{DRACO}{Draco 3D compression library}
+\newacronym{OBJ}{OBJ}{Wavefront OBJ file format}
+\newacronym{OpenGL}{OpenGL}{Open Graphics Library}
+\newacronym{VTK}{VTK}{Visualization Toolkit}
+
+% Hardware
+\newacronym{CPU}{CPU}{Central Processing Unit}
+\newacronym{GPU}{GPU}{Graphics Processing Unit}
+\newacronym{RAM}{RAM}{Random Access Memory}
+
+% Conferences and Workshops
+\newacronym{MMSP}{MMSP}{IEEE International Workshop on Multimedia Signal Processing}
+\newacronym{SBrT}{SBrT}{Brazilian Symposium on Telecommunications and Signal Processing}
+\newacronym{CVPR}{CVPR}{IEEE/CVF Conference on Computer Vision and Pattern Recognition}
+\newacronym{WPOS}{WPOS}{Undergraduate and Graduate Workshop of the Computer Science Department of the University of Brasília}
+\newacronym{JVCI}{JVCI}{Journal of Visual Communication and Image Representation}
+\newacronym{USD}{USD}{United States Dollar}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Informações do Trabalho
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\orientador{\prof \dr Pedro Garcia Freitas}{CIC/UnB}%
+%\coorientador{\prof \dr José Ralha}{CIC/UnB}
+\coordenador[a]{\prof \dr Marcelo Grandi Mandelli}{Universidade de Brasília}%
+\diamesano{01}{December}{2025}%
+
+\membrobanca{\prof \dr Membro 1}{ENE/UnB}%
+\membrobanca{\prof \dr Membro 2}{ENE/UnB}%
+
+\autor{Arthur Silva}{Carneiro}%
+
+\titulo{TransferKAN: Ballistic Wound Classification via Transfer Learning and Kolmogorov-Arnold Networks}%
+
+\palavraschave{Ferimentos Balísticos, Aprendizado por Transferência, Redes de Kolmogorov-Arnold (KAN), Visão Computacional}
+
+\keywords{Ballistic Wounds, Transfer Learning, Kolmogorov-Arnold Networks (KAN), Computer Vision}
+
+\newcommand{\unbcic}{\texttt{UnB-CIC}}%
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Texto
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{document}%
+\capitulo{1_Introduction}{Introduction}%
+\capitulo{2_Background}{Background and Related Work}%
+\capitulo{3_RelatedWork}{Related Work}%
+\capitulo{4_ProposedSolution}{Proposed Solution}%
+\capitulo{5_methodology}{Methodology}%
+\capitulo{6_Results}{Results}%
+\capitulo{7_Conclusions}{Conclusions}%
+
+
+% \apendice{Published_Articles}{Published Articles}%
+% \apendice{Submitted_Articles}{Submitted Articles}%
+% \apendice{WIP_Articles}{Work in Progress Articles}%
+% \anexo{Anexo1}{Documentação Original \unbcic\ (parcial)}%
+\end{document}%
