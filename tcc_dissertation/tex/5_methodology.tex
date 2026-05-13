@@ -1,14 +1,39 @@
 \label{chap:methodology}
 
-The methodology chapter serves as the technical backbone of your research, providing a transparent and replicable account of how you conducted your study. 
+This chapter details the data, the architecture, and the experimental setup used to evaluate the TransferKAN model. The methodology is designed to rigorously train and validate the proposed architecture while ensuring strict data separation to prevent data leakage.
 
-Its goal is to establish procedural validity. It convinces the reader that your results are not accidental but the product of a rigorous, systematic application of scientific methods. 
+\section{Dataset Description}
 
-This chapter transforms the "blueprint" from your proposed solution into a concrete "construction rtecipe" that another researcher could follow to achieve the exact same outcomes.
+The dataset utilized in this study is the FDCPUnBGunshotDB, a curated collection of real crime scene photographs obtained by the Federal District Civil Police (PCDF) in Brazil. The dataset is highly imbalanced, reflecting the natural occurrence of forensic findings at crime scenes.
 
-It starts with the experimental design, where you define the scope and the controlled variables of your tests. You must describe the materials and dataset in detaisl, explaining the origin of the ballistic wound images, the preprocessing steps taken (such as normalization or data augmentationtechniques) and the justification for each choices.
+For the wound type classification task, the dataset contains a total of 2,551 images, distributed between 1,883 entry wounds and 668 exit wounds. For the Medical-Legal Shooting Distance (MLSD) classification task, only the 1,883 entry wound images are considered, categorized into three distinct classes:
+\begin{itemize}
+    \item \textbf{Distant (Label 2):} 1,609 images (85.45\%)
+    \item \textbf{Close range (Label 1):} 232 images (12.32\%)
+    \item \textbf{Contact (Label 0):} 42 images (2.23\%)
+\end{itemize}
 
-It leads into the implementation details, where the abstract KAN architecture is mapped onto physical reality. Here, you discuss the software environment, specific libraries, and the hardware used, effectively bridging the gap between theory and execution.
+\section{TransferKAN Architecture}
 
+The core of our proposed solution is the \textbf{TransferKAN} architecture, a hybrid deep neural network that combines the feature extraction strengths of Convolutional Neural Networks (CNNs) with the non-linear classification capabilities of Kolmogorov-Arnold Networks (KANs).
 
-Unlike the previous "Proposed Solution" chapter, which is theoretical and architectural, the methodology chapter is descriptive and objective. It should be written in a way that prioritizes clarity and precision. Every technical choice made during the experiment (such as the number of epochs or the choice of a specific spline degree in the KAN layers) must be documented here so that the reader can trust the integrity of the data that follows.
+\subsection{Feature Extractor}
+We employed a pre-trained ResNet152 as the backbone for spatial feature extraction. The ResNet152 was chosen due to its extensive depth and residual connections, which are proven to extract highly detailed and robust visual features. The standard final fully connected layer (MLP) was removed, leaving the network to output a flattened feature vector of size 2048.
+
+\subsection{Kolmogorov-Arnold Network Classifier}
+Instead of conventional dense layers, we appended a KAN module as the final classifier. The KAN network operates on the principles of the Kolmogorov-Arnold representation theorem, utilizing parameterized activation functions (splines) on the edges rather than fixed activation functions on the nodes. 
+
+For the wound type classification (binary: Entry/Exit), the KAN was configured with a structure of [2048, 128, 2], using a cubic spline order of 3 and an increased grid size of 10 to capture complex non-linear nuances. For the MLSD classification (multiclass: Contact, Close Range, Distant), the KAN structure was adapted to [2048, 128, 3]. A dropout layer with a probability of 0.5 was inserted between the feature extractor and the KAN classifier to prevent overfitting.
+
+\section{Experimental Setup}
+
+To ensure reliable and robust evaluation, the experimental pipeline was strictly controlled.
+
+\subsection{Data Augmentation}
+Due to the scarcity and imbalance of forensic data, advanced Data Augmentation was applied exclusively to the training set using the Albumentations library. The augmentation pipeline included transformations such as horizontal and vertical flips, shift-scale-rotate, elastic transformations (simulating skin elasticity), Contrast-Limited Adaptive Histogram Equalization (CLAHE) for tissue details, and Gaussian noise to simulate varied lighting conditions. The validation set only underwent essential resizing and normalization.
+
+\subsection{K-Fold Cross-Validation and Data Splitting}
+To prevent semantic data leakage, the dataset was split based on the \textit{Case ID} rather than individual images. This ensures that multiple images belonging to the same victim are not distributed across both training and testing sets. We implemented a 5-fold cross-validation strategy, maintaining an 80\%/20\% case-based split per fold.
+
+\subsection{Training Procedure}
+The training was conducted in two phases. In the first phase, the ResNet152 backbone was frozen, and only the KAN classifier was trained using the AdamW optimizer with a learning rate of $1 \times 10^{-3}$ and weight decay. In the second phase (fine-tuning), the entire network was unfrozen, and training continued with a lower learning rate of $1 \times 10^{-5}$. A CosineAnnealingLR scheduler was utilized throughout both phases to smoothly decay the learning rate. During each fold, the model weights achieving the highest test accuracy were saved, and the out-of-fold predictions were concatenated to calculate the final cross-validated metrics. Class weighting was also applied to the Cross-Entropy Loss to counteract the severe dataset imbalance.
