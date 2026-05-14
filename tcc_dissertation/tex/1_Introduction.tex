@@ -1,0 +1,46 @@
+\label{chap:introduction}
+
+\section{Problem Statement}
+\label{sec_problem}
+
+Firearms correspond to one of the most used instruments worldwide for committing homicides. In forensic fieldwork, encountering gunshot wounds during external body examinations is common. During these examinations, forensic experts must precisely determine the nature of the wound, primarily distinguishing between entry and exit wounds, and classifying the entry wounds according to the distance from which the shot was fired, commonly referred to as the Medical-Legal Shooting Distance (MLSD).
+
+Some characteristics, such as shape, size, and margins, allow for relatively easy differentiation between entry and exit wounds under ideal conditions. However, in reality, these characteristics are not always clearly visible; they may be partially absent, overlapping, or altered by putrefaction. Other factors, including caliber, ammunition type, shot angle, and the impacted body region, further complicate accurate classification. 
+
+The application of Artificial Intelligence (AI) and Deep Learning (DL) in computer vision tasks has revolutionized medical diagnostics, offering robust tools for image classification. Despite these advancements, the translation of such technologies into the forensic domain remains limited. One of the main challenges lies in acquiring comprehensive datasets with high-quality scientific data. Forensic images are usually taken under various environmental conditions, with a range of equipment, and in the routine circumstances of crime scenes where standardization is practically impossible. 
+
+Existing literature, such as recent models trained on human autopsy databases, relies on traditional Convolutional Neural Networks (CNNs) using conventional Multi-Layer Perceptrons (MLPs) for final classification. While these architectures perform adequately, they often struggle with highly imbalanced datasets and the non-linear complexity inherent in varied forensic wound images. There is a critical gap for a more efficient classifier that can extract abstract non-linear patterns without requiring exponentially larger datasets or parameter counts.
+
+\section{Research Objectives}
+\label{sec_goals}
+
+The primary objective of this study is to develop and evaluate a hybrid deep learning architecture, named TransferKAN, for the classification of human gunshot wounds using real crime scene images. This work focuses on two specific forensic tasks: classifying wound types (Entry vs. Exit) and determining the Medical-Legal Shooting Distance (MLSD).
+
+To achieve this overarching goal, the following specific objectives were established:
+\begin{itemize}
+    \item To implement a Transfer Learning framework utilizing a pre-trained ResNet152 backbone for high-level spatial feature extraction from forensic images.
+    \item To design and integrate a Kolmogorov-Arnold Network (KAN) as the decision classifier, replacing traditional dense layers, to better capture complex non-linear relationships.
+    \item To implement a rigorous k-fold cross-validation scheme to evaluate the model's performance reliably, preventing data leakage.
+    \item To compare the performance of the proposed TransferKAN architecture against the baseline performance of state-of-the-art CNNs, specifically the ResNet152 classifier reported in the 2024 literature.
+\end{itemize}
+
+
+\subsection{Research Hypothesis}
+\label{sec_hypothesis}
+
+We hypothesize that replacing the standard Multi-Layer Perceptron (MLP) classification head of a state-of-the-art deep convolutional network (ResNet152) with a Kolmogorov-Arnold Network (KAN) will result in a superior hybrid architecture (TransferKAN). This architecture will better model the non-linear boundaries of imbalanced forensic image classes, yielding higher performance in both wound type and MLSD classification compared to the traditional ResNet152 baseline.
+
+\section{Contributions}
+\label{sec_contributions}
+
+The main contributions of this work can be summarized as follows:
+\begin{itemize}
+    \item The introduction of the \textbf{TransferKAN architecture} into the forensic pathology domain. This hybrid model leverages the feature-extraction prowess of ResNet152 and the parameter-efficient, non-linear classification capabilities of Kolmogorov-Arnold Networks.
+    \item The demonstration that the TransferKAN approach, coupled with robust data augmentation and k-fold cross-validation, outperforms the baseline metrics of traditional models used in prior literature for both Entry/Exit and MLSD classification on a real-world crime scene dataset.
+    \item The provision of a rigorous methodological pipeline that mitigates data leakage issues through case-based data splitting, offering a more realistic evaluation of the model's generalization capabilities in real forensic scenarios.
+\end{itemize}
+
+\section{Organization of This Document}
+\label{sec_about}
+
+The remainder of this document is organized as follows. Chapter~\ref{chap:background} provides the necessary background on forensic pathology regarding gunshot wounds and introduces the deep learning concepts utilized. Chapter~\ref{chap:related_work} reviews the related literature on AI applied to forensic wound classification. Chapter~\ref{chap:methodology} details the proposed methodology, including the dataset description, the TransferKAN architecture, and the validation procedures. Chapter~\ref{chap:results} presents the comparative results and discussion. Finally, Chapter~\ref{chap:conclusions} concludes the thesis and suggests avenues for future research.

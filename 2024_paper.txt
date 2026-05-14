@@ -1,0 +1,1126 @@
+International Journal of Legal Medicine
+https://doi.org/10.1007/s00414-024-03355-4
+ORIGINAL ARTICLE
+Deep learning-based human gunshot wounds classiﬁcation
+Renato Queiroz Nogueira Lira 1 · Luana Geovana Motta de Sousa 1 · Maisa Luana Memoria Pinho 1 ·
+Renan Cesar Pinto da Silva Andrade de Lima 1 · Pedro Garcia Freitas 2 · Bruno Scholles Soares Dias 3 ·
+Andreia Cristina Breda de Souza 4 · André Ferreira Leite 1
+Received: 10 June 2024 / Accepted: 18 October 2024
+© The Author(s), under exclusive licence to Springer-Verlag GmbH Germany, part of Springer Nature 2024
+Abstract
+In this paper, we present a forensic perspective on classifying gunshot wound patterns using Deep Learning (DL). Although
+DL has revolutionized various medical specialties, such as automating tasks like medical image classiﬁcation, its applications
+in forensic contexts have been limited despite the inherently visual nature of the ﬁeld. This study investigates the application
+of DL techniques (59 architectures) to classify gunshot wounds in a forensic context, focusing on distinguishing between
+entry and exit wounds and determining the Medical-Legal Shooting Distance (MLSD), which classiﬁes wounds as contact,
+close range, or distant, based on digital images from real crime scene cases. A comprehensive database was constructed with
+2,551 images, including 1,883 entries and 668 exit wounds. The ResNet152 architecture demonstrated superior performance
+in both entry and exit wound classiﬁcation and MLSD categorization. For the ﬁrst task, achieved accuracy of 86.90% and an
+AUC of 82.09%. For MLSD, the ResNet152 showed an accuracy of 92.48% and AUC up to 94.36%, though sample imbalance
+affected the metrics. Our ﬁndings underscore the challenges of standardizing wound images due to varying capture conditions
+but reﬂect the practical realities of forensic work. This research highlights the signiﬁcant potential of DL in enhancing forensic
+pathology practices, advocating for Artiﬁcial Intelligence (AI) as a supportive tool to complement human expertise in forensic
+investigations.
+Keywords Forensic medicine · Gunshot wounds · Artiﬁcial intelligence · Deep learning
+Introduction
+Firearms correspond to one of the most used instruments
+worldwide for committing homicides, being related to 75%
+of cases in the Americas in 2021 [ 1]. In Brazil, the country
+with the highest number of ﬁrearm-related fatalities, there are
+more than 47,000 deaths attributed to ﬁrearms annually [ 2].
+Given these high rates, it is common in forensic ﬁeldwork
+to encounter gunshot wounds during external body examina-
+tions, whether at the crime scene or during an autopsy. When
+these are found, among various procedures, it is necessary
+to distinguish between entry and exit wounds and to classify
+the entry wounds according to the distance from which the
+shot was ﬁred [ 3, 4].
+Luana Geovana Motta de Sousa, Maisa Luana Memoria Pinho, and
+Renan Cesar Pinto da Silva Andrade de Lima contributed equally to
+this work.
+Extended author information available on the last page of the article
+Some characteristics, such as shape, size, and margins,
+allow for relatively easy differentiation between entry and
+exit wounds [ 5]. However, these characteristics are not
+always clearly visible, or they may be partially absent or
+even overlapping, complicating the accurate classiﬁcation.
+Additionally, other factors can inﬂuence wound production,
+including the caliber and type of ammunition, the angle and
+speed of the shot, barriers encountered by the projectile, and
+the region of the body impacted [ 6, 7].
+Similarly, the classiﬁcation of the shot distance can be
+inﬂuenced by the same aforementioned factors [ 6]. This dis-
+tance has a medico-legal classiﬁcation, which is based on the
+characteristics presented by the injury itself and its naked eye
+appearances. These categories include: distant (or medium-
+distance) wound, close (or near) range wound and contact
+wound [7, 8]. Some authors also introduce additional cate-
+gories between close-range and contact, such as near-contact
+and loose-contact [ 6]. Moreover, it is important to empha-
+size that this is a medico-legal classiﬁcation based on the
+123International Journal of Legal Medicine
+traces found on the victim, not necessarily reﬂecting the
+actual event, and serves as an indication or suggestion of
+what occurred at the crime scene [ 7].
+Regardless, for forensic investigation purposes, any addi-
+tional information can be crucial in aiding the elucidation
+of what happened, how it happened, and who was involved.
+However, to ensure impartiality and justice, it is important
+that the evidence produced is based on and grounded in sci-
+entiﬁc criteria [ 9].
+In turn, in recent years, there has been an increase in
+the research and perspectives of use of AI with Machine
+Learning (ML) across various sectors, including forensic
+medicine [ 10–15]. In the pursuit of faster and more robust
+crime resolution, image recognition and classiﬁcation have
+seen signiﬁcant advancements, including initiating studies on
+the classiﬁcation of ﬁrearm injuries [ 16, 17]. Despite these
+developments contributing to the enhancement of forensic
+methodologies and the efﬁciency of criminal investigations,
+and being the studies that initiated research in the area, they
+involved the use of only a few images and were based on
+injuries in pig carcasses [ 17] or, when trained with autopsy
+photographs of wounds on human bodies, did not analyze the
+MLSD aspect [ 16].
+The current study aimed to develop a ML model that can
+analyze and classify photographs of real crime scene forensic
+cases of gunshot wounds in relation to determining whether
+they are entry or exit wounds and to classify MLSD of the
+gunshot wounds.
+Materialandmethods
+Figure 1 illustrated the framework employed during the
+development of this work. It includes three main stages
+responsible for preprocessing the captured photographies
+from the crime scene, classifying the preprocessed images
+using a deep neural network, and ﬁnally estimating the clas-
+siﬁcation according to a speciﬁc forensic task. The following
+subsections details each stage.
+Data acquisition
+In this study, photographic records of homicide and suicide
+cases examined by crime scene forensic experts and reports
+by medical examiners from incidents attended by the Fed-
+eral District Civil Police (PCDF) (Brasília, Federal District,
+Brazil) from the January of 2012 until March of 2022 were
+used. From the selected time period, a total of 2,012,584
+photographs were stored. This dataset was obtained with
+the proper authorization of PCDF and the Committee for
+Ethics in Research of the University of Brasília approved
+this research (Protocol number 54418221.9.0000.0030).
+The images and relevant data related to the wounds, such
+as age, sex, anatomical location, distance, and wound cate-
+gory, the following inclusion criteria were established:
+1. the victim was examined and photographed in the crime
+scene by forensic experts;
+2. the body did not show advanced signs of decomposition
+(e.g., greenish discoloration of the skin of the anterior
+abdominal wall in the right iliac fossa region);
+3. the photos from the scene examination were in focus and
+with sufﬁcient visualization of the wounds;
+4. the victim was identiﬁed, due to the need for additional
+data - sex and age at the time of death;
+5. there were bullets stored in the bodies;
+6. the bullets had been recovered during the autopsy at the
+Legal Medical Institute (IML/PCDF);
+7. the bullets recovered at the IML had been sent to the
+Institute of Criminalistics (IC/PCDF);
+8. it was possible to determine the caliber(s) of the bullet(s)
+at the Forensic Ballistics Section (SBF/IC/PCDF);
+9. only one caliber involved per victim was determined at
+SBF;
+10. the respective autopsy reports, made by experienced
+forensics pathologists, indicates which anatomical loca-
+tion, shot distance (distant, close or contact) and category
+(entry or exit) the photographed wound corresponds to.
+These reports correspond to the gold standard.
+Raw Data
+(from crime scenes)
+Preprocessed Data
+...
+Preprocess Data
+Train-Test
+Split
+Training Data
+...
+Test Data
+...
+Data Augmentation
+Augmented Training Data
+...
+Combined 
+Training
+Data
+Data
+Preparation
+Train Classification Model
+(PyTorch)
+Evaluate Trained Models
+(Accuracy, AUC, etc)
+Fig. 1 Developed framework for data augmentation, classiﬁcation modeling, and used to evaluate the proposed methodology
+123International Journal of Legal Medicine
+Table 1 Cases and images per
+sex and wound type (entry or
+exit)
+Sex # Cases (%) # Images (%) # Entries (%) # Exits (%)
+Female 24 (4.91) 114 (4.47) 85 (4.51) 29 (4.34)
+Male 465 (95.09) 2437 (95.53) 1798 (95.49) 639 (95.66)
+Total 489 (100) 2551 (100) 1883 (100) 668 (100)
+These criteria were designed based on the working pro-
+tocol guidelines of the PCDF and, due to the use of this
+database, several wounds and cases were excluded from this
+study, reducing the available sample. However, these data
+may be used for further analyses, potentially involving cal-
+iber as one of the factors to be studied.
+Data preprocessing
+The images retrieved from these cases were then manually
+cropped to isolate the wounds in a square format. This manual
+processing was handled using the GNU Image Manipulation
+Program (GIMP) image processing software, resulting in a
+preprocessed dataset of 2,551 images of gunshot wounds.
+These preprocessed images were then categorized according
+to wound type and MLSD. The wound types were categorized
+into entry and exit wounds, corresponding to 1,883 entry and
+668 exit wounds. Table 1 details the wound types according
+to the number of cases, associated images, and sex. More-
+over, considering only the subset of entry wound images, we
+obtained 1,609 from distance shots, 232 from close range,
+and 42 from contact shots as per the MLSD categorization,
+as depicted in Table 2.
+As observed in Tables 1, 2 and 3, the dataset under study
+exhibits a signiﬁcant imbalance. Such imbalance is typical
+in forensic datasets, where certain types of wounds or shoot-
+ing distances are often underrepresented compared to others
+[18]. This imbalance stems from real-world crime cases,
+where certain types of wounds are rare or sensitive, leading
+to limited sample availability. In response to this, techniques
+were applied during data preprocessing when constructing
+the training pipeline for the models under investigation.
+Learning-based classification
+Considering the curated data as described in the previous
+section, we identiﬁed that the recognition of forensic char-
+acteristics of gunshot wound images can be expressed as an
+Table 2 Entry wounds images
+per medico-legal distance
+classiﬁcation
+Distance # Images (%)
+Distant 1609 (85.45)
+Close range 232 (12.32)
+Contact 42 (2.23)
+Total 1883 (100)
+image classiﬁcation problem. More speciﬁcally, the identiﬁ-
+cation of the wound type is a binary classiﬁcation problem
+(i.e., entry or exit), while the categorization of the MLSD is
+a multiclass classiﬁcation problem, as can be inferred from
+Table2. In other words, both are Computer Vision (CV) prob-
+lems. Therefore, this study tested the potential of a series of
+DL models established in the literature for CV problems.
+The neural networks used in this study were achieved
+from TorchVision [ 19], popular library that is part of the
+PyTorch [20] ecosystem. TorchVision provides tools and util-
+ities speciﬁcally designed for computer vision tasks, such as
+state-of-the-art architectures and its pretrained models. From
+this library, ﬁfty-nine state-of-the-art DL architectures were
+utilized to analyze forensic images for the differentiation of
+entry and exit wounds as well as the determination of MLSD.
+These models are listed in Tables 4 and 5. Additionally, we
+employed a supplementary abstraction software layer using
+Skorch [ 21], a library that provides a high-level interface
+for working with PyTorch models in a scikit-learn-like way.
+This additional layer was included to add Scikit-Learn [ 22]
+compatibility and make it easy to use PyTorch models with
+the scikit-learn ecosystem. This allows our software imple-
+mentation to leverage tools and utilities from Scikit-Learn,
+such as grid search, cross-validation, hyperparameter tun-
+ing, and pipelines, with PyTorch models. Thus, with the use
+of Skorch, our implementation beneﬁts from several desir-
+able properties in terms of software engineering, such as
+decoupling, maintainability, efﬁciency, correctness, reusabil-
+ity, testability, etc. Our concern on these properties was to
+ensure reliability in conducting our experiments.
+As can be noticed from Tables 1, 2 and 3, the studied
+dataset is highly imbalanced. This imbalance is usually com-
+mon in forensic datasets, where certain types of wounds
+or shooting distances may be underrepresented compared
+to others. The data imbalance emerges from the real-world
+crime cases, where some type of wounds can often be lim-
+Table 3 Number of wound images per anatomical location on the body
+Anatomical location # Images (%)
+Head and neck 548 (21.48)
+Trunk 1310 (51.35)
+Upper limbs 503 (19.72)
+Lower limbs 190 (7.45)
+Total 2551 (100)
+123International Journal of Legal Medicine
+Table 4 Performance metrics for different neural network architectures using hold-out validation to predict the wound type
+Architecture V ariant ACC Precision Recall F1-Score AUC Speciﬁcity
+M m WM m WM m WM m WM m W
+Alexnet [28] 0.765 0.695 0.765 0.780 0.716 0.765 0.765 0.703 0.765 0.771 0.716 0.716 0.716 0.716 0.765 0.765
+DenseNet 121 0.736 0.640 0.736 0.727 0.629 0.736 0.736 0.634 0.736 0.731 0.629 0.629 0.629 0.629 0.736 0.736
+[29] 161 0.753 0.659 0.753 0.737 0.635 0.753 0.753 0.644 0.753 0.742 0.635 0.635 0.635 0.635 0.753 0.753
+169 0.777 0.700 0.777 0.768 0.679 0.777 0.777 0.688 0.777 0.772 0.679 0.679 0.679 0.679 0.777 0.777
+201 0.744 0.663 0.744 0.751 0.671 0.744 0.744 0.667 0.744 0.747 0.671 0.671 0.671 0.671 0.744 0.744
+EfﬁcientNet B0 0.744 0.646 0.744 0.727 0.624 0.744 0.744 0.632 0.744 0.734 0.624 0.624 0.624 0.624 0.744 0.744
+[30, 31] B1 0.734 0.627 0.734 0.713 0.603 0.734 0.734 0.610 0.734 0.720 0.603 0.603 0.603 0.603 0.734 0.734
+B2 0.750 0.656 0.750 0.734 0.631 0.750 0.750 0.639 0.750 0.740 0.631 0.631 0.631 0.631 0.750 0.750
+B3 0.757 0.659 0.757 0.728 0.604 0.757 0.757 0.615 0.757 0.732 0.604 0.604 0.604 0.604 0.757 0.757
+B4 0.715 0.588 0.715 0.684 0.566 0.715 0.715 0.569 0.715 0.695 0.566 0.566 0.566 0.566 0.715 0.715
+B5 0.744 0.608 0.744 0.686 0.535 0.744 0.744 0.517 0.744 0.683 0.535 0.535 0.535 0.535 0.744 0.744
+B6 0.759 0.667 0.759 0.740 0.633 0.759 0.759 0.644 0.759 0.745 0.633 0.633 0.633 0.633 0.759 0.759
+B7 0.750 0.375 0.750 0.563 0.500 0.750 0.750 0.429 0.750 0.644 0.500 0.500 0.500 0.500 0.750 0.750
+V2L 0.782 0.710 0.782 0.760 0.638 0.782 0.782 0.654 0.782 0.759 0.638 0.638 0.638 0.638 0.782 0.782
+V2M 0.726 0.602 0.726 0.693 0.572 0.726 0.726 0.577 0.726 0.703 0.572 0.572 0.572 0.572 0.726 0.726
+V2S 0.721 0.621 0.721 0.714 0.614 0.721 0.721 0.617 0.721 0.717 0.614 0.614 0.614 0.614 0.721 0.721
+MaxVit [32] 0.780 0.703 0.780 0.761 0.653 0.780 0.780 0.668 0.780 0.764 0.653 0.653 0.653 0.653 0.780 0.780
+MNASNet 5 0.705 0.589 0.705 0.688 0.578 0.705 0.705 0.582 0.705 0.695 0.578 0.578 0.578 0.578 0.705 0.705
+[33] 75 0.717 0.590 0.717 0.686 0.567 0.717 0.717 0.571 0.717 0.696 0.567 0.567 0.567 0.567 0.717 0.717
+10 0.682 0.570 0.682 0.677 0.568 0.682 0.682 0.569 0.682 0.680 0.568 0.568 0.568 0.568 0.682 0.682
+13 0.746 0.659 0.746 0.744 0.656 0.746 0.746 0.657 0.746 0.745 0.656 0.656 0.656 0.656 0.746 0.746
+MobileNet V2 0.719 0.609 0.719 0.702 0.593 0.719 0.719 0.598 0.719 0.709 0.593 0.593 0.593 0.593 0.719 0.719
+[34, 35] V3Large 0.690 0.566 0.690 0.672 0.557 0.690 0.690 0.559 0.690 0.680 0.557 0.557 0.557 0.557 0.690 0.690
+V3Small 0.703 0.585 0.703 0.685 0.574 0.703 0.703 0.577 0.703 0.693 0.574 0.574 0.574 0.574 0.703 0.703
+Regnet X16GF 0.690 0.534 0.690 0.648 0.524 0.690 0.690 0.521 0.690 0.664 0.524 0.524 0.524 0.524 0.690 0.690
+[36] X32GF 0.724 0.580 0.724 0.675 0.546 0.724 0.724 0.544 0.724 0.687 0.546 0.546 0.546 0.546 0.724 0.724
+X400MF 0.663 0.528 0.663 0.646 0.525 0.663 0.663 0.526 0.663 0.654 0.525 0.525 0.525 0.525 0.663 0.663
+X800MF 0.703 0.563 0.703 0.667 0.546 0.703 0.703 0.547 0.703 0.680 0.546 0.546 0.546 0.546 0.703 0.703
+X8GF 0.699 0.558 0.699 0.664 0.543 0.699 0.699 0.544 0.699 0.677 0.543 0.543 0.543 0.543 0.699 0.699
+Y16GF 0.711 0.571 0.711 0.672 0.549 0.711 0.711 0.549 0.711 0.685 0.549 0.549 0.549 0.549 0.711 0.711
+123International Journal of Legal MedicineTable 4 continued
+Architecture V ariant ACC Precision Recall F1-Score AUC Speciﬁcity
+M m WM m WM m WM m WM m W
+Y32GF 0.671 0.533 0.671 0.648 0.528 0.671 0.671 0.528 0.671 0.659 0.528 0.528 0.528 0.528 0.671 0.671
+Y400MF 0.674 0.540 0.674 0.654 0.535 0.674 0.674 0.536 0.674 0.663 0.535 0.535 0.535 0.535 0.674 0.674
+Y800MF 0.703 0.565 0.703 0.669 0.549 0.703 0.703 0.550 0.703 0.681 0.549 0.549 0.549 0.549 0.703 0.703
+Y8GF 0.703 0.563 0.703 0.667 0.546 0.703 0.703 0.547 0.703 0.680 0.546 0.546 0.546 0.546 0.703 0.703
+ResNet 152 0.869 0.827 0.869 0.868 0.821 0.869 0.869 0.824 0.869 0.869 0.821 0.821 0.821 0.821 0.869 0.869
+[37] 101 0.863 0.822 0.863 0.860 0.803 0.863 0.863 0.811 0.863 0.861 0.803 0.803 0.803 0.803 0.863 0.863
+50 0.850 0.802 0.850 0.848 0.792 0.850 0.850 0.797 0.850 0.849 0.792 0.792 0.792 0.792 0.850 0.850
+34 0.850 0.799 0.850 0.852 0.806 0.850 0.850 0.802 0.850 0.851 0.806 0.806 0.806 0.806 0.850 0.850
+18 0.817 0.758 0.817 0.810 0.734 0.817 0.817 0.744 0.817 0.812 0.734 0.734 0.734 0.734 0.817 0.817
+ShufﬂeNet V2x05 0.730 0.628 0.730 0.717 0.614 0.730 0.730 0.619 0.730 0.722 0.614 0.614 0.614 0.614 0.730 0.730
+[38] V2x10 0.701 0.533 0.701 0.646 0.520 0.701 0.701 0.512 0.701 0.664 0.520 0.520 0.520 0.520 0.701 0.701
+V2x15 0.711 0.580 0.711 0.679 0.560 0.711 0.711 0.563 0.711 0.690 0.560 0.560 0.560 0.560 0.711 0.711
+V2x20 0.692 0.551 0.692 0.660 0.539 0.692 0.692 0.540 0.692 0.672 0.539 0.539 0.539 0.539 0.692 0.692
+SqueezeNet 10 0.750 0.375 0.750 0.563 0.500 0.750 0.750 0.429 0.750 0.644 0.500 0.500 0.500 0.500 0.750 0.750
+[39] 11 0.750 0.375 0.750 0.563 0.500 0.750 0.750 0.429 0.750 0.644 0.500 0.500 0.500 0.500 0.750 0.750
+SwinT B 0.728 0.614 0.728 0.703 0.591 0.728 0.728 0.597 0.728 0.712 0.591 0.591 0.591 0.591 0.728 0.728
+[40] S 0.671 0.536 0.671 0.650 0.531 0.671 0.671 0.531 0.671 0.660 0.531 0.531 0.531 0.531 0.671 0.671
+T 0.713 0.594 0.713 0.691 0.578 0.713 0.713 0.583 0.713 0.700 0.578 0.578 0.578 0.578 0.713 0.713
+V2B 0.750 0.375 0.750 0.563 0.500 0.750 0.750 0.429 0.750 0.644 0.500 0.500 0.500 0.500 0.750 0.750
+V2S 0.713 0.557 0.713 0.661 0.533 0.713 0.713 0.528 0.713 0.676 0.533 0.533 0.533 0.533 0.713 0.713
+V2T 0.750 0.375 0.750 0.563 0.500 0.750 0.750 0.429 0.750 0.644 0.500 0.500 0.500 0.500 0.750 0.750
+VGG 11 0.763 0.673 0.763 0.742 0.633 0.763 0.763 0.645 0.763 0.748 0.633 0.633 0.633 0.633 0.763 0.763
+[41] 13 0.790 0.720 0.790 0.774 0.671 0.790 0.790 0.687 0.790 0.777 0.671 0.671 0.671 0.671 0.790 0.790
+16 0.782 0.706 0.782 0.772 0.685 0.782 0.782 0.694 0.782 0.776 0.685 0.685 0.685 0.685 0.782 0.782
+19 0.777 0.700 0.777 0.768 0.679 0.777 0.777 0.688 0.777 0.772 0.679 0.679 0.679 0.679 0.777 0.777
+ViT B16 0.713 0.587 0.713 0.684 0.567 0.713 0.713 0.571 0.713 0.695 0.567 0.567 0.567 0.567 0.713 0.713
+[42] B32 0.674 0.559 0.674 0.669 0.557 0.674 0.674 0.558 0.674 0.671 0.557 0.557 0.557 0.557 0.674 0.674
+L16 0.678 0.544 0.678 0.656 0.538 0.678 0.678 0.539 0.678 0.666 0.538 0.538 0.538 0.538 0.678 0.678
+L32 0.692 0.563 0.692 0.669 0.553 0.692 0.692 0.555 0.692 0.679 0.553 0.553 0.553 0.553 0.692 0.692
+Considering each metric separately, the best results in terms of maximum absolute value are boldfaced. Symbols M, m,a n d W illustrates macro, micro, and weighted, respectively
+123International Journal of Legal Medicine
+Table 5 Performance metrics for different neural network architectures using hold-out validation to predict the medico-legal shooting distance
+Architecture V ariant ACC Precision Recall F1-Score AUC Speciﬁcity
+M m WM m WM m WM m WM m W
+Alexnet [28] 0.889 0.537 0.889 0.862 0.378 0.889 0.889 0.395 0.889 0.856 0.541 0.916 0.555 0.703 0.944 0.222
+DenseNet 121 0.877 0.422 0.877 0.825 0.356 0.877 0.877 0.359 0.877 0.841 0.521 0.908 0.527 0.685 0.939 0.177
+[29] 161 0.894 0.824 0.894 0.871 0.465 0.894 0.894 0.528 0.894 0.863 0.589 0.921 0.569 0.712 0.947 0.243
+169 0.883 0.467 0.883 0.820 0.388 0.883 0.883 0.398 0.883 0.844 0.548 0.912 0.563 0.708 0.942 0.242
+201 0.902 0.634 0.902 0.883 0.482 0.902 0.902 0.527 0.902 0.886 0.627 0.927 0.659 0.772 0.951 0.415
+EfﬁcientNet B0 0.877 0.758 0.877 0.857 0.438 0.877 0.877 0.483 0.877 0.858 0.583 0.908 0.591 0.728 0.939 0.305
+[30, 31] B1 0.886 0.670 0.886 0.852 0.462 0.886 0.886 0.508 0.886 0.857 0.585 0.914 0.564 0.709 0.943 0.242
+B2 0.864 0.393 0.864 0.817 0.360 0.864 0.864 0.364 0.864 0.836 0.523 0.898 0.531 0.687 0.932 0.198
+B3 0.900 0.560 0.900 0.873 0.400 0.900 0.900 0.424 0.900 0.869 0.561 0.925 0.582 0.722 0.950 0.265
+B4 0.883 0.450 0.883 0.837 0.376 0.883 0.883 0.386 0.883 0.851 0.539 0.912 0.552 0.701 0.942 0.221
+B5 0.869 0.357 0.869 0.806 0.345 0.869 0.869 0.340 0.869 0.833 0.513 0.902 0.523 0.667 0.943 0.114
+B6 0.886 0.295 0.886 0.785 0.333 0.886 0.886 0.313 0.886 0.832 0.500 0.914 0.500 0.667 0.943 0.114
+B7 0.886 0.463 0.886 0.834 0.342 0.886 0.886 0.332 0.886 0.837 0.508 0.914 0.511 0.674 0.943 0.136
+V2L 0.880 0.617 0.880 0.854 0.448 0.880 0.880 0.488 0.880 0.861 0.588 0.910 0.593 0.729 0.940 0.306
+V2M 0.883 0.614 0.883 0.846 0.414 0.883 0.883 0.448 0.883 0.852 0.558 0.912 0.552 0.701 0.942 0.221
+V2S 0.875 0.592 0.875 0.843 0.428 0.875 0.875 0.465 0.875 0.852 0.570 0.906 0.569 0.712 0.937 0.263
+MaxVit [32] 0.880 0.765 0.880 0.859 0.486 0.880 0.880 0.549 0.880 0.862 0.607 0.910 0.593 0.729 0.940 0.305
+MNASNet 5 0.844 0.344 0.844 0.806 0.344 0.844 0.844 0.342 0.844 0.824 0.519 0.883 0.541 0.694 0.922 0.238
+[33] 75 0.872 0.521 0.872 0.843 0.436 0.872 0.872 0.462 0.872 0.853 0.577 0.904 0.578 0.719 0.936 0.284
+10 0.872 0.566 0.872 0.837 0.418 0.872 0.872 0.451 0.872 0.850 0.568 0.904 0.578 0.719 0.936 0.283
+13 0.869 0.409 0.869 0.824 0.371 0.869 0.869 0.378 0.869 0.842 0.533 0.902 0.544 0.696 0.934 0.219
+MobileNet V2 0.886 0.424 0.886 0.831 0.360 0.886 0.886 0.361 0.886 0.848 0.531 0.914 0.553 0.702 0.943 0.221
+[34, 35] V3Large 0.872 0.411 0.872 0.829 0.381 0.872 0.872 0.388 0.872 0.847 0.546 0.904 0.567 0.711 0.936 0.262
+V3Small 0.891 0.548 0.891 0.862 0.362 0.891 0.891 0.367 0.891 0.849 0.526 0.918 0.535 0.690 0.946 0.179
+Regnet X16GF 0.855 0.294 0.855 0.781 0.322 0.855 0.855 0.307 0.855 0.817 0.489 0.891 0.483 0.655 0.928 0.111
+[36] X32GF 0.872 0.370 0.872 0.808 0.346 0.872 0.872 0.341 0.872 0.834 0.511 0.904 0.514 0.676 0.936 0.155
+X400MF 0.844 0.358 0.844 0.808 0.353 0.844 0.844 0.353 0.844 0.825 0.520 0.883 0.530 0.687 0.922 0.217
+X800MF 0.855 0.487 0.855 0.804 0.377 0.855 0.855 0.396 0.855 0.826 0.527 0.891 0.515 0.677 0.928 0.175
+X8GF 0.850 0.349 0.850 0.802 0.346 0.850 0.850 0.344 0.850 0.824 0.510 0.887 0.512 0.675 0.925 0.174
+Y16GF 0.875 0.398 0.875 0.820 0.355 0.875 0.875 0.357 0.875 0.840 0.523 0.906 0.537 0.691 0.937 0.199
+123International Journal of Legal MedicineTable 5 continued
+Architecture V ariant ACC Precision Recall F1-Score AUC Speciﬁcity
+M m WM m WM m WM m WM m W
+Y32GF 0.864 0.659 0.864 0.814 0.380 0.864 0.864 0.407 0.864 0.830 0.526 0.898 0.509 0.673 0.932 0.154
+Y400MF 0.869 0.333 0.869 0.798 0.336 0.869 0.869 0.326 0.869 0.829 0.505 0.902 0.512 0.675 0.934 0.155
+Y800MF 0.880 0.531 0.880 0.819 0.387 0.880 0.880 0.404 0.880 0.840 0.536 0.910 0.529 0.686 0.940 0.178
+Y8GF 0.861 0.324 0.861 0.794 0.333 0.861 0.861 0.323 0.861 0.825 0.502 0.895 0.507 0.672 0.930 0.154
+ResNet 152 0.925 0.810 0.925 0.917 0.637 0.925 0.925 0.701 0.925 0.917 0.733 0.944 0.745 0.830 0.962 0.566
+[37] 101 0.914 0.813 0.914 0.903 0.571 0.914 0.914 0.642 0.914 0.896 0.674 0.935 0.665 0.776 0.957 0.416
+50 0.911 0.862 0.911 0.898 0.617 0.911 0.911 0.696 0.911 0.896 0.696 0.933 0.663 0.775 0.955 0.415
+34 0.897 0.732 0.897 0.885 0.591 0.897 0.897 0.643 0.897 0.889 0.691 0.923 0.687 0.792 0.949 0.478
+18 0.914 0.557 0.914 0.887 0.449 0.914 0.914 0.479 0.914 0.892 0.613 0.935 0.665 0.776 0.957 0.415
+ShufﬂeNet V2x05 0.855 0.355 0.855 0.804 0.348 0.855 0.855 0.346 0.855 0.827 0.512 0.891 0.515 0.677 0.928 0.175
+[38] V2x10 0.877 0.411 0.877 0.830 0.374 0.877 0.877 0.380 0.877 0.849 0.544 0.908 0.570 0.713 0.939 0.263
+V2x15 0.869 0.337 0.869 0.797 0.336 0.869 0.869 0.326 0.869 0.828 0.502 0.902 0.501 0.668 0.934 0.134
+V2x20 0.880 0.379 0.880 0.810 0.340 0.880 0.880 0.330 0.880 0.834 0.506 0.910 0.508 0.672 0.940 0.135
+SqueezeNet 10 0.095 0.032 0.095 0.009 0.333 0.095 0.095 0.058 0.095 0.016 0.500 0.321 0.500 0.667 0.547 0.905
+[39] 11 0.886 0.295 0.886 0.785 0.333 0.886 0.886 0.313 0.886 0.832 0.500 0.914 0.500 0.667 0.943 0.114
+SwinT B 0.861 0.354 0.861 0.809 0.341 0.861 0.861 0.339 0.861 0.831 0.517 0.895 0.540 0.693 0.930 0.219
+[40] S 0.855 0.522 0.855 0.816 0.395 0.855 0.855 0.420 0.855 0.831 0.539 0.891 0.526 0.684 0.928 0.197
+T 0.872 0.727 0.872 0.840 0.410 0.872 0.872 0.449 0.872 0.845 0.553 0.904 0.546 0.697 0.936 0.219
+V2B 0.886 0.295 0.886 0.785 0.333 0.886 0.886 0.313 0.886 0.832 0.500 0.914 0.500 0.667 0.943 0.114
+V2S 0.861 0.405 0.861 0.826 0.376 0.861 0.861 0.384 0.861 0.841 0.542 0.895 0.561 0.707 0.930 0.262
+V2T 0.872 0.419 0.872 0.826 0.363 0.872 0.872 0.369 0.872 0.841 0.527 0.904 0.535 0.690 0.936 0.199
+VGG 11 0.905 0.666 0.905 0.889 0.466 0.905 0.905 0.514 0.905 0.884 0.613 0.929 0.639 0.759 0.953 0.372
+[41] 13 0.875 0.542 0.875 0.845 0.437 0.875 0.875 0.467 0.875 0.856 0.582 0.906 0.590 0.727 0.937 0.305
+16 0.864 0.392 0.864 0.825 0.378 0.864 0.864 0.381 0.864 0.843 0.546 0.898 0.573 0.715 0.932 0.282
+19 0.883 0.578 0.883 0.852 0.431 0.883 0.883 0.466 0.883 0.858 0.574 0.912 0.573 0.716 0.942 0.264
+ViT B16 0.838 0.342 0.838 0.801 0.342 0.838 0.838 0.340 0.838 0.819 0.510 0.879 0.517 0.678 0.919 0.195
+[42] B32 0.875 0.425 0.875 0.837 0.390 0.875 0.875 0.400 0.875 0.853 0.558 0.906 0.590 0.727 0.937 0.305
+L16 0.869 0.708 0.869 0.832 0.400 0.869 0.869 0.436 0.869 0.840 0.544 0.902 0.533 0.689 0.934 0.198
+L32 0.847 0.376 0.847 0.817 0.371 0.847 0.847 0.372 0.847 0.831 0.537 0.885 0.553 0.702 0.923 0.260
+Considering each metric separately, the best results in terms of maximum absolute value are boldfaced. Symbols M, m,a n d W illustrates macro, micro, and weighted, respectively
+123International Journal of Legal Medicine
+ited in samples due to the sensitivity and rarity of such data.
+Taking that into account, we implemented some techniques
+in the data preprocessing when creating the training pipeline
+for the investigated models.
+The main technique adopted in the scope of training
+data preparation was the data augmentation. The term “data
+augmentation” allude to procedures for building iterative
+sampling and optimization algorithms via the incorporation
+of unobserved data or latent variables. Its main goal is to
+increase the volume, quality and diversity of training data.
+In terms of the distribution of the target dataset, the greater
+the size, diversity, and representativeness of the training data,
+the more effectively the DL model performs on unseen data.
+It introduces variability into the training data, which helps
+prevent the model from memorizing speciﬁc features of the
+training set and overﬁtting. Augmentation techniques such as
+rotation, ﬂipping, and changes in brightness or contrast help
+the model become more robust to these variations, ensur-
+ing accurate identiﬁcation across different scenarios. On one
+hand, the variety of training samples should be ample enough
+for the model to manage various deviations in image appear-
+ance and even noisy target instances. On the other hand, this
+encourages the model to learn more generalizable features
+that are applicable to a wider range of forensic cases.
+In the context of this work, data augmentation helps in arti-
+ﬁcially increasing the size of the dataset, which is crucial for
+training deep learning models effectively. These techniques
+can help to balance the dataset by creating synthetic exam-
+ples of the minority classes, improving the model’s ability
+to recognize and classify all types of wounds and distances.
+However, there is a wide variety of augmentation techniques
+available in the literature [ 23], and choosing the appropriate
+set of augmentations for the problem can be quite chal-
+lenging. Speciﬁcally, we use 13 augmentation techniques,
+including variants of rotation, ﬂipping, cropping and resiz-
+ing, brightness and contrast adjustments, Gaussian noise,
+color jitter (changes in hue and saturation), elastic transfor-
+mations, and grayscale conversion. Examples results of these
+augmentation techniques are depicted in Fig. 2.
+The augmentation illustrated in Fig. 2 were chosen to han-
+dle variations that may occur in real-world forensic cases.
+Rotation, ﬂipping, and further geometric transformations
+such as SR can help the model learn to recognize wounds
+from different angles, making the model more adaptable to
+variations in the size and anatomical location of wounds.
+Elastic and afﬁne transformations can mimic the natural
+variability in skin and tissue appearance, making the model
+more robust to such changes. V arying the brightness and con-
+trast can help the model become robust to different lighting
+conditions that may be encountered in real-world foren-
+sic images taken from different crime scenes. Some noise
+and color augmentations such as ISOnoise, RBC, RGBShift,
+and Gaussian noise can make the model more resilient to
+image quality variations, such as those caused by differ-
+ent imaging equipment or environmental conditions. These
+augmentation techniques were discovered with AutoAulbu-
+ment [24], an AutoML tool that automatically searches for the
+best augmentation policies based on training data. Using the
+its classiﬁcation model, AutoAlbument provides a complete
+ready-to-use conﬁguration for the augmentation pipeline.
+After discovered these augmentation techniques set, they are
+then incorporated in the training procedure with the Albu-
+mentations framework [25].
+In practice, when using an augmentation library, it is
+essential that the quality of the synthetic samples does not
+deteriorate to a point of impairing performance on normal
+wound images. To avoid it, we combine synthetic examples
+with the original wound images rather than using only syn-
+thetic ones. The inclusion of the original preprocessed wound
+image sample was performed by adding the identity function
+as property in the Albumentations pipeline, which returns
+the image itself. This approach preserves the actual charac-
+teristics of the original data, ensuring that the model learns
+from authentic features and patterns present in the dataset.
+Original SR HF Blur CLAHE ET GN HS ISONoise RBC RGBShift ToGray Sharpen UnsharpShort
+Long
+Contact
+Exit
+Fig. 2 Examples of gunshot wounds images and some their augmented
+versions. First line corresponds to a close range entry, second line cor-
+responds to distance shot entry, third line presents the contact shot entry
+image, and the last line shows an example of exit gunshot wound. The
+results obtained from the used augmentation are depicted from left to
+right: the original (preprocessed) image, Safe Rotation (SR), Horizon-
+tal Flip (HF), blur, Contrast-Limited Adaptive Histogram Equalization
+(CLAHE), Elastic Transform (ET), Gaussian Noise (GN), Hue Sat-
+uration (HS), ISO noise, Random Brightness Constrast (RBC), gray
+representation of image (ToGray), sharpen, and unsharp mask
+123International Journal of Legal Medicine
+By combining original and augmented images, the model
+learns to recognize patterns from both the natural data dis-
+tribution and the variations introduced by augmentation. By
+using this combination of training data, the model receives
+balanced exposure to both real and augmented data, enhanc-
+ing its robustness to variations in real-world scenarios.
+After combining the training data, a data resampling strat-
+egy is implemented in order to further reduce the remaining
+imbalance after data augmentation. Particularly, a combina-
+tion of over- and under-sampling using Synthetic Minority
+Over-sampling Technique (SMOTE) and Edited Nearest
+Neighbours. (ENN) is applied for handling class imbalance
+with fewer noisy instances, leading to improved performance
+and robustness of ML models. It combines the oversam-
+pling of the minority class using SMOTE with the cleaning
+of the dataset using ENN [ 26]. This resampling strategy
+is implemented via Imbalanced-learn [ 27], an open-source
+Python library designed to handle imbalanced datasets in
+ML. Finally, the class weights are computed to train the
+TorchVision models.
+Experimental setup
+The experiments were performed on a Linux machine
+(Ubuntu 22.04 LTS) using an AI software system devel-
+oped by ourselves using the Python language (version 3.10).
+Computer hardware speciﬁcations included an Intel i7-8700
+CPU, 32GB of RAM, and an RTX 3090 GPU. The TorchVi-
+sion models are trained and tested separately. For each
+model and training round, 1000 epochs are used. The mod-
+els trained with a batch size of 16 include RegnetY128GF
+and ViTH14. The models trained with a batch size of
+32 include EfﬁcientnetB6, EfﬁcientnetB7, EfﬁcientnetV2L,
+RegnetY128GF, Squeezenet10, SwinTransformerT, Swin-
+TransformerS, SwinTransformerB, SwinTransformerV2T,
+SwinTransformerV2S, SwinTransformerV2B, ShufﬂeNetV
+2x20, ShufﬂeNetV2x15, ViTB16, ViTB32, ViTL16, ViTL32,
+ViTH14, and MaxVit. The remaining models not mentioned
+were trained with a batch size of 64. Early stopping with
+checkpointing is adopted to save the weights that perform
+best over the validation set during training.
+Two cross-validation approaches were used: holdout and
+k-fold. For both approaches, the protocol consists of splitting
+the database into two content-independent subsets - one sub-
+set for training and another for testing. To avoid overﬁtting,
+the training and test data are split considering stratiﬁcation
+based on the case number. This means that images associ-
+ated with cases used in the training subset are not used for
+testing, and vice versa. With this constraint, 80% of cases are
+randomly selected for training, and the remaining 20% are
+used for testing in holdout cross-validation. Similarly, strati-
+ﬁed grouped k-fold is adopted to ensure that each fold of the
+cross-validation procedure contains a balanced representa-
+tion of these groups, providing a more realistic evaluation of
+the model’s generalization capability. In this case, the groups
+used for stratiﬁcation correspond to the crime cases.
+We evaluate the performance of the tested models using
+regular classiﬁcation metrics. More precisely, the models
+were assessed according to the following metrics:
+ Accuracy (ACC): calculate the percentage of its correct
+predictions. It is deﬁned as follows
+Accuracy = TP + TN
+TP + FP + TN + FN .
+ Precision: because the accuracy score may have as draw-
+backs the imbalance problem and being uninformative as
+a standalone classiﬁcation metric, the precision measures
+the ability of a classiﬁer not to label as Positive a Negative
+sample. It is deﬁned as follows
+Precision = TP
+TP + FP .
+ Recall: it is a ratio of predictions of the Positive class that
+are Positive by ground truth to the total number of Positive
+samples. In other words, recall measures the ability of
+a classiﬁer to detect Positive samples. It is deﬁned as
+follows
+Recall = TP
+TP + FN .
+ F1-Score: it is the harmonic mean of precision and recall,
+representing both metrics in one score. The highest possi-
+ble value of an F-score is 1, indicating perfect precision
+and recall, and the lowest possible value is 0, if either
+precision or recall is zero. It is deﬁned as follows:
+F1-score = 2 × Precision × Recall
+Precision + Recall .
+ Speciﬁcity: it measures the ability of a classiﬁer to cor-
+rectly identify negative samples. It is calculated as the
+proportion of true negatives (TN) out of all actual nega-
+tives (TN + FP). Speciﬁcity is particularly useful when
+the cost of false positives is high, providing a comprehen-
+sive understanding of the performance of a classiﬁcation
+model. It is deﬁned as follows:
+Speciﬁcity = TN
+TN + FP
+ Area under the Curve (AUC) : it evaluates the per-
+formance of a classiﬁcation model by measuring the
+area under the Receiver Operating Characteristic (ROC)
+curve, which plots the True Positive Rate (sensitivity)
+123International Journal of Legal Medicine
+against the False Positive Rate (1 - speciﬁcity) at various
+threshold settings. The ROC curve is created by plotting
+the True Positive Rate (TPR) against the False Positive
+Rate (FPR) at various threshold settings. The AUC is then
+computed as the area under this ROC curve:
+AUC =
+∫
+1
+0
+TPRd (FPR )
+=
+n∑
+i=1
+( TPR i + FPR i
+2
+)
+· (FPR i − FPR i−1),
+where
+TPR = TP
+TP + FN and FPR = FP
+FP + TN ,
+are the ratio of true positives to all actual positives (also
+known as sensitivity) and the ratio of false positives to all
+actual negatives, respectively. Using the trapezoidal rule,
+n is the number of thresholds.
+In the context of evaluating classiﬁcation models, the
+above-described performance metrics can be aggregated
+with macro, micro, and weighted averages. Here is a brief
+overview of each:
+ Macro average calculates the metric (e.g., precision,
+recall, or F1-Score) for each class individually and then
+takes the average of these metrics. In other words, it treats
+all classes equally, regardless of their frequency as fol-
+lows:
+Macro /Phi1= 1
+C
+C∑
+i=1
+/Phi1i,
+where C is the number of classes and /Phi1i is the perfor-
+mance metric for class i.
+ Micro averageaggregates the contributions of all classes
+to compute the average metric. It treats each instance
+equally, regardless of class.
+ Weighted average calculates the metric for each class
+and then takes the average weighted by the number of
+instances in each class. It can be expressed as:
+Weighted /Phi1=
+∑
+C
+i=1(/Phi1i ×Number of Instances in Class i)
+∑C
+i=1 Number of Instances in Class i
+.
+Cross-validation
+In order to observe whether the ResNet152 results are stable,
+we conducted a K-fold cross-validation to ensure that this
+model is evaluated comprehensively and reliably. Using a
+boxplot to illustrate the k-fold cross-validation results is an
+effective way to visualize the distribution of the performance
+metrics across the different folds. The boxplot displays the
+median, quartiles, and potential outliers of the wound images,
+providing a clear summary of the results.
+Results
+In this study, 2,551 wound images were analyzed, primar-
+ily from male subjects (95.09%)(Table 1), with most images
+showing wounds located on the trunk (51.35%)(Table 3).
+The majority of the wounds were classiﬁed as entry wounds
+(1,883), with 668 exit wounds. In terms of MLSD, most entry
+wounds were classiﬁed as distant (85.45%), while close-
+range and contact wounds were less frequent (Table 2). The
+age distribution of the cases indicated a predominance of
+younger victims, with a mean age of approximately 27 years
+and a signiﬁcant skew towards individuals in their 20s (Fig.3a
+and b). These ﬁndings highlight key demographic and injury
+pattern trends in gunshot wound cases.
+Wound type classification
+Table 4 shows the accuracy, precision, recall and F1-score,
+AUC and speciﬁcity of would type classiﬁcation using a
+houldout approach. This table discriminates the performance
+in terms of neural network architectures and its variants pro-
+vided in the TorchVision library. In this table, the boldfaced
+values highlight the best model. Moreover, Table 4 shows
+the micro, macro, and weighted averages for each metric.
+From these results, we can notice that the results vary a lot
+for different models. However, it is noticeable that ResNet
+presents the best results. Among the variants of ResNet, the
+ResNet152 achieves the best performance for all metrics.
+Since The ResNet 152 achieved the highest values for 14 out
+of 16 evaluated metrics, we chose this model as the most
+suitable for wound type classiﬁcation.
+Figure 4a presents a boxplot with the results of the ResNet
+152’s wound type classiﬁcation metrics.
+Medico-legal shooting distance classification
+Similarly to what was done for the classiﬁcation of gun-
+shot wound types, the results for the detection of MLSD
+are presented in Table 5. The ResNet 152 achieved the high-
+est scores for the used metrics. The only exceptions were the
+macro precision values, which were higher for the ResNet 50
+version, and the weighted speciﬁcity indices, for which the
+SqueezeNet 10 version reached the highest mark. Figure 4b
+presents the distribution of ResNet 152 MLSD classiﬁcation
+metrics.
+123International Journal of Legal Medicine
+Fig. 3 Frequency of age at time of death
+Discussion
+This study marks a signiﬁcant advancement in forensic sci-
+ence as it is among the ﬁrst to employ DL tools to classify
+gunshot wound patterns with extensive labels such as entry
+and exit wounds and MLSD, utilizing a broad array of neural
+network architectures. Unique in its approach, this research
+utilizes a considerable dataset of forensic images captured
+during real crime scene investigations, a feat not matched
+by any previous work. The implementation of these method-
+ologies holds the potential to notably accelerate the pace of
+real criminal investigations by offering rapid, reliable analy-
+ses that enhance traditional forensic methods. Furthermore,
+the technology serves as an complementary tool for forensic
+experts during the crucial phases of examination and report
+drafting, promoting more accurate and informed decision-
+making.
+Clearly, for ethical reasons, conducting research with a
+completely controlled sample of gunshot wounds on human
+cadavers, like studies of Phelps in 1897 [ 43], is virtu-
+ally impractical. Therefore, many studies still use animal
+carcasses [ 17, 44, 45]. However, as much as these may
+approximate what is seen in humans, there are signiﬁcant
+differences [ 46] that could lead to the incorrect training of
+the ML model for future use in human cases.
+In this study, for classifying entry and exit gunshot wounds
+images, the use of ResNet152 achieved percentages, with
+the exception of the AUC results, closely align with those
+by Cheng et al. [ 16], which reported an accuracy of 87.99%,
+precision of 83.99%, recall of 87.71%, speciﬁcity of 88.19%,
+F1-score of 85.81% and AUC of 94.6% with a larger sam-
+ple, comprising 2,028 entry and 1,314 exit wound images.
+However, the images do not appear to have been obtained
+at crime scenes, but rather during necropsy examinations,
+123International Journal of Legal Medicine
+Fig. 4 Classiﬁcation performance for wound type (a) and shooting distance (b) using ResNet 152 over the k-folds
+which indicates a certain level of control over the captured
+images.
+Additionally, in shooting distance classiﬁcation, this study
+achieved a 92.48% accuracy rate using ResNet152. How-
+ever, despite the high accuracy, the sample imbalance may
+have negatively impacted other metrics, including recall and
+the F1-Score. While newer models like ViT and EfﬁcientNet
+offer advanced techniques and may perform exceptionally
+well in many scenarios, ResNet’s combination of residual
+connections, depth, pretraining, and optimization make it a
+robust choice for a wide range of tasks, including the MLSD
+classiﬁcation task. In contrast, Oura et al. [17] reached a 98%
+accuracy rate. However, this higher accuracy was probably
+facilitated by their use of a small, controlled sample compris-
+ing only 204 images in a laboratory setting. It is important to
+note that their study utilized pig carcasses instead of wound
+on humans corpses, which could affect the applicability of
+their ﬁndings to real-world forensic scenarios.
+With this, it becomes evident that one of the greatest chal-
+lenges in developing ML models for image categorization is
+acquiring a database with high-quality scientiﬁc data [ 47].
+Due to the sensitive content nature of the area, this chal-
+123International Journal of Legal Medicine
+lenge may be even greater in the forensic ﬁeld. Therefore,
+the photographs used in this study were taken by differ-
+ent individuals, under various environmental and exposure
+conditions, with a range of cameras, and in the routine
+circumstances of forensic work at crime scenes, where stan-
+dardization becomes virtually unfeasible. Given this, it is
+understood that a standardized database would not only mis-
+align with the realities of forensic work, where numerous
+factors can alter the characteristics of injuries, but also require
+an exhaustive effort.
+The challenge in standardizing a database of gunshot
+wound images is also evident in the discrepancy between
+the number of entry (1,883) and exit wounds (668). Logi-
+cally, for an exit wound to occur, there must inevitably be an
+entry wound. Additionally, in this study, inclusion criterion
+#5 required that bullets be lodged in the body. Therefore,
+it is expected that the number of entry wounds would sur-
+pass that of exit wounds. Furthermore, even with access to
+a database containing millions of images from crime scene
+investigations, the utility of this dataset was signiﬁcantly
+limited. Many images were related to other types of police
+incidents or featured different instruments (e.g., knives), had
+poor image quality, and faced restrictive criteria, all of which
+signiﬁcantly constrained the acquisition of a larger, more use-
+ful sample. Despite these limitations, the sample used in this
+study more accurately reﬂects the conditions forensic teams
+encounter in real-world scenarios and deviates from the labo-
+ratory standardization typical of other research [16, 17]. This
+approach enhances the practical relevance of the ﬁndings to
+real-world forensic investigations.
+In turn, the classiﬁcation of distance shooting is used in
+cases where the characteristics of close-range and contact
+shots are not present (examples: smoke pattern and tattoo-
+ing) [48] and typically occur at a distance range starting from
+18 inches-2 feet (0.45 to 0.60 meters) [ 5, 49]. Therefore, for
+MLSD classiﬁcation purposes, there is a tendency for the
+majority of injuries to be of the distance type, as per the sam-
+ple obtained (85.45%). Unfortunately, for these reasons, it
+was not possible to achieve a more uniform sample regard-
+ing the number of images available in each distance category.
+Depending on the location of the wound on the body, the
+characteristics displayed also change. The ﬂaccidity of the
+region, as well as its elasticity and density, are some of the
+factors that inﬂuence the appearance of the wounds [ 50–52].
+In the sample used, most of the wounds were located on the
+trunk (51.35%). However, even within the torso, there are
+quite distinct areas, such as the abdomen compared to the
+sternum area. In turn, given that the wounds analyzed are
+situated on the skin, age greatly affects the activity of colla-
+gen and, consequently, elasticity [ 53]. Since 66.67% of the
+cases and 70.29% of the images are from individuals below
+thirty years of age, it is expected that the effect of age on
+elasticity did not have a signiﬁcant inﬂuence. Finally, the
+differences in wounds due to sex, because of the arrange-
+ment of Langer’s lines, skin thickness, and fat accumulation
+locations [52], were minimized by having a sample predom-
+inantly composed of male victims (95.09%).
+In the ﬁeld of scientiﬁc inquiry, it is crucial to acknowl-
+edge that AI serves not as a replacement for human expertise
+but as a formidable ally. The intrinsic value of human
+judgment and knowledge proves irreplaceable, especially
+in interpreting complex contexts and making well-informed
+decisions. Therefore, it is imperative to employ AI sys-
+tems within forensic sciences as supportive instruments that
+enhance, rather than replace, the capabilities of forensic pro-
+fessionals [ 10, 47]. In real investigative scenarios, we can
+envision various applications, such as assisting pathologists
+in decision-making and accelerating criminal investigations.
+This approach ensures that the integration of AI into forensic
+practices augments the efﬁcacy and accuracy of inves-
+tigations, maintaining the indispensable balance between
+technological innovation and the nuanced understanding that
+only human experts can provide [ 47].
+Limitations
+This study presents signiﬁcant strides in computer vision for
+the classiﬁcation of gunshot wounds. However, while the
+dataset comprises images from actual forensic cases, there
+is a signiﬁcant imbalance in the number of images avail-
+able for each category of wounds, which could skew the
+accuracy of the model. Additionally, these images reﬂect a
+wide range of environmental and exposure conditions, con-
+tributing to variability in image quality that can affect the
+performance of the machine learning models. The imbal-
+ance in wound categories introduces potential selection bias,
+as certain types of wounds may be overrepresented, lead-
+ing to models that perform well on the training data but
+struggle with generalization. Furthermore, the study lacks
+external validation, as the models were primarily validated
+using a dataset from a single institution located at Federal
+District, Brazil. Future work should focus on testing the
+models across diverse populations to improve robustness. To
+enhance model performance further, exploring resampling
+and training strategies, such as Data Center Interpolation
+with Improved Sparrow Search Algorithm [ 54], as well as
+incorporating classical feature-engineered models like Hu
+Moments, Haralick texture features, and local binary pat-
+terns, could offer complementary approaches for improving
+the robustness and accuracy of the models under real-world
+forensic conditions.
+123International Journal of Legal Medicine
+Conclusions
+This study explored the use of ﬁfty-nine deep neural net-
+work architectures for classifying gunshot wound images
+from real crime cases, focusing on distinguishing between
+entry and exit wounds, as well as determining the MLSD
+in a forensic context. The ResNet152 architecture demon-
+strated superior performance in wound type classiﬁcation,
+achieving up to 86.90% accuracy, precision, recall, F1-score
+and speciﬁcity and an AUC of 82.09%. For MLSD, the same
+architecture reached an accuracy of 92.48%, precision, recall
+and F1-score up to 92.48%, AUC up to 94.36% and speciﬁty
+up to 96.24% , although sample imbalance affected the met-
+rics. Our ﬁndings underscore the challenges of standardizing
+wound images due to varying capture conditions, yet they
+reﬂect the practical realities of forensic work. This research
+highlights the signiﬁcant potential of deep neural networks
+in forensic pathology, advocating for AI as a supportive tool
+to enhance, not replace, human expertise, ensuring the bal-
+ance between technological innovation and expert judgment
+in forensic investigations.
+Acknowledgements This work was supported by the Fundação de
+Apoio a Pesquisa do Distrito Federal (FAP-DF), by the Coordenação de
+Aperfeiçoamento de Pessoal de Nível Superior (CAPES), the Conselho
+Nacional de Desenvolvimento Cientíﬁco e Tecnológico (CNPq), and
+by the University of Brasília (UnB).
+Author Contributions Author 1 took a lead role, overseeing the
+conceptualization of the study, data curation, resource management,
+investigation, and the preparation of the original draft. Authors 2, 3,
+and 4 were pivotal in data curation, ensuring that the necessary data for
+the study’s objectives were accurately collected and organized. Author
+5 contributed signiﬁcantly to the study’s conceptualization, developed
+the methodology, managed the software aspects, and participated in the
+writing and editing processes. Author 6 enhanced the research with soft-
+ware development, validation, and additional investigation. Authors 7
+and 8 played crucial roles in conceptualizing the project, supervising the
+research activities, managing the project, and reﬁning the manuscript
+through their critical review and editing, ensuring both the rigor and
+integrity of the study.
+Funding Sources This research did not receive any speciﬁc grant from
+funding agencies in the public, commercial, or not-for-proﬁt sectors.
+Data Availability The image dataset used in this paper is available
+at https://github.com/pedrogarciafreitas/FDCPUnBGunshotDB.git and
+the processed data used in the analysis were generated using the source
+code publicly available at https://gitlab.com/lisa-unb/leguwoi.git .
+Declarations
+The research involved the use of photographic records and reports from
+homicide and suicide cases handled by the PCDF in Brasília, Brazil.
+Proper authorization was obtained from the institution, and the study
+was approved by the Ethics Committee for Research at the University
+of Brasília under protocol number 54418221.9.0000.0030. As the study
+did not involve direct participation of individuals, consent to participate
+was not applicable.
+Competing Interest The authors have no competing interests to declare.
+References
+1. UNODC: Global study on homicide 2023. https://www.unodc.
+org/unodc/en/data-and-analysis/global-study-on-homicide.html .
+Accessed 08 Mar 2024
+2. Wisevoter: Gun deaths by country 2023. https://wisevoter.com/
+country-rankings/gun-deaths-by-country . Accessed 08 Mar 2024
+3. Kleypas DA, Badiye A (2024) Evidence collection vol 2, pp 113–
+116. https://pubmed.ncbi.nlm.nih.gov/28722882/
+4. Shrestha R, Kanchan T, Krishan K (2024) Gunshot wounds forensic
+pathology, pp 1–8. StatPearls Publishing, Treasure Island, Florida,
+United States. http://www.ncbi.nlm.nih.gov/pubmed/32310579
+5. Denton JS, Segovia A, Filkins JA (2006) Practical pathology of
+gunshot wounds. Arch Pathol Lab Med 130(9):1283–9. https://
+doi.org/10.5858/2006-130-1283-PPOGW
+6. Di Maio VJM (2015) Gunshot wounds: practical aspects of
+ﬁrearms, ballistics, and forensic techniques, 3rd edn. CRC Press,
+Boca Raton, Florida, United States, p 377
+7. Saukko PJ, Knight B (2016) Knight’s Forensic Pathology, 4th edn.
+CRC Press, Boca Raton, Florida, United States
+8. Adelson L (1961) A microscopic study of dermal gunshot wounds.
+Am J Clin Pathol 35(5):393–402. https://doi.org/10.1093/ajcp/35.
+5.393
+9. Dror IE, Pierce ML (2020) ISO standards addressing issues of bias
+and impartiality in forensic work. J Forensic Sci 65(3):800–808.
+https://doi.org/10.1111/1556-4029.14265
+10. V odanovi´c M, Subaši´cM ,M i l o š e v i ´cD ,G a l i ´cI ,B r k i ´c H (2023)
+Artiﬁcial intelligence in forensic medicine and forensic dentistry.
+J Forensic Odonto-Stomatol 41(2):30–41
+11. Tournois L, Trousset V , Hatsch D, Delabarde T, Ludes B, Lefèvre T
+(2023) Artiﬁcial intelligence in the practice of forensic medicine: a
+scoping review. Int J Legal Med. https://doi.org/10.1007/s00414-
+023-03140-9
+12. Lefèvre T, Tournois L (2023) Artiﬁcial intelligence and diagnostics
+in medicine and forensic science. Diagnostics 13(23):1–12.https://
+doi.org/10.3390/diagnostics13233554
+13. Wankhade TD, Ingale SW, Mohite PM, Bankar NJ (2022) Artiﬁ-
+cial intelligence in forensic medicine and toxicology: the future of
+forensic medicine. Cureus 14(8). https://doi.org/10.7759/cureus.
+28376
+14. Galante N, Cotroneo R, Furci D, Lodetti G, Casali MB (2022)
+Applications of artiﬁcial intelligence in forensic sciences: current
+potential beneﬁts, limitations and perspectives. Int J Legal Med
+445–458. https://doi.org/10.1007/s00414-022-02928-5
+15. Margagliotti G, Bollé T (2019) Machine learning & forensic
+science. Forensic Sci Int 298:138–139. https://doi.org/10.1016/j.
+forsciint.2019.02.045
+16. Cheng J, Schmidt C, Wilson A, Wang Z, Hao W, Pantanowitz
+J, Morris C, Tashjian R, Pantanowitz L (2024) Artiﬁcial intelli-
+gence for human gunshot wound classiﬁcation. J Pathol Inform
+15:100361. https://doi.org/10.1016/j.jpi.2023.100361
+17. Oura P , Junno A, Junno J-A (2021) Deep learning in forensic gun-
+shot wound interpretation—a proof-of-concept study. Int J Legal
+Med 135:2101–2106. https://doi.org/10.1007/s00414-021-02566-
+3
+18. Molina DK, Dimaio V , Cave R (2013) Gunshot wounds: a review of
+ﬁrearm type, range, and location as pertaining to manner of death.
+Am J Forensic Med Pathol 34:366–371. https://doi.org/10.1097/
+PAF.0000000000000065
+19. Marcel S, Rodriguez Y (2010) Torchvision the machine-vision
+package of torch. In: Bimbo AD, Chang S, Smeulders AWM (eds)
+Proceedings of the 18th international conference on multimedia
+123International Journal of Legal Medicine
+2010, Firenze, Italy, October 25-29, 2010, pp 1485–1488. Asso-
+ciation for Computing Machinery, New Y ork, New Y ork, United
+States. https://doi.org/10.1145/1873951.1874254
+20. Paszke A, Gross S, Massa F, Lerer A, Bradbury J, Chanan G,
+Killeen T, Lin Z, Gimelshein N, Antiga L, Desmaison A, Köpf
+A, Y ang EZ, DeVito Z, Raison M, Tejani A, Chilamkurthy S,
+Steiner B, Fang L, Bai J, Chintala S (2019) Pytorch: an imper-
+ative style, high-performance deep learning library. In: Wallach
+HM, Larochelle H, Beygelzimer A, d’Alché-Buc F, Fox EB,
+Garnett R (eds) Advances in neural information processing sys-
+tems 32: annual conference on neural information processing
+systems 2019, NeurIPS 2019, December 8-14, 2019, V ancouver,
+BC, Canada, pp 8024–8035. https://proceedings.neurips.cc/paper/
+2019/hash/bdbca288fee7f92f2bfa9f7012727740-Abstract.html
+21. Tietz M, Fan TJ, Nouri D, Bossan B (2017) skorch Developers:
+Skorch: a scikit-learn compatible neural network library that wraps
+PyTorch. https://skorch.readthedocs.io/en/stable/
+22. Buitinck L, Louppe G, Blondel M, Pedregosa F, Mueller A, Grisel
+O, Niculae V , Prettenhofer P , Gramfort A, Grobler J, Layton R,
+V anderPlas J, Joly A, Holt B, V aroquaux G (2013) Api design
+for machine learning software: experiences from the scikit-learn
+project, vol. abs/1309.0238. http://dblp.uni-trier.de/db/journals/
+corr/corr1309.html#BuitinckLBPMGNPGGL VJHV13
+23. Mumuni A, Mumuni F (2022) Data augmentation: A comprehen-
+sive survey of modern approaches. Array 16:100258. https://doi.
+org/10.1016/J.ARRA Y .2022.100258
+24. Hataya R, Zdenek J, Y oshizoe K, Nakayama H (2020) Faster
+autoaugment: learning augmentation strategies using backpropa-
+gation. In: V edaldi A, Bischof H, Brox T, Frahm J (eds) Computer
+Vision - ECCV 2020 - 16th European Conference, Glasgow, UK,
+August 23-28, 2020, Proceedings, Part XXV . Lecture Notes in
+Computer Science, vol 12370, pp 1–16. Springer, Cham, Switzer-
+land. https://doi.org/10.1007/978-3-030-58595-2_1
+25. Buslaev A, Iglovikov VI, Khvedchenya E, Parinov A, Druzhinin
+M, Kalinin AA (2020) Albumentations: fast and ﬂexible image
+augmentations. Information 11(2):125. https://doi.org/10.3390/
+INFO11020125
+26. Batista GEAPA, Prati RC, Monard MC (2004) A study of the
+behavior of several methods for balancing machine learning train-
+ing data. SIGKDD Explor 6(1):20–29. https://doi.org/10.1145/
+1007730.1007735
+27. Lemaître G, Nogueira F, Aridas CK (2017) Imbalanced-learn:
+a python toolbox to tackle the curse of imbalanced datasets in
+machine learning. J Mach Learn Res 18(17):1–5
+28. Krizhevsky A, Sutskever I, Hinton GE (2017) ImageNet classiﬁ-
+cation with deep convolutional neural networks. Commun ACM
+60(6):84–90. https://doi.org/10.1145/3065386
+29. Huang G, Liu Z, Maaten L, Weinberger KQ (2017) Densely con-
+nected convolutional networks, pp 2261–2269. https://doi.org/10.
+1109/CVPR.2017.243
+30. Tan M, Le QV (2019) Efﬁcientnet: rethinking model scaling for
+convolutional neural networks, vol 97, pp 6105–6114
+31. Tan M, Le QV (2021) Efﬁcientnetv2: smaller models and faster
+training, vol 139, pp 10096–10106
+3 2 . T uZ ,T a l e b iH ,Z h a n gH ,Y a n gF ,M i l a n f a rP ,B o v i kA C ,L iY
+(2022) Maxvit: multi-axis vision transformer, vol 13684, pp 459–
+479. https://doi.org/10.1007/978-3-031-20053-3_27
+33. Tan M, Chen B, Pang R, V asudevan V , Sandler M, Howard A,
+Le QV (2019) Mnasnet: platform-aware neural architecture search
+for mobile, pp 2820–2828. https://doi.org/10.1109/CVPR.2019.
+00293
+34. Sandler M, Howard AG, Zhu M, Zhmoginov A, Chen L (2018)
+Mobilenetv2: inverted residuals and linear bottlenecks, pp 4510–
+4520. https://doi.org/10.1109/CVPR.2018.00474
+35. Howard A, Pang R, Adam H, Le QV , Sandler M, Chen B, Wang W,
+Chen L, Tan M, Chu G, V asudevan V , Zhu Y (2019) Searching for
+mobilenetv3, pp 1314–1324. https://doi.org/10.1109/ICCV .2019.
+00140
+36. Radosavovic I, Kosaraju RP , Girshick RB, He K, Dollár P (2020)
+Designing network design spaces, pp 10425–10433. https://doi.
+org/10.1109/CVPR42600.2020.01044
+37. He K, Zhang X, Ren S, Sun J (2016) Deep residual learning
+for image recognition, pp 770–778.https://doi.org/10.1109/CVPR.
+2016.90
+38. Ma N, Zhang X, Zheng H, Sun J (2018) Shufﬂenet V2: practical
+guidelines for efﬁcient CNN architecture design, vol 11218, pp
+122–138. https://doi.org/10.1007/978-3-030-01264-9_8
+39. Iandola FN, Moskewicz MW, Ashraf K, Han S, Dally WJ, Keutzer
+K (2016) Squeezenet: Alexnet-level accuracy with 50x fewer
+parameters and <1mb model size. CoRR arXiv:1602.07360
+40. Liu Z, Lin Y , Cao Y , Hu H, Wei Y , Zhang Z, Lin S, Guo B (2021)
+Swin transformer: hierarchical vision transformer using shifted
+windows, pp 9992–10002. https://doi.org/10.1109/ICCV48922.
+2021.00986
+41. Simonyan K, Zisserman A (2015) V ery deep convolutional net-
+works for large-scale image recognition. In: Bengio Y , LeCun Y
+(eds) 3rd International Conference on Learning Representations,
+ICLR 2015, San Diego, CA, USA, May 7-9, 2015, Conference
+Track Proceedings. arXiv:1409.1556
+42. Dosovitskiy A, Beyer L, Kolesnikov A, Weissenborn D, Zhai X,
+Unterthiner T, Dehghani M, Minderer M, Heigold G, Gelly S,
+Uszkoreit J, Houlsby N (2021) An image is worth 16x16 words:
+transformers for image recognition at scale. In: International con-
+ference on learning representations. https://openreview.net/forum?
+id=YicbFdNTTy
+43. Phelps C (1897) Traumatic injuries of the brain and its membranes.
+Appleton, New Y ork, New Y ork, United States
+44. Pircher R, Preiß D, Pollak S, Thierauf-Emberger A, Perdekamp
+MG, Geisenberger D (2017) The inﬂuence of the bullet shape on
+the width of abrasion collars and the size of gunshot entrance holes.
+Int J Legal Med 131(2):441–445. https://doi.org/10.1007/s00414-
+016-1501-6
+45. Rainio J, Lalu K, Ranta H, Penttilä A (2003) Morphology of exper-
+imental assault riﬂe skin wounds. Int J Legal Med 117(1):19–26.
+https://doi.org/10.1007/s00414-002-0308-9
+46. Bartell TH, Mustoe TA (1989) Animal models of human tissue
+expansion. Plast Reconstr Surg 83(4):681–6. https://doi.org/10.
+1097/00006534-198904000-00014
+47. Piraianu AI, Fulga A, Musat CL, Ciobotaru OR, Poalelungi DG,
+Stamate E, Ciobotaru O, Fulga I (2023) Enhancing the evi-
+dence with algorithms: how artiﬁcial intelligence is transforming
+forensic medicine. Diagnostics 13(18). https://doi.org/10.3390/
+diagnostics13182992
+48. Smith JC (1964) Investigation of fatal gunshot wounds. Cleve-
+Marshall Law Rev 13(2):296–308
+49. Svensson A, Wendel O, Nicol JD (1965) Techniques of crime scene
+investigation. American Elsevier Publishing Company, New Y ork,
+New Y ork, United States
+50. Mahoney P , Carr D, Arm R, Gibb I, Hunt N, Delaney RJ (2017)
+Ballistic impacts on an anatomically correct synthetic skull with a
+surrogate skin/soft tissue layer. Int J Legal Med 1–12. https://doi.
+org/10.1007/s00414-017-1737-9
+51. Humphrey C, Kumaratilake J (2016) Ballistics and anatomical
+modelling – a review. Legal Med 23:21–29. https://doi.org/10.
+1016/j.legalmed.2016.09.002
+52. Ridge MD, Wright V (1966) The directional effects of skin. A
+bio-engineering study of skin with particular reference to Langer’s
+lines. J Investig Dermatol 46(4):341–346. https://doi.org/10.1038/
+jid.1966.54
+53. Maiden NR, Byard RW (2016) Unpredictable tensile strength
+biomechanics may limit thawed cadaver use for simulant
+123International Journal of Legal Medicine
+research. Aust J Forensic Sci 48(1):54–58.https://doi.org/10.1080/
+00450618.2015.1025842
+54. Gu Q, Tian J, Li X, Jiang S (2022) A novel random forest integrated
+model for imbalanced data classiﬁcation problem. Knowl-Based
+Syst 250:109050. https://doi.org/10.1016/j.knosys.2022.109050
+Publisher’s Note Springer Nature remains neutral with regard to juris-
+dictional claims in published maps and institutional afﬁliations.
+Springer Nature or its licensor (e.g. a society or other partner) holds
+exclusive rights to this article under a publishing agreement with the
+author(s) or other rightsholder(s); author self-archiving of the accepted
+manuscript version of this article is solely governed by the terms of such
+publishing agreement and applicable law.
+AuthorsandAﬃliations
+Renato Queiroz Nogueira Lira 1 · Luana Geovana Motta de Sousa 1 · Maisa Luana Memoria Pinho 1 ·
+Renan Cesar Pinto da Silva Andrade de Lima 1 · Pedro Garcia Freitas 2 · Bruno Scholles Soares Dias 3 ·
+Andreia Cristina Breda de Souza 4 · André Ferreira Leite 1
+B Renato Queiroz Nogueira Lira
+renato.lira@aluno.unb.br; renatolira@msn.com
+Luana Geovana Motta de Sousa
+luana.geovana@aluno.unb.br
+Maisa Luana Memoria Pinho
+maisa.pinho@aluno.unb.br
+Renan Cesar Pinto da Silva Andrade de Lima
+renan.lima@aluno.unb.br
+Pedro Garcia Freitas
+pedro.freitas@unb.br
+Bruno Scholles Soares Dias
+brunoscholles98@gmail.com
+Andreia Cristina Breda de Souza
+andreiacrisbreda@gmail.com
+André Ferreira Leite
+andreleite@unb.br
+1 Department of Dentistry, University of Brasília, Campus
+Darcy Ribeiro, Asa Norte, Brasília 70910-900, Distrito
+Federal, Brazil
+2 Department of Computer Science, University of Brasília,
+Campus Darcy Ribeiro, Asa Norte, Brasília 70910-900,
+Distrito Federal, Brazil
+3 Department of Electrical Engineering, University of Brasília,
+Campus Darcy Ribeiro, Asa Norte, Brasília 70910-900,
+Distrito Federal, Brazil
+4 Department of Forensic Dentistry and Public Health, Federal
+University of Rio de Janeiro, Cidade Universitária, Rio de
+Janeiro 21941-617, Rio de Janeiro, Brazil
+123

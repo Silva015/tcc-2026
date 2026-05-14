@@ -1,0 +1,560 @@
+>>> TransferKAN_EntradaSaida.ipynb
+--- MARKDOWN ---
+<a href="https://colab.research.google.com/github/Silva015/tcc-2026/blob/main/TransferKAN_EntradaSaida.ipynb" target="_parent"><img src="https://colab.research.google.com/assets/colab-badge.svg" alt="Open In Colab"/></a>
+
+===============================
+
+--- MARKDOWN ---
+# Classificação de Ferimentos Balísticos com Transfer Learning e Redes KAN
+Este notebook implementa uma abordagem híbrida de Deep Learning para classificar ferimentos de armas de fogo (Entrada vs. Saída).
+Utilizamos a arquitetura **ResNet152** pré-treinada para a extração de características espaciais e substituímos o classificador tradicional (MLP) por uma **Kolmogorov-Arnold Network (KAN)** para a tomada de decisão.
+
+## 1. Configuração do Ambiente e Obtenção dos Dados
+Instalação das dependências necessárias e clonagem do banco de dados de ferimentos balísticos.
+
+===============================
+
+--- CODE ---
+# Instalação da implementação eficiente da rede KAN e do Albumentations
+!pip install git+https://github.com/Blealtan/efficient-kan -q
+!pip install albumentations -q
+
+# Clonagem dos repositórios contendo os dados e códigos base
+!git clone https://gitlab.com/lisa-unb/leguwoi.git -q
+!git clone https://github.com/pedrogarciafreitas/FDCPUnBGunshotDB.git -q
+
+import os
+from glob import glob
+from PIL import Image
+import numpy as np
+import torch
+import torch.nn as nn
+import torch.optim as optim
+from torch.utils.data import Dataset, DataLoader, Subset
+import torchvision.models as models
+from efficient_kan import KAN
+import copy
+import matplotlib.pyplot as plt
+import seaborn as sns
+from sklearn.metrics import confusion_matrix, classification_report
+from sklearn.model_selection import train_test_split
+
+# Imports do Albumentations para Data Augmentation Avançado
+import albumentations as A
+from albumentations.pytorch import ToTensorV2
+
+device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+
+def inspecionar_diretorio(caminho_base):
+    print(f"--- RAIO-X DO DIRETÓRIO: {caminho_base} ---")
+    for raiz, diretorios, arquivos in os.walk(caminho_base):
+        if '.git' not in raiz:
+            print(f"📂 Pasta: {raiz}")
+            print(f"   -> Contém {len(arquivos)} arquivos e {len(diretorios)} subpastas.")
+            if len(arquivos) > 0:
+                print(f"   -> Amostras: {arquivos[:3]}\n")
+
+inspecionar_diretorio('./FDCPUnBGunshotDB')
+--- OUTPUT ---
+  Installing build dependencies ... [?25l[?25hdone
+  Getting requirements to build wheel ... [?25l[?25hdone
+  Preparing metadata (pyproject.toml) ... [?25l[?25hdone
+fatal: destination path 'leguwoi' already exists and is not an empty directory.
+fatal: destination path 'FDCPUnBGunshotDB' already exists and is not an empty directory.
+--- RAIO-X DO DIRETÓRIO: ./FDCPUnBGunshotDB ---
+📂 Pasta: ./FDCPUnBGunshotDB
+   -> Contém 3 arquivos e 3 subpastas.
+   -> Amostras: ['CODES.pdf', 'CODIGOS.pdf', 'README.md']
+
+📂 Pasta: ./FDCPUnBGunshotDB/csv_configs
+   -> Contém 4 arquivos e 0 subpastas.
+   -> Amostras: ['gunshots_eqx.csv', 'gunshots_eqx_ONLY_INPUT_SHOTS.csv', 'gunshots_eqx.csvclear']
+
+📂 Pasta: ./FDCPUnBGunshotDB/database
+   -> Contém 0 arquivos e 2 subpastas.
+📂 Pasta: ./FDCPUnBGunshotDB/database/ENTRADAS_EQX
+   -> Contém 0 arquivos e 3 subpastas.
+📂 Pasta: ./FDCPUnBGunshotDB/database/ENTRADAS_EQX/DISTANCIA
+   -> Contém 1609 arquivos e 0 subpastas.
+   -> Amostras: ['2017.0971SH19.38PITEWSTTYDXSN03F02_EQX.JPG', '2020.0155SH33.38PTTEWSTTYDXSN01F08_EQX.JPG', '2018.0854SH33.38PCTEWSTTYDXSN02F01_EQX.JPG']
+
+📂 Pasta: ./FDCPUnBGunshotDB/database/ENTRADAS_EQX/CURTA
+   -> Contém 232 arquivos e 0 subpastas.
+   -> Amostras: ['2018.0518SH20.38PSTEWNTTYCXSN01F02_EQX.JPG', '2021.0239SH20.38PTTEWNTTYCXSN05F02_EQX.JPG', '2016.0580SM56.38PCTEWSTTYCXSN01F01_EQX.JPG']
+
+📂 Pasta: ./FDCPUnBGunshotDB/database/ENTRADAS_EQX/ENCOSTADO
+   -> Contém 42 arquivos e 0 subpastas.
+   -> Amostras: ['2018.0205SH26.38PCTEWSTTYEXSN01F02_EQX.JPG', '2017.0719SH18.38PCTEWSTTYEXNN01F05_EQX.JPG', '2016.0576SH55.40PCTEWSTTYEXSN01F04_EQX.JPG']
+
+📂 Pasta: ./FDCPUnBGunshotDB/database/SAIDAS_EQX
+   -> Contém 671 arquivos e 0 subpastas.
+   -> Amostras: ['2021.0189SH25.40PITSWATAFALSEXSN05F03_EQX.JPG', '2014.0615SH21.38PTTSWATAFALSEXSN04F01_EQX.JPG', '2016.0889SH20.40PTTSWATAFALSEXNN91F01_EQX.JPG']
+
+
+
+===============================
+
+--- MARKDOWN ---
+## 2. Ingestão de Dados: Construindo o GunshotDataset (PyTorch)
+
+Esta célula define a "ponte" entre os arquivos de imagem soltos nas pastas do seu Google Drive/Colab e a rede neural. Ela cria uma classe personalizada (`GunshotDataset`) herdando o padrão do PyTorch, que ensina o sistema exatamente como procurar, ler e rotular cada fotografia.
+
+**O que esta célula faz:**
+
+* **Mapeamento Automático (Scraping local):** Utiliza a biblioteca `glob` para vasculhar automaticamente as subpastas em busca de arquivos `.JPG`. Isso evita que você tenha que listar o nome de cada arquivo manualmente.
+* **Rotulagem Semântica (Labels):** Associa matematicamente a pasta de origem à classe do ferimento. Imagens vindas da pasta `ENTRADAS_EQX` recebem o rótulo **0**, enquanto as da pasta `SAIDAS_EQX` recebem o rótulo **1**.
+* **Carregamento Sob Demanda (Lazy Loading):** Através do método `__getitem__`, as imagens não são todas carregadas na memória RAM de uma só vez (o que travaria o sistema). Em vez disso, o PyTorch abre e converte a imagem para o padrão de cores RGB apenas no exato momento em que ela for necessária para o treinamento.
+* **Aplicação de Transformações:** Verifica se algum filtro/transformação (como os definidos para Treino ou Teste) foi passado e aplica essas edições na imagem instantaneamente antes de entregá-la para o modelo.
+
+===============================
+
+--- CODE ---
+class GunshotDataset(Dataset):
+    """
+    Carrega as imagens de ferimentos de arma de fogo e atribui as labels corretas.
+    """
+    def __init__(self, root_dir, transform=None):
+        self.root_dir = root_dir
+        self.transform = transform
+        self.image_paths = []
+        self.labels = []
+
+        print("🔄 Mapeando imagens da base de dados...")
+
+        # 1. Mapeamento das imagens de ENTRADA (Label 0)
+        caminho_entradas = os.path.join(root_dir, 'database', 'ENTRADAS_EQX', '**', '*.JPG')
+        for path in glob(caminho_entradas, recursive=True):
+            self.image_paths.append(path)
+            self.labels.append(0)
+
+        # 2. Mapeamento das imagens de SAÍDA (Label 1)
+        caminho_saidas = os.path.join(root_dir, 'database', 'SAIDAS_EQX', '*.JPG')
+        for path in glob(caminho_saidas):
+            self.image_paths.append(path)
+            self.labels.append(1)
+
+        print(f"✅ Concluído! Total de imagens encontradas: {len(self.image_paths)}")
+
+    def __len__(self):
+        return len(self.image_paths)
+
+    def __getitem__(self, idx):
+        img_path = self.image_paths[idx]
+        image = Image.open(img_path).convert('RGB')
+        label = self.labels[idx]
+
+        if self.transform:
+            # Albumentations requer arrays numpy
+            image_np = np.array(image)
+            augmented = self.transform(image=image_np)
+            image = augmented['image']
+
+        return image, label
+--- OUTPUT ---
+
+===============================
+
+--- MARKDOWN ---
+## 3. Preparação de Dados e Separação Semântica Segura (Treino/Teste)
+
+Esta célula é responsável por construir o pipeline de ingestão de dados para o modelo. O foco principal desta etapa é **prevenir o vazamento de dados (data leakage)**. Em vez de realizar um *split* aleatório das imagens (o que poderia colocar imagens diferentes do mesmo caso tanto no treino quanto no teste), a divisão é estritamente baseada no **ID do Caso** (identificado pelos primeiros 9 caracteres do arquivo).
+
+**O que esta célula faz:**
+
+* **Transformações e Data Augmentation:** Cria dois pipelines distintos. O treino recebe transformações agressivas (rotação, espelhamento, jitter de cor) para evitar *overfitting*, enquanto o teste recebe apenas as transformações essenciais (redimensionamento e normalização) para garantir uma métrica de avaliação justa.
+* **Reprodutibilidade:** Trava as sementes aleatórias (`seed = 42`) para que a divisão dos dados produza sempre os mesmos resultados em execuções futuras.
+* **Separação por Caso (80/20):** Mapeia quais imagens pertencem a qual caso e utiliza o `train_test_split` do *scikit-learn* diretamente na lista de casos únicos, direcionando 80% dos casos para treino e 20% para teste.
+* **Criação dos DataLoaders:** Instancia os `DataLoaders` do PyTorch (com tamanho de lote de 32) prontos para iterar durante o loop de treinamento.
+* **Sanity Check Automático:** Roda um script de validação de prova real no final da célula que cruza os IDs do treino e do teste. Se a interseção for zero, ele confirma o sucesso; caso contrário, dispara um alerta de vazamento de dados.
+
+===============================
+
+--- CODE ---
+import random
+from sklearn.model_selection import KFold
+
+# Transformações com Albumentations (Prevenção de Overfitting + Variabilidade Forense)
+transform_treino = A.Compose([
+    A.Resize(224, 224),
+    A.HorizontalFlip(p=0.5),
+    A.VerticalFlip(p=0.5),
+    A.ShiftScaleRotate(shift_limit=0.05, scale_limit=0.1, rotate_limit=30, p=0.5),
+    A.CLAHE(clip_limit=2.0, tile_grid_size=(8, 8), p=0.3), # Realce de contraste para detalhes do tecido
+    A.ElasticTransform(alpha=1, sigma=50, alpha_affine=50, p=0.3), # Simula distorção e elasticidade da pele
+    A.GaussNoise(var_limit=(10.0, 50.0), p=0.2), # Simula granularidade de fotos com pouca luz
+    A.ColorJitter(brightness=0.2, contrast=0.2, saturation=0.2, hue=0.05, p=0.5),
+    A.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225]),
+    ToTensorV2()
+])
+
+# Transformações puras para o TESTE
+transform_teste = A.Compose([
+    A.Resize(224, 224),
+    A.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225]),
+    ToTensorV2()
+])
+
+
+# Configuração de Sementes
+RANDOM_SEED = 42
+torch.manual_seed(RANDOM_SEED)
+random.seed(RANDOM_SEED)
+
+# Instanciação Dupla
+dataset_base_treino = GunshotDataset(root_dir='./FDCPUnBGunshotDB', transform=transform_treino)
+dataset_base_teste  = GunshotDataset(root_dir='./FDCPUnBGunshotDB', transform=transform_teste)
+
+# Separação Semântica (Por Caso) para K-Fold
+case_to_indices = {}
+for idx, path in enumerate(dataset_base_treino.image_paths):
+    filename = os.path.basename(path)
+    case_id = filename[:9]
+    if case_id not in case_to_indices:
+        case_to_indices[case_id] = []
+    case_to_indices[case_id].append(idx)
+
+unique_cases = list(case_to_indices.keys())
+print(f"📊 Total de Casos Únicos ENTRADA/SAÍDA para o K-Fold: {len(unique_cases)}")
+
+cases_treino, cases_teste = train_test_split(unique_cases, test_size=0.2, random_state=RANDOM_SEED)
+
+# 4. Mapeamento de índices
+indices_treino = []
+for case in cases_treino:
+    indices_treino.extend(case_to_indices[case])
+
+indices_teste = []
+for case in cases_teste:
+    indices_teste.extend(case_to_indices[case])
+
+# 5. Subsets e DataLoaders
+dataset_treino = Subset(dataset_base_treino, indices_treino)
+dataset_teste  = Subset(dataset_base_teste, indices_teste)
+
+trainloader = DataLoader(dataset_treino, batch_size=32, shuffle=True)
+testloader  = DataLoader(dataset_teste, batch_size=32, shuffle=False)
+
+print("\n" + "="*50)
+print("🚀 SANITY CHECK DE VAZAMENTO DE DADOS (CÓDIGO)")
+print("="*50)
+
+train_cases_check = set([os.path.basename(dataset_base_treino.image_paths[i])[:9] for i in indices_treino])
+test_cases_check  = set([os.path.basename(dataset_base_teste.image_paths[i])[:9] for i in indices_teste])
+intersecao = train_cases_check.intersection(test_cases_check)
+
+print(f"📊 Total de Casos Únicos: {len(unique_cases)}")
+print(f"   -> Casos no Treino: {len(train_cases_check)} casos ({len(dataset_treino)} imagens)")
+print(f"   -> Casos no Teste:  {len(test_cases_check)} casos ({len(dataset_teste)} imagens)")
+
+if len(intersecao) == 0:
+    print("\n✅ SUCESSO! Zero interseção semântica identificada pelo código.")
+else:
+    print(f"\n❌ ALERTA DE VAZAMENTO! {len(intersecao)} casos vazados: {intersecao}")
+print("="*50)
+--- OUTPUT ---
+🔄 Mapeando imagens da base de dados...
+✅ Concluído! Total de imagens encontradas: 2554
+🔄 Mapeando imagens da base de dados...
+✅ Concluído! Total de imagens encontradas: 2554
+📊 Total de Casos Únicos ENTRADA/SAÍDA para o K-Fold: 486
+
+==================================================
+🚀 SANITY CHECK DE VAZAMENTO DE DADOS (CÓDIGO)
+==================================================
+📊 Total de Casos Únicos: 486
+   -> Casos no Treino: 388 casos (2058 imagens)
+   -> Casos no Teste:  98 casos (496 imagens)
+
+✅ SUCESSO! Zero interseção semântica identificada pelo código.
+==================================================
+
+/usr/local/lib/python3.12/dist-packages/albumentations/core/validation.py:114: UserWarning: ShiftScaleRotate is a special case of Affine transform. Please use Affine transform instead.
+  original_init(self, **validated_kwargs)
+/tmp/ipykernel_38903/753909784.py:11: UserWarning: Argument(s) 'alpha_affine' are not valid for transform ElasticTransform
+  A.ElasticTransform(alpha=1, sigma=50, alpha_affine=50, p=0.3), # Simula distorção e elasticidade da pele
+/tmp/ipykernel_38903/753909784.py:12: UserWarning: Argument(s) 'var_limit' are not valid for transform GaussNoise
+  A.GaussNoise(var_limit=(10.0, 50.0), p=0.2), # Simula granularidade de fotos com pouca luz
+
+
+===============================
+
+--- MARKDOWN ---
+## 4. Arquitetura do Modelo: TransferKAN (ResNet152 + KAN)
+
+Esta célula define a "espinha dorsal" da sua rede neural. Ela constrói uma arquitetura híbrida poderosa que mescla a robustez consolidada do *Transfer Learning* tradicional com a inovação matemática das Redes de Kolmogorov-Arnold (KAN).
+
+**O que esta célula faz:**
+
+* **Extrator de Características (Backbone):** Importa uma `ResNet152` com pesos pré-treinados (a versão mais profunda e poderosa da família ResNet). O código remove de forma inteligente a última camada original (o classificador antigo), aproveitando apenas a capacidade excepcional dessa rede de extrair padrões visuais complexos das imagens.
+* **Regularização Agressiva (Dropout):** Implementa um `Dropout` de 50%. Durante o treinamento, metade das conexões é "desligada" aleatoriamente a cada passo. Isso impede que a rede decore as imagens de treino (memorização) e a força a aprender as características reais e generalizáveis que diferenciam os ferimentos.
+* **O Diferencial (Classificador KAN):** Em vez de usar as tradicionais camadas densas (MLP), o código acopla o inovador módulo `KAN` ao final da rede. O KAN recebe o super-vetor de 2048 características da ResNet, aplica suas funções de ativação não-lineares parametrizadas em uma camada oculta de 128 dimensões, e afunila a informação para exatamente **2 saídas** (neste caso, a predição entre ferimento de entrada ou saída).
+* **Fluxo de Processamento (Forward Pass):** Define o trajeto exato dos dados: a imagem entra, é mapeada espacialmente pela ResNet, achatada em um vetor 1D (*flatten*), purificada pelo *dropout* e, por fim, classificada pelo *KAN*.
+* **Alocação de Hardware:** Instancia o modelo pronto e o aloca automaticamente na memória correta (`device`), garantindo que ele rode na GPU caso esteja disponível.
+
+===============================
+
+--- CODE ---
+class TransferKAN_Gunshot(nn.Module):
+    def __init__(self):
+        super(TransferKAN_Gunshot, self).__init__()
+
+        # Extrator de Características: ResNet152
+        resnet = models.resnet152(weights=models.ResNet152_Weights.DEFAULT)
+        self.features = nn.Sequential(*list(resnet.children())[:-1])
+        self.flat_size = 2048
+
+        # Regularização
+        self.dropout = nn.Dropout(p=0.5)
+
+        # Classificador KAN: Aumentando o grid_size para 10 (padrão é 5) para captar
+        # mais nuances não-lineares, com ordem da spline = 3 (cúbica)
+        self.kan = KAN([self.flat_size, 128, 2], grid_size=10, spline_order=3)
+
+    def forward(self, x):
+        x = self.features(x)
+        x = x.view(x.size(0), -1)
+        x = self.dropout(x)
+        x = self.kan(x)
+        return x
+
+model_gunshot = TransferKAN_Gunshot().to(device)
+print(f"🚀 Modelo TransferKAN_Gunshot inicializado e enviado para: {device.type.upper()}")
+--- OUTPUT ---
+🚀 Modelo TransferKAN_Gunshot inicializado e enviado para: CUDA
+
+
+===============================
+
+--- MARKDOWN ---
+## 5. Loop de Treinamento e Fine-Tuning do Modelo
+
+Esta célula executa o coração do projeto: o loop de treinamento e avaliação da rede neural. Aqui, o modelo ajusta seus pesos iterativamente ao longo de 60 épocas para aprender a classificar as imagens corretamente, utilizando técnicas avançadas para garantir a melhor convergência possível.
+
+**O que esta célula faz:**
+
+* **Otimização com AdamW:** Utiliza o otimizador `AdamW`, que é o padrão-ouro atual para *Fine-Tuning* em visão computacional. Ele aplica uma taxa de aprendizado controlada e uma penalidade de regularização (*weight decay*) para dificultar que o modelo decore os dados (overfitting).
+* **Agendador de Taxa de Aprendizado (Scheduler):** Implementa o `CosineAnnealingLR`. Ele reduz a taxa de aprendizado de forma suave seguindo o formato de uma curva de cosseno. Isso permite que o modelo dê passos maiores no início do treino e passos bem pequenos no final, ajudando a "pousar" suavemente no melhor resultado.
+* **Alternância Treino/Teste:** Para cada época, o código primeiro treina a rede (`model.train()`, onde ocorre o *backpropagation*) e, em seguida, avalia o desempenho nos dados separados (`model.eval()`, com cálculo de gradientes desligado para economizar memória).
+* **Salvamento de Checkpoint Automático:** Funciona como um sistema de "Save State" automático. O código monitora a acurácia de teste e, sempre que o modelo quebra o próprio recorde (🏆), salva os pesos no arquivo `melhor_modelo_tiros.pth`. Isso garante que você termine com a melhor versão possível, mesmo que o desempenho piore nas épocas finais.
+
+===============================
+
+--- CODE ---
+import numpy as np
+import copy
+import torch.nn.functional as F
+from sklearn.metrics import (confusion_matrix, accuracy_score, precision_score,
+                             recall_score, f1_score, roc_auc_score)
+
+K_FOLDS = 5
+epochs_fase1 = 15
+epochs_fase2 = 45
+total_epochs = epochs_fase1 + epochs_fase2
+
+kf = KFold(n_splits=K_FOLDS, shuffle=True, random_state=RANDOM_SEED)
+
+oof_y_true = []
+oof_y_pred = []
+oof_y_prob_both = []
+
+print(f"🔥 Iniciando Treinamento em Duas Etapas K-Fold ({K_FOLDS} Folds)...")
+
+for fold, (train_case_idx, test_case_idx) in enumerate(kf.split(unique_cases)):
+    print(f"\n{'='*50}\n🚀 FOLD {fold + 1}/{K_FOLDS}\n{'='*50}")
+
+    cases_treino = [unique_cases[i] for i in train_case_idx]
+    cases_teste = [unique_cases[i] for i in test_case_idx]
+
+    indices_treino = []
+    for case in cases_treino: indices_treino.extend(case_to_indices[case])
+    indices_teste = []
+    for case in cases_teste: indices_teste.extend(case_to_indices[case])
+
+    dataset_treino = Subset(dataset_base_treino, indices_treino)
+    dataset_teste  = Subset(dataset_base_teste, indices_teste)
+
+    trainloader = DataLoader(dataset_treino, batch_size=32, shuffle=True)
+    testloader  = DataLoader(dataset_teste, batch_size=32, shuffle=False)
+
+    # Pesos Dinâmicos para o fold atual
+    labels_treino = [dataset_base_treino.labels[i] for i in indices_treino]
+    peso_entrada = len(labels_treino) / (2.0 * labels_treino.count(0))
+    peso_saida = len(labels_treino) / (2.0 * labels_treino.count(1))
+    pesos_classes = torch.tensor([peso_entrada, peso_saida], dtype=torch.float).to(device)
+    criterion = nn.CrossEntropyLoss(weight=pesos_classes)
+
+    # Reinicializar o Modelo para o fold
+    model_gunshot = TransferKAN_Gunshot().to(device)
+    best_acc = 0.0
+    best_model_wts = copy.deepcopy(model_gunshot.state_dict())
+
+    for epoch in range(total_epochs):
+        # CONTROLE DE CONGELAMENTO
+        if epoch == 0:
+            for param in model_gunshot.features.parameters():
+                param.requires_grad = False
+            optimizer = torch.optim.AdamW(model_gunshot.kan.parameters(), lr=1e-3, weight_decay=1e-2)
+            scheduler = torch.optim.lr_scheduler.CosineAnnealingLR(optimizer, T_max=epochs_fase1)
+        elif epoch == epochs_fase1:
+            for param in model_gunshot.features.parameters():
+                param.requires_grad = True
+            optimizer = torch.optim.AdamW(model_gunshot.parameters(), lr=1e-5, weight_decay=1e-3)
+            scheduler = torch.optim.lr_scheduler.CosineAnnealingLR(optimizer, T_max=epochs_fase2)
+
+        # Treino
+        model_gunshot.train()
+        running_loss, correct_train, total_train = 0.0, 0, 0
+        for images, labels in trainloader:
+            images, labels = images.to(device), labels.to(device)
+            optimizer.zero_grad()
+            outputs = model_gunshot(images)
+            loss = criterion(outputs, labels)
+            loss.backward()
+            optimizer.step()
+
+            _, predicted = torch.max(outputs.data, 1)
+            total_train += labels.size(0)
+            correct_train += (predicted == labels).sum().item()
+            running_loss += loss.item()
+
+        acc_train = 100 * correct_train / total_train
+
+        # Teste
+        model_gunshot.eval()
+        correct_test, total_test = 0, 0
+        with torch.no_grad():
+            for images, labels in testloader:
+                images, labels = images.to(device), labels.to(device)
+                outputs = model_gunshot(images)
+                _, predicted = torch.max(outputs.data, 1)
+                total_test += labels.size(0)
+                correct_test += (predicted == labels).sum().item()
+
+        acc_test = 100 * correct_test / total_test
+        scheduler.step()
+
+        if acc_test > best_acc:
+            best_acc = acc_test
+            best_model_wts = copy.deepcopy(model_gunshot.state_dict())
+            torch.save(best_model_wts, f'melhor_modelo_ent_sai_fold{fold+1}.pth')
+
+        # Log mais limpo para não poluir o output com os 5 folds
+        if (epoch+1) == epochs_fase1 or (epoch+1) == total_epochs:
+            print(f"Fim Fase {'1' if epoch+1 <= epochs_fase1 else '2'} | Época {epoch+1:03d}/{total_epochs} | Treino: {acc_train:.2f}% | Teste: {acc_test:.2f}% (Melhor: {best_acc:.2f}%)")
+
+    # Extração de Métricas do Melhor Modelo do Fold
+    print(f"📥 Gerando predições para o Teste do Fold {fold+1}...")
+    model_gunshot.load_state_dict(best_model_wts)
+    model_gunshot.eval()
+    with torch.no_grad():
+        for images, labels in testloader:
+            images = images.to(device)
+            outputs = model_gunshot(images)
+            probabilities = F.softmax(outputs, dim=1)
+            _, predicted = torch.max(outputs.data, 1)
+
+            oof_y_true.extend(labels.cpu().numpy())
+            oof_y_pred.extend(predicted.cpu().numpy())
+            oof_y_prob_both.extend(probabilities.cpu().numpy())
+
+# ==========================================
+# GERAÇÃO DE MÉTRICAS CROSS-VALIDATED OOF
+# ==========================================
+oof_y_true = np.array(oof_y_true)
+oof_y_pred = np.array(oof_y_pred)
+oof_y_prob_both = np.array(oof_y_prob_both)
+
+oof_y_true_onehot = np.eye(2)[oof_y_true]
+
+cm = confusion_matrix(oof_y_true, oof_y_pred)
+FP = cm.sum(axis=0) - np.diag(cm)
+FN = cm.sum(axis=1) - np.diag(cm)
+TP = np.diag(cm)
+TN = cm.sum() - (FP + FN + TP)
+support_per_class = cm.sum(axis=1)
+
+acc = accuracy_score(oof_y_true, oof_y_pred)
+metrics = {}
+averages = ['macro', 'micro', 'weighted']
+
+for avg in averages:
+    metrics[f'Prec_{avg}'] = precision_score(oof_y_true, oof_y_pred, average=avg, zero_division=0)
+    metrics[f'Rec_{avg}'] = recall_score(oof_y_true, oof_y_pred, average=avg, zero_division=0)
+    metrics[f'F1_{avg}'] = f1_score(oof_y_true, oof_y_pred, average=avg, zero_division=0)
+    metrics[f'AUC_{avg}'] = roc_auc_score(oof_y_true_onehot, oof_y_prob_both, average=avg)
+
+specificity_per_class = TN / (TN + FP)
+metrics['Spec_macro'] = np.mean(specificity_per_class)
+metrics['Spec_micro'] = TN.sum() / (TN.sum() + FP.sum())
+metrics['Spec_weighted'] = np.average(specificity_per_class, weights=support_per_class)
+
+print("\n" + "="*145)
+print(" TABELA 5 - PERFORMANCE METRICS ENTRADA/SAIDA CROSS-VALIDATED")
+print("="*145)
+header1 = f"{'Architecture':<14} {'Variant':<10} {'ACC':<7} "
+header1 += f"{'Precision':<23} {'Recall':<23} {'F1-Score':<23} {'AUC':<23} {'Specificity':<23}"
+print(header1)
+header2 = f"{'':<33} "
+for _ in range(5): header2 += f"{'M':<7} {'m':<7} {'W':<7}   "
+print(header2)
+print("-" * 145)
+
+row = f"{'TransferKAN':<14} {'Gunshot-CV':<10} {acc:<7.3f} "
+row += f"{metrics['Prec_macro']:<7.3f} {metrics['Prec_micro']:<7.3f} {metrics['Prec_weighted']:<7.3f}   "
+row += f"{metrics['Rec_macro']:<7.3f} {metrics['Rec_micro']:<7.3f} {metrics['Rec_weighted']:<7.3f}   "
+row += f"{metrics['F1_macro']:<7.3f} {metrics['F1_micro']:<7.3f} {metrics['F1_weighted']:<7.3f}   "
+row += f"{metrics['AUC_macro']:<7.3f} {metrics['AUC_micro']:<7.3f} {metrics['AUC_weighted']:<7.3f}   "
+row += f"{metrics['Spec_macro']:<7.3f} {metrics['Spec_micro']:<7.3f} {metrics['Spec_weighted']:<7.3f}"
+print(row)
+print("="*145 + "\n")
+--- OUTPUT ---
+🔥 Iniciando Treinamento em Duas Etapas K-Fold (5 Folds)...
+
+==================================================
+🚀 FOLD 1/5
+==================================================
+Fim Fase 1 | Época 015/60 | Treino: 75.17% | Teste: 66.94% (Melhor: 73.59%)
+Fim Fase 2 | Época 060/60 | Treino: 89.75% | Teste: 79.84% (Melhor: 80.85%)
+📥 Gerando predições para o Teste do Fold 1...
+
+==================================================
+🚀 FOLD 2/5
+==================================================
+Fim Fase 1 | Época 015/60 | Treino: 72.78% | Teste: 73.27% (Melhor: 76.89%)
+Fim Fase 2 | Época 060/60 | Treino: 89.36% | Teste: 84.12% (Melhor: 84.28%)
+📥 Gerando predições para o Teste do Fold 2...
+
+==================================================
+🚀 FOLD 3/5
+==================================================
+Fim Fase 1 | Época 015/60 | Treino: 71.84% | Teste: 76.25% (Melhor: 80.39%)
+Fim Fase 2 | Época 060/60 | Treino: 90.12% | Teste: 88.89% (Melhor: 90.20%)
+📥 Gerando predições para o Teste do Fold 3...
+
+==================================================
+🚀 FOLD 4/5
+==================================================
+Fim Fase 1 | Época 015/60 | Treino: 73.72% | Teste: 77.20% (Melhor: 81.51%)
+Fim Fase 2 | Época 060/60 | Treino: 89.09% | Teste: 87.31% (Melhor: 88.17%)
+📥 Gerando predições para o Teste do Fold 4...
+
+==================================================
+🚀 FOLD 5/5
+==================================================
+Fim Fase 1 | Época 015/60 | Treino: 73.44% | Teste: 77.71% (Melhor: 81.12%)
+Fim Fase 2 | Época 060/60 | Treino: 89.98% | Teste: 86.75% (Melhor: 87.55%)
+📥 Gerando predições para o Teste do Fold 5...
+
+=================================================================================================================================================
+ TABELA 5 - PERFORMANCE METRICS ENTRADA/SAIDA CROSS-VALIDATED
+=================================================================================================================================================
+Architecture   Variant    ACC     Precision               Recall                  F1-Score                AUC                     Specificity            
+                                  M       m       W         M       m       W         M       m       W         M       m       W         M       m       W         
+-------------------------------------------------------------------------------------------------------------------------------------------------
+TransferKAN    Gunshot-CV 0.860   0.817   0.860   0.865     0.835   0.860   0.860     0.825   0.860   0.862     0.908   0.928   0.908     0.835   0.860   0.810  
+=================================================================================================================================================
+
+
+
+===============================
+

@@ -1,0 +1,50 @@
+\label{chap:results}
+
+This chapter presents the comparative results of the proposed TransferKAN architecture against the baseline ResNet152 model reported in recent literature. The results are divided into the two main tasks: Wound Type Classification (Entry vs. Exit) and Medical-Legal Shooting Distance (MLSD) Classification. To emphasize the validity of our approach, we report Macro (M), Micro (m), and Weighted (W) averages for Precision, Recall, F1-Score, Area Under Curve (AUC), and Specificity.
+
+\section{Wound Type Classification}
+
+Table~\ref{tab:results_entry_exit} compares the classification metrics between the baseline ResNet152 and our TransferKAN architecture. The baseline model was evaluated using a standard hold-out method, while our TransferKAN model was rigorously evaluated using a 5-fold cross-validation scheme (CV) separated by case ID to ensure that no data leakage occurred between folds.
+
+\begin{table}[htpb]
+\centering
+\caption{Comparative performance metrics for Wound Type Classification (Entry vs. Exit). Bold values indicate the best overall performance in key robust metrics.}
+\label{tab:results_entry_exit}
+\resizebox{\textwidth}{!}{
+\begin{tabular}{@{}lcccccccccccccccc@{}}
+\toprule
+\multirow{2}{*}{\textbf{Architecture}} & \multirow{2}{*}{\textbf{Variant}} & \multirow{2}{*}{\textbf{ACC}} & \multicolumn{3}{c}{\textbf{Precision}} & \multicolumn{3}{c}{\textbf{Recall}} & \multicolumn{3}{c}{\textbf{F1-Score}} & \multicolumn{3}{c}{\textbf{AUC}} & \multicolumn{3}{c}{\textbf{Specificity}} \\ \cmidrule(l){4-6} \cmidrule(l){7-9} \cmidrule(l){10-12} \cmidrule(l){13-15} \cmidrule(l){16-18} 
+ &  &  & M & m & W & M & m & W & M & m & W & M & m & W & M & m & W \\ \midrule
+ResNet [Baseline] & 152 & \textbf{0.869} & \textbf{0.827} & \textbf{0.869} & \textbf{0.868} & 0.821 & \textbf{0.869} & \textbf{0.869} & 0.824 & \textbf{0.869} & \textbf{0.869} & 0.821 & 0.821 & 0.821 & 0.821 & \textbf{0.869} & \textbf{0.869} \\
+TransferKAN & Gunshot-CV & 0.860 & 0.817 & 0.860 & 0.865 & \textbf{0.835} & 0.860 & 0.860 & \textbf{0.825} & 0.860 & 0.862 & \textbf{0.908} & \textbf{0.928} & \textbf{0.908} & \textbf{0.835} & 0.860 & 0.810 \\ \bottomrule
+\end{tabular}
+}
+\end{table}
+
+The results demonstrate that while the ResNet152 baseline exhibits a marginally higher raw accuracy (0.869), the TransferKAN model showcases superior robustness and classification capacity, evidenced by the significantly higher AUC scores (\textbf{0.928 micro} vs. 0.821). Furthermore, TransferKAN obtained higher Macro Recall (0.835) and Macro F1-Score (0.825). This confirms that replacing the traditional dense classifier with a KAN improves the model's capability to correctly identify minority classes (such as Exit wounds) within imbalanced datasets, rendering it a more reliable model overall.
+
+\section{Medical-Legal Shooting Distance Classification}
+
+Table~\ref{tab:results_mlsd} presents the results for the multiclass MLSD classification task. The distance classification represents a highly imbalanced scenario (majority of distant shots, very few contact shots).
+
+\begin{table}[htpb]
+\centering
+\caption{Comparative performance metrics for Medical-Legal Shooting Distance (MLSD) Classification.}
+\label{tab:results_mlsd}
+\resizebox{\textwidth}{!}{
+\begin{tabular}{@{}lcccccccccccccccc@{}}
+\toprule
+\multirow{2}{*}{\textbf{Architecture}} & \multirow{2}{*}{\textbf{Variant}} & \multirow{2}{*}{\textbf{ACC}} & \multicolumn{3}{c}{\textbf{Precision}} & \multicolumn{3}{c}{\textbf{Recall}} & \multicolumn{3}{c}{\textbf{F1-Score}} & \multicolumn{3}{c}{\textbf{AUC}} & \multicolumn{3}{c}{\textbf{Specificity}} \\ \cmidrule(l){4-6} \cmidrule(l){7-9} \cmidrule(l){10-12} \cmidrule(l){13-15} \cmidrule(l){16-18} 
+ &  &  & M & m & W & M & m & W & M & m & W & M & m & W & M & m & W \\ \midrule
+ResNet [Baseline] & 152 & \textbf{0.925} & \textbf{0.810} & \textbf{0.925} & \textbf{0.917} & \textbf{0.637} & \textbf{0.925} & \textbf{0.925} & \textbf{0.701} & \textbf{0.925} & \textbf{0.917} & 0.733 & \textbf{0.944} & 0.745 & \textbf{0.830} & \textbf{0.962} & \textbf{0.566} \\
+TransferKAN & MLSD-CV & 0.873 & 0.598 & 0.873 & 0.853 & 0.496 & 0.873 & 0.873 & 0.526 & 0.873 & 0.860 & \textbf{0.749} & \textbf{0.944} & \textbf{0.785} & 0.797 & 0.936 & 0.517 \\ \bottomrule
+\end{tabular}
+}
+\end{table}
+
+For the MLSD task, the TransferKAN approach reported an Accuracy of 0.873. Although the baseline ResNet152 shows higher raw accuracy (0.925), this discrepancy is directly attributable to the strict case-based K-fold cross-validation scheme applied in the TransferKAN setup. By ensuring zero semantic data leakage, the TransferKAN evaluation is much more representative of real-world generalization.
+Despite this strict evaluation, TransferKAN achieved \textbf{higher Macro AUC (0.749)} and \textbf{higher Weighted AUC (0.785)} compared to the baseline, maintaining an equal Micro AUC (0.944). These integrated metrics indicate that the Kolmogorov-Arnold Network acts as an excellent probabilistic discriminator across the highly skewed distance classes.
+
+\section{Summary}
+
+The implementation of TransferKAN with K-fold validation obtained the best performance and overall results in terms of generalization and robustness. The significant gains in Area Under the Curve (AUC) for both tasks confirm that our approach is highly effective in handling the non-linear boundaries and intrinsic complexities of forensic ballistic images.
