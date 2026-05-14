@@ -1,9 +1,31 @@
 \label{chap:related}
 
-By placing Related Works as Chapter 3 (after the Background and before your Proposed Solution), you create a perfect "logical sandwich". 
+This chapter reviews the current literature concerning the application of artificial intelligence to forensic pathology, specifically focusing on the classification of gunshot wounds. It critically analyzes the state-of-the-art benchmark established by recent studies and identifies the architectural gaps that the proposed TransferKAN model aims to address.
 
-While Background chapter describes the theory of KAN, deep learning and Ballistics, this Related Works chapter is what other researchers have achieved using different AI for ballistics, and here is where they fell short.
+\section{AI in Forensic Pathology}
+\label{sec:ai_forensics}
 
-The ultimate purpose of this chapter is to find the "Gap." You analyze the Related Works to say: "Researcher X used CNNs, but they are too heavy for mobile forensic kits. Researcher Y used small datasets, but their accuracy was low." This allows you to conclude the chapter by saying: "Therefore, there is a need for a lightweight yet accurate model—which is what this TCC proposes in the next chapter."
+The integration of artificial intelligence into forensic sciences has been historically slower compared to clinical medicine. Initial studies in the domain predominantly utilized animal carcasses, such as pigs, to simulate human skin properties when analyzing gunshot wounds. While these controlled laboratory environments allowed for high classification accuracies, they lacked the extreme variability, contamination, and complex morphological alterations encountered in actual human crime scenes.
 
-Ex:~\cite{queiroz2025deep}.
+\section{The 2024 Benchmark Study}
+\label{sec:2024_benchmark}
+
+A significant breakthrough in the field was recently achieved by Lira et al. (2024) in their paper \textit{Deep learning-based human gunshot wounds classification}. This study was pioneering because it utilized a substantial, real-world forensic dataset---the FDCPUnBGunshotDB---comprising 2,551 digital photographs taken directly from crime scenes and autopsies by the Federal District Civil Police in Brazil. 
+
+The authors systematically evaluated 59 different deep learning architectures (including various iterations of EfficientNet, MobileNet, ViT, and ResNet) to perform two primary tasks: distinguishing between entry and exit wounds, and classifying the Medical-Legal Shooting Distance (MLSD).
+
+\subsection{Baseline Methodologies and Results}
+In their methodology, Lira et al. employed extensive data augmentation to combat the inherent imbalance of the dataset (e.g., 1,883 entry wounds versus only 668 exit wounds). They utilized a hold-out cross-validation approach and found that the \textbf{ResNet152} architecture demonstrated the superior overall performance across both tasks.
+\begin{itemize}
+    \item For the \textbf{Entry vs. Exit} binary classification, the ResNet152 achieved an accuracy of 86.90\% and an Area Under the Curve (AUC) of 82.09\%.
+    \item For the \textbf{MLSD} multiclass categorization, the same architecture achieved an impressive accuracy of 92.48\% and an AUC of up to 94.36\%.
+\end{itemize}
+
+\section{Identifying the Research Gap}
+\label{sec:research_gap}
+
+While the 2024 study established a robust benchmark and proved the viability of computer vision in real-world forensic investigations, a critical architectural limitation persists. 
+
+The state-of-the-art ResNet152 model, like all traditional CNNs evaluated in the benchmark, relies on a standard Multi-Layer Perceptron (MLP) for its final classification head. MLPs consist of dense linear layers followed by fixed, non-linear activation nodes. In scenarios involving highly imbalanced forensic datasets where visual features are obscured by noise, blood, and putrefaction, the rigid node-based activations of MLPs require massive amounts of parameters to successfully map highly complex, non-linear decision boundaries.
+
+The authors of the 2024 study noted that sample imbalance still negatively affected metrics such as precision and recall for minority classes. Therefore, there is a clear and pressing need for a lightweight yet highly expressive classification head that can better probabilistically discriminate these complex non-linear boundaries without exponentially increasing the dataset size. This gap forms the direct motivation for introducing Kolmogorov-Arnold Networks (KAN) as the classification head in this thesis.

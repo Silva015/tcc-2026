@@ -1,5 +1,51 @@
 \label{chap:background}
 
-The Background chapter (also known as Theoretical Framework) serves as the scientific foundation of your work. Its primary purpose is to prove that you aren't "reinventing the wheel" and that you have mastered the existing knowledge required to solve your problem.
+This chapter provides the essential theoretical foundation required to understand the interdisciplinary nature of this work, bridging forensic pathology and advanced artificial intelligence. It details the fundamental concepts of gunshot wound classification, the mechanisms of deep learning for computer vision, and the mathematical theory underlying Kolmogorov-Arnold Networks (KAN).
 
-Since you are bridging two very different fields (Forensics and Advanced AI/KAN), this chapter  will be crucial for your TCC.
+\section{Forensic Pathology of Gunshot Wounds}
+\label{sec:forensic_background}
+
+In forensic medicine, the accurate analysis of gunshot wounds is crucial for reconstructing the events of a crime scene. When a projectile strikes a human body, it produces a predictable set of morphological alterations that vary significantly depending on the firearm, the ammunition, and the distance from which it was fired.
+
+\subsection{Entry versus Exit Wounds}
+The most fundamental classification tasks involve distinguishing an entry wound from an exit wound.
+An entry wound is typically characterized by an \textit{abrasion ring} (a marginal rim of scraped skin), tissue inversion, and a generally regular, circular, or oval shape, depending on the angle of incidence. The physical properties of the skin being pushed inward by the bullet cause these specific signs.
+Conversely, an exit wound usually presents with everted (outward-turning) tissue, irregular or stellate (star-like) shapes, and the absence of an abrasion ring or gunshot residue, as the projectile pushes the tissue outward from within. 
+
+However, intermediate targets, skeletal deflections, and postmortem changes such as putrefaction can obscure these characteristics, making visual classification a highly complex task heavily reliant on expert forensic experience.
+
+\subsection{Medical-Legal Shooting Distance (MLSD)}
+Beyond distinguishing entry from exit, classifying the distance of the shot---the Medical-Legal Shooting Distance (MLSD)---is vital for legal investigations. MLSD is categorized based on macroscopic traces left by the combustion of gunpowder and primer components on the skin:
+\begin{itemize}
+    \item \textbf{Contact:} The muzzle of the firearm is pressed against the skin. These wounds often display a "muzzle imprint" and severe tissue lacerations due to expanding gases entering the subcutaneous layers.
+    \item \textbf{Close Range:} Fired from a short distance (typically less than 60 cm), these wounds exhibit \textit{tattooing} or \textit{stippling} (unburned powder grains embedded in the skin) and soot deposition around the entry hole.
+    \item \textbf{Distant:} Fired from a distance where gunpowder residues no longer reach the skin. The wound primarily shows the abrasion ring without surrounding soot or stippling.
+\end{itemize}
+
+\section{Deep Learning for Computer Vision}
+\label{sec:dl_background}
+
+Deep Learning (DL), a subset of machine learning, has revolutionized the field of Computer Vision by enabling computational models to automatically discover and extract the representations needed for feature detection from raw data. 
+
+\subsection{Convolutional Neural Networks (CNNs) and ResNet}
+Convolutional Neural Networks (CNNs) are the standard architecture for image classification. They utilize convolutional layers to extract hierarchical spatial features---from simple edges in the lower layers to complex semantic shapes in the deeper layers.
+
+A persistent issue in training deep CNNs is the vanishing gradient problem, where gradients become too small to update the weights effectively in early layers. The Residual Network (ResNet) architecture solved this by introducing "skip connections" (or residual blocks), which allow the gradient to bypass certain layers. ResNet152, a variant with 152 layers, represents a pinnacle of deep feature extraction, widely used as a robust backbone in transfer learning applications for medical and forensic imaging.
+
+Traditionally, the deep spatial features extracted by architectures like ResNet are flattened and passed through a Multi-Layer Perceptron (MLP)---composed of dense, fully connected linear layers followed by fixed non-linear activation functions (e.g., ReLU)---to produce the final class probabilities.
+
+\section{Kolmogorov-Arnold Networks (KAN)}
+\label{sec:kan_background}
+
+While MLPs have been the ubiquitous standard for the classification head in deep learning, they are fundamentally based on the Universal Approximation Theorem. Recently, a novel neural network architecture known as Kolmogorov-Arnold Networks (KAN) has been proposed, inspired by the Kolmogorov-Arnold representation theorem.
+
+\subsection{Theoretical Foundation}
+The Kolmogorov-Arnold representation theorem states that any multivariate continuous function can be represented as a finite composition of continuous functions of a single variable and the operation of addition. 
+
+In a traditional MLP, the network learns fixed weights (linear transformations) on the edges, and applies a fixed, predefined non-linear activation function (like ReLU or Sigmoid) at the nodes. 
+In stark contrast, a KAN flips this paradigm: it places \textit{learnable} non-linear activation functions on the \textit{edges} (connections) and simply sums them at the nodes. 
+
+\subsection{B-Splines and Parameter Efficiency}
+To make the edge functions learnable, KANs typically parameterize them using B-splines (Basis splines). A B-spline is a piecewise polynomial function that can flexibly adapt its shape to model highly complex, non-linear relationships. 
+
+Because every weight parameter in an MLP is replaced by a highly flexible spline function in a KAN, KANs generally require far fewer parameters to achieve the same or better mapping of complex decision boundaries. This makes them highly parameter-efficient and less prone to overfitting on imbalanced or relatively small datasets---a critical advantage for forensic computer vision, where obtaining thousands of perfectly standardized gunshot wound images is practically impossible.
