@@ -1,0 +1,437 @@
+>>> TransferKAN_MLSD.ipynb
+--- MARKDOWN ---
+<a href="https://colab.research.google.com/github/Silva015/tcc-2026/blob/main/TransferKAN_MLSD.ipynb" target="_parent"><img src="https://colab.research.google.com/assets/colab-badge.svg" alt="Open In Colab"/></a>
+
+===============================
+
+--- MARKDOWN ---
+# Classificação de Distância de Disparo (MLSD) com ResNet152 + KAN
+Este experimento adapta a rede KAN híbrida para classificar a distância de disparo (Medical-Legal Shooting Distance - MLSD) apenas em ferimentos de ENTRADA. As classes são:
+0: Encostado (Contact)
+1: Curta distância (Close range)
+2: À distância (Distant)
+
+===============================
+
+--- CODE ---
+# Instalação da implementação eficiente da rede KAN
+!pip install git+https://github.com/Blealtan/efficient-kan -q
+
+# Clonagem dos repositórios contendo os dados e códigos base
+!git clone https://gitlab.com/lisa-unb/leguwoi.git -q
+!git clone https://github.com/pedrogarciafreitas/FDCPUnBGunshotDB.git -q
+
+import os
+from glob import glob
+from PIL import Image
+import torch
+from torch.utils.data import Dataset, DataLoader, Subset
+import torchvision.transforms as transforms
+import torch.nn as nn
+import torchvision.models as models
+from efficient_kan import KAN
+import torch.optim as optim
+import copy
+import numpy as np
+import matplotlib.pyplot as plt
+import seaborn as sns
+from sklearn.model_selection import train_test_split
+from sklearn.metrics import confusion_matrix, classification_report
+import random
+import torch.nn.functional as F
+from sklearn.metrics import (accuracy_score, precision_score, recall_score,
+                             f1_score, roc_auc_score, confusion_matrix, classification_report)
+from sklearn.preprocessing import label_binarize
+
+
+device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+print(f"Executando no dispositivo: {device}")
+--- OUTPUT ---
+  Installing build dependencies ... [?25l[?25hdone
+  Getting requirements to build wheel ... [?25l[?25hdone
+  Preparing metadata (pyproject.toml) ... [?25l[?25hdone
+  Building wheel for efficient-kan (pyproject.toml) ... [?25l[?25hdone
+Executando no dispositivo: cuda
+
+
+===============================
+
+--- CODE ---
+class GunshotDistanceDataset(Dataset):
+    """
+    Carrega apenas imagens de ENTRADA e atribui labels de distância (0: Encostado, 1: Curta, 2: Distância).
+    """
+    def __init__(self, root_dir, transform=None):
+        self.root_dir = root_dir
+        self.transform = transform
+        self.image_paths = []
+        self.labels = []
+
+        print("🔄 Mapeando imagens de distâncias na base de dados...")
+
+        # 1. ENCOSTADO (Label 0)
+        caminho_encostado = os.path.join(root_dir, 'database', 'ENTRADAS_EQX', 'ENCOSTADO', '*.JPG')
+        for path in glob(caminho_encostado):
+            self.image_paths.append(path)
+            self.labels.append(0)
+
+        # 2. CURTA DISTÂNCIA (Label 1)
+        caminho_curta = os.path.join(root_dir, 'database', 'ENTRADAS_EQX', 'CURTA', '*.JPG')
+        for path in glob(caminho_curta):
+            self.image_paths.append(path)
+            self.labels.append(1)
+
+        # 3. À DISTÂNCIA (Label 2)
+        caminho_distancia = os.path.join(root_dir, 'database', 'ENTRADAS_EQX', 'DISTANCIA', '*.JPG')
+        for path in glob(caminho_distancia):
+            self.image_paths.append(path)
+            self.labels.append(2)
+
+        print(f"✅ Concluído! Total de imagens de ENTRADA encontradas: {len(self.image_paths)}")
+
+    def __len__(self):
+        return len(self.image_paths)
+
+    def __getitem__(self, idx):
+        img_path = self.image_paths[idx]
+        image = Image.open(img_path).convert('RGB')
+        label = self.labels[idx]
+
+        if self.transform:
+            image = self.transform(image)
+
+        return image, label
+--- OUTPUT ---
+
+===============================
+
+--- CODE ---
+from sklearn.model_selection import KFold
+import random
+
+# Transformações para o TREINO e TESTE
+transform_treino = transforms.Compose([
+    transforms.Resize((224, 224)),
+    transforms.RandomHorizontalFlip(),
+    transforms.RandomVerticalFlip(),
+    transforms.RandomRotation(30),
+    transforms.ColorJitter(brightness=0.2, contrast=0.2),
+    transforms.ToTensor(),
+    transforms.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225])
+])
+
+transform_teste = transforms.Compose([
+    transforms.Resize((224, 224)),
+    transforms.ToTensor(),
+    transforms.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225])
+])
+
+RANDOM_SEED = 42
+torch.manual_seed(RANDOM_SEED)
+random.seed(RANDOM_SEED)
+
+dataset_base_treino = GunshotDistanceDataset(root_dir='./FDCPUnBGunshotDB', transform=transform_treino)
+dataset_base_teste  = GunshotDistanceDataset(root_dir='./FDCPUnBGunshotDB', transform=transform_teste)
+
+# Separação Semântica (Por Caso/Paciente) para o K-Fold
+case_to_indices = {}
+for idx, path in enumerate(dataset_base_treino.image_paths):
+    filename = os.path.basename(path)
+    case_id = filename[:9] # Primeiros 9 caracteres
+    if case_id not in case_to_indices:
+        case_to_indices[case_id] = []
+    case_to_indices[case_id].append(idx)
+
+unique_cases = list(case_to_indices.keys())
+print(f"📊 Total de Casos Únicos de ENTRADA para o K-Fold: {len(unique_cases)}")
+--- OUTPUT ---
+🔄 Mapeando imagens de distâncias na base de dados...
+✅ Concluído! Total de imagens de ENTRADA encontradas: 1883
+🔄 Mapeando imagens de distâncias na base de dados...
+✅ Concluído! Total de imagens de ENTRADA encontradas: 1883
+📊 Total de Casos Únicos de ENTRADA para o K-Fold: 441
+
+
+===============================
+
+--- CODE ---
+class TransferKAN_MLSD(nn.Module):
+    def __init__(self):
+        super(TransferKAN_MLSD, self).__init__()
+
+        # 1. Extrator de Características: ResNet152
+        resnet = models.resnet152(weights=models.ResNet152_Weights.DEFAULT)
+        self.features = nn.Sequential(*list(resnet.children())[:-1])
+        self.flat_size = 2048
+
+        # 2. Regularização: Dropout de 50%
+        self.dropout = nn.Dropout(p=0.5)
+
+        # 3. Classificador KAN: 2048 -> 128 -> 3 (Três classes de distância)
+        self.kan = KAN([self.flat_size, 128, 3])
+
+    def forward(self, x):
+        x = self.features(x)
+        x = x.view(x.size(0), -1)
+        x = self.dropout(x)
+        x = self.kan(x)
+        return x
+
+model_mlsd = TransferKAN_MLSD().to(device)
+print(f"🚀 Modelo TransferKAN_MLSD inicializado e enviado para: {device.type.upper()}")
+--- OUTPUT ---
+Downloading: "https://download.pytorch.org/models/resnet152-f82ba261.pth" to /root/.cache/torch/hub/checkpoints/resnet152-f82ba261.pth
+
+100%|██████████| 230M/230M [00:01<00:00, 231MB/s]
+
+🚀 Modelo TransferKAN_MLSD inicializado e enviado para: CUDA
+
+
+===============================
+
+--- CODE ---
+import numpy as np
+import copy
+from sklearn.utils.class_weight import compute_class_weight
+from sklearn.metrics import (accuracy_score, precision_score, recall_score,
+                             f1_score, roc_auc_score, confusion_matrix, classification_report)
+from sklearn.preprocessing import label_binarize
+import torch.nn.functional as F
+
+K_FOLDS = 5
+epochs = 60
+kf = KFold(n_splits=K_FOLDS, shuffle=True, random_state=RANDOM_SEED)
+
+# Variáveis para armazenar as predições de todos os folds (Out-of-Fold)
+oof_y_true = []
+oof_y_pred = []
+oof_y_prob_both = []
+
+print(f"🔄 Iniciando K-Fold Cross-Validation ({K_FOLDS} Folds)...")
+
+for fold, (train_case_idx, test_case_idx) in enumerate(kf.split(unique_cases)):
+    print(f"\n{'='*50}\n🚀 FOLD {fold + 1}/{K_FOLDS}\n{'='*50}")
+
+    # 1. Separar casos do fold atual
+    cases_treino = [unique_cases[i] for i in train_case_idx]
+    cases_teste = [unique_cases[i] for i in test_case_idx]
+
+    indices_treino = []
+    for case in cases_treino: indices_treino.extend(case_to_indices[case])
+    indices_teste = []
+    for case in cases_teste: indices_teste.extend(case_to_indices[case])
+
+    dataset_treino = Subset(dataset_base_treino, indices_treino)
+    dataset_teste  = Subset(dataset_base_teste, indices_teste)
+
+    trainloader = DataLoader(dataset_treino, batch_size=32, shuffle=True)
+    testloader  = DataLoader(dataset_teste, batch_size=32, shuffle=False)
+
+    # 2. Recalcular pesos para o fold atual
+    train_labels = [dataset_base_treino.labels[i] for i in indices_treino]
+    class_weights = compute_class_weight(class_weight='balanced', classes=np.unique(train_labels), y=train_labels)
+    class_weights_tensor = torch.tensor(class_weights, dtype=torch.float).to(device)
+    criterion = nn.CrossEntropyLoss(weight=class_weights_tensor)
+
+    # 3. Reinicializar Modelo e Otimizadores para o fold
+    model_mlsd = TransferKAN_MLSD().to(device)
+    optimizer = torch.optim.AdamW(model_mlsd.parameters(), lr=1e-4, weight_decay=1e-2)
+    scheduler = torch.optim.lr_scheduler.CosineAnnealingLR(optimizer, T_max=epochs)
+
+    best_acc = 0.0
+    best_model_wts = copy.deepcopy(model_mlsd.state_dict())
+
+    # 4. Loop de Treinamento do Fold
+    for epoch in range(epochs):
+        model_mlsd.train()
+        running_loss, correct_train, total_train = 0.0, 0, 0
+
+        for images, labels in trainloader:
+            images, labels = images.to(device), labels.to(device)
+            optimizer.zero_grad()
+            outputs = model_mlsd(images)
+            loss = criterion(outputs, labels)
+            loss.backward()
+            optimizer.step()
+
+            _, predicted = torch.max(outputs.data, 1)
+            total_train += labels.size(0)
+            correct_train += (predicted == labels).sum().item()
+            running_loss += loss.item()
+
+        acc_train = 100 * correct_train / total_train
+
+        model_mlsd.eval()
+        correct_test, total_test = 0, 0
+        with torch.no_grad():
+            for images, labels in testloader:
+                images, labels = images.to(device), labels.to(device)
+                outputs = model_mlsd(images)
+                _, predicted = torch.max(outputs.data, 1)
+                total_test += labels.size(0)
+                correct_test += (predicted == labels).sum().item()
+
+        acc_test = 100 * correct_test / total_test
+        scheduler.step()
+
+        if acc_test > best_acc:
+            best_acc = acc_test
+            best_model_wts = copy.deepcopy(model_mlsd.state_dict())
+            torch.save(best_model_wts, f'melhor_modelo_mlsd_fold{fold+1}.pth')
+
+        if (epoch+1) % 10 == 0 or epoch == 0:
+            print(f"Época {epoch+1:03d}/{epochs} | Treino: {acc_train:.2f}% | Teste: {acc_test:.2f}% (Melhor: {best_acc:.2f}%)")
+
+    # 5. Avaliar o melhor modelo do fold e armazenar resultados globais
+    print(f"📥 Gerando predições para o Teste do Fold {fold+1}...")
+    model_mlsd.load_state_dict(best_model_wts)
+    model_mlsd.eval()
+    with torch.no_grad():
+        for images, labels in testloader:
+            images = images.to(device)
+            outputs = model_mlsd(images)
+            probabilities = F.softmax(outputs, dim=1)
+            _, predicted = torch.max(outputs.data, 1)
+
+            oof_y_true.extend(labels.cpu().numpy())
+            oof_y_pred.extend(predicted.cpu().numpy())
+            oof_y_prob_both.extend(probabilities.cpu().numpy())
+
+# ==========================================
+# CÁLCULO DE MÉTRICAS GLOBAIS (CROSS-VALIDATED)
+# ==========================================
+oof_y_true = np.array(oof_y_true)
+oof_y_pred = np.array(oof_y_pred)
+oof_y_prob_both = np.array(oof_y_prob_both)
+
+oof_y_true_bin = label_binarize(oof_y_true, classes=[0, 1, 2])
+classes = ['Encostado (0)', 'Curta (1)', 'Distância (2)']
+
+cm = confusion_matrix(oof_y_true, oof_y_pred)
+FP = cm.sum(axis=0) - np.diag(cm)
+FN = cm.sum(axis=1) - np.diag(cm)
+TP = np.diag(cm)
+TN = cm.sum() - (FP + FN + TP)
+support_per_class = cm.sum(axis=1)
+
+acc = accuracy_score(oof_y_true, oof_y_pred)
+metrics = {}
+averages = ['macro', 'micro', 'weighted']
+
+for avg in averages:
+    metrics[f'Prec_{avg}'] = precision_score(oof_y_true, oof_y_pred, average=avg, zero_division=0)
+    metrics[f'Rec_{avg}'] = recall_score(oof_y_true, oof_y_pred, average=avg, zero_division=0)
+    metrics[f'F1_{avg}'] = f1_score(oof_y_true, oof_y_pred, average=avg, zero_division=0)
+    metrics[f'AUC_{avg}'] = roc_auc_score(oof_y_true_bin, oof_y_prob_both, multi_class='ovr', average=avg)
+
+specificity_per_class = np.divide(TN, (TN + FP), out=np.zeros_like(TN, dtype=float), where=(TN + FP)!=0)
+metrics['Spec_macro'] = np.mean(specificity_per_class)
+metrics['Spec_micro'] = TN.sum() / (TN.sum() + FP.sum()) if (TN.sum() + FP.sum()) > 0 else 0
+metrics['Spec_weighted'] = np.average(specificity_per_class, weights=support_per_class)
+
+print("\n" + "="*145)
+print(" TABELA 5 - PERFORMANCE METRICS MLSD CROSS-VALIDATED")
+print("="*145)
+header1 = f"{'Architecture':<14} {'Variant':<10} {'ACC':<7} "
+header1 += f"{'Precision':<23} {'Recall':<23} {'F1-Score':<23} {'AUC':<23} {'Specificity':<23}"
+print(header1)
+header2 = f"{'':<33} "
+for _ in range(5): header2 += f"{'M':<7} {'m':<7} {'W':<7}   "
+print(header2)
+print("-" * 145)
+
+row = f"{'TransferKAN':<14} {'MLSD-KFold':<10} {acc:<7.3f} "
+row += f"{metrics['Prec_macro']:<7.3f} {metrics['Prec_micro']:<7.3f} {metrics['Prec_weighted']:<7.3f}   "
+row += f"{metrics['Rec_macro']:<7.3f} {metrics['Rec_micro']:<7.3f} {metrics['Rec_weighted']:<7.3f}   "
+row += f"{metrics['F1_macro']:<7.3f} {metrics['F1_micro']:<7.3f} {metrics['F1_weighted']:<7.3f}   "
+row += f"{metrics['AUC_macro']:<7.3f} {metrics['AUC_micro']:<7.3f} {metrics['AUC_weighted']:<7.3f}   "
+row += f"{metrics['Spec_macro']:<7.3f} {metrics['Spec_micro']:<7.3f} {metrics['Spec_weighted']:<7.3f}"
+print(row)
+print("="*145 + "\n")
+print(classification_report(oof_y_true, oof_y_pred, target_names=classes, zero_division=0))
+--- OUTPUT ---
+🔄 Iniciando K-Fold Cross-Validation (5 Folds)...
+
+==================================================
+🚀 FOLD 1/5
+==================================================
+Época 001/60 | Treino: 83.27% | Teste: 82.47% (Melhor: 82.47%)
+Época 010/60 | Treino: 94.40% | Teste: 80.82% (Melhor: 82.47%)
+Época 020/60 | Treino: 98.88% | Teste: 78.08% (Melhor: 82.74%)
+Época 030/60 | Treino: 99.67% | Teste: 84.11% (Melhor: 84.11%)
+Época 040/60 | Treino: 99.74% | Teste: 81.10% (Melhor: 84.11%)
+Época 050/60 | Treino: 100.00% | Teste: 81.92% (Melhor: 84.11%)
+Época 060/60 | Treino: 100.00% | Teste: 82.19% (Melhor: 84.11%)
+📥 Gerando predições para o Teste do Fold 1...
+
+==================================================
+🚀 FOLD 2/5
+==================================================
+Época 001/60 | Treino: 76.93% | Teste: 88.65% (Melhor: 88.65%)
+Época 010/60 | Treino: 96.30% | Teste: 86.76% (Melhor: 88.65%)
+Época 020/60 | Treino: 98.28% | Teste: 84.86% (Melhor: 88.65%)
+Época 030/60 | Treino: 99.14% | Teste: 85.68% (Melhor: 88.65%)
+Época 040/60 | Treino: 99.67% | Teste: 85.95% (Melhor: 88.65%)
+Época 050/60 | Treino: 99.74% | Teste: 86.76% (Melhor: 88.65%)
+Época 060/60 | Treino: 99.93% | Teste: 87.57% (Melhor: 88.65%)
+📥 Gerando predições para o Teste do Fold 2...
+
+==================================================
+🚀 FOLD 3/5
+==================================================
+Época 001/60 | Treino: 82.71% | Teste: 87.43% (Melhor: 87.43%)
+Época 010/60 | Treino: 96.54% | Teste: 86.29% (Melhor: 92.29%)
+Época 020/60 | Treino: 99.15% | Teste: 90.29% (Melhor: 92.29%)
+Época 030/60 | Treino: 99.87% | Teste: 90.57% (Melhor: 92.29%)
+Época 040/60 | Treino: 99.80% | Teste: 90.29% (Melhor: 92.29%)
+Época 050/60 | Treino: 99.87% | Teste: 90.86% (Melhor: 92.29%)
+Época 060/60 | Treino: 99.80% | Teste: 90.57% (Melhor: 92.29%)
+📥 Gerando predições para o Teste do Fold 3...
+
+==================================================
+🚀 FOLD 4/5
+==================================================
+Época 001/60 | Treino: 81.16% | Teste: 82.03% (Melhor: 82.03%)
+Época 010/60 | Treino: 94.93% | Teste: 79.43% (Melhor: 82.03%)
+Época 020/60 | Treino: 99.18% | Teste: 81.09% (Melhor: 82.74%)
+Época 030/60 | Treino: 99.11% | Teste: 79.91% (Melhor: 82.74%)
+Época 040/60 | Treino: 99.93% | Teste: 79.43% (Melhor: 82.74%)
+Época 050/60 | Treino: 100.00% | Teste: 81.56% (Melhor: 82.74%)
+Época 060/60 | Treino: 100.00% | Teste: 81.56% (Melhor: 82.74%)
+📥 Gerando predições para o Teste do Fold 4...
+
+==================================================
+🚀 FOLD 5/5
+==================================================
+Época 001/60 | Treino: 75.73% | Teste: 85.07% (Melhor: 85.07%)
+Época 010/60 | Treino: 90.72% | Teste: 84.80% (Melhor: 85.07%)
+Época 020/60 | Treino: 99.01% | Teste: 84.80% (Melhor: 86.67%)
+Época 030/60 | Treino: 99.40% | Teste: 86.93% (Melhor: 87.47%)
+Época 040/60 | Treino: 99.67% | Teste: 85.07% (Melhor: 89.33%)
+Época 050/60 | Treino: 99.87% | Teste: 87.20% (Melhor: 89.33%)
+Época 060/60 | Treino: 99.80% | Teste: 86.40% (Melhor: 89.33%)
+📥 Gerando predições para o Teste do Fold 5...
+
+=================================================================================================================================================
+ TABELA 5 - PERFORMANCE METRICS MLSD CROSS-VALIDATED
+=================================================================================================================================================
+Architecture   Variant    ACC     Precision               Recall                  F1-Score                AUC                     Specificity            
+                                  M       m       W         M       m       W         M       m       W         M       m       W         M       m       W         
+-------------------------------------------------------------------------------------------------------------------------------------------------
+TransferKAN    MLSD-KFold 0.873   0.598   0.873   0.853     0.496   0.873   0.873     0.526   0.873   0.860     0.749   0.944   0.785     0.797   0.936   0.517  
+=================================================================================================================================================
+
+               precision    recall  f1-score   support
+
+Encostado (0)       0.33      0.12      0.18        42
+    Curta (1)       0.55      0.41      0.47       232
+Distância (2)       0.91      0.96      0.93      1609
+
+     accuracy                           0.87      1883
+    macro avg       0.60      0.50      0.53      1883
+ weighted avg       0.85      0.87      0.86      1883
+
+
+
+===============================
+

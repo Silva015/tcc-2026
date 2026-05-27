@@ -1,10 +1,34 @@
 \label{chap:solution}
 
+To address the limitations of traditional CNN architectures in classifying highly imbalanced and non-linear forensic gunshot wound datasets, this thesis introduces a novel hybrid architecture: the \textbf{TransferKAN}.
 
-Including a "Proposed Solution" chapter as a standalone chapter is actually a very sophisticated practice in Engineering and Computer Science theses.
+\section{The TransferKAN Architecture}
+\label{sec:transferkan_arch}
 
-It acts as a bridge between the "What is out there" (Related Works) and the "How I did it" (Methodology).
+The core philosophy behind TransferKAN is to merge the proven spatial feature extraction capabilities of state-of-the-art Convolutional Neural Networks with the highly expressive and parameter-efficient classification potential of Kolmogorov-Arnold Networks (KAN). 
 
-Since you are using KAN Networks (a relatively new architecture) combined with Transfer Learning, a separate chapter allows you to explain your "innovation" without getting bogged down in the boring details of data collection or software versions.
+Traditional architectures, such as the ResNet152 used in the 2024 benchmark, process an image through a series of convolutional blocks to generate a high-dimensional feature vector. This vector is then typically fed into a Multi-Layer Perceptron (MLP) classification head. While the ResNet backbone is exceptionally adept at recognizing visual patterns (edges, textures, shapes), the MLP head often struggles to map these features into discrete classes when the decision boundaries are highly complex, noisy, and non-linear---as is inherently the case with forensic imagery of gunshot wounds.
 
-The idea is to make a special chapter to make your contribution evident.
+\subsection{Architectural Components}
+
+The TransferKAN architecture consists of three distinct sequential stages:
+\begin{enumerate}
+    \item \textbf{Spatial Feature Extractor (ResNet152 Backbone):} We utilize a ResNet152 model pre-trained on ImageNet. The final fully connected dense layer (the original MLP classifier) is programmatically removed. Consequently, for a standard input image, the backbone outputs a flattened feature vector of size 2048. This leverages the paradigm of Transfer Learning, avoiding the need to train a deep feature extractor from scratch on a limited forensic dataset.
+    
+    \item \textbf{Regularization (Dropout):} To bridge the backbone and the new classifier while aggressively preventing overfitting, a Dropout layer with a probability of $p=0.5$ is introduced. This forces the network to learn redundant and robust representations rather than memorizing the training samples.
+    
+    \item \textbf{Kolmogorov-Arnold Network (KAN) Classifier:} The core innovation lies in appending a KAN module directly to the feature vector. Instead of a dense layer matrix multiplication with fixed node activations, the KAN maps the 2048-dimensional vector into the desired number of output classes (e.g., 2 for Entry/Exit or 3 for MLSD) through an intermediate hidden layer of 128 dimensions. The connections between these layers are modeled as learnable B-splines.
+\end{enumerate}
+
+\section{Justification of the Innovation}
+\label{sec:justification}
+
+The transition from an MLP classification head to a KAN classifier is not merely a structural substitution; it represents a fundamental shift in how the network models the final decision boundary. 
+
+By placing the non-linear activation functions on the edges (splines), the KAN dynamically molds its activation shapes to best fit the data during training. This provides two significant advantages in the forensic context:
+\begin{itemize}
+    \item \textbf{Superior Discrimination in Imbalanced Data:} Splines allow the KAN to create highly intricate, non-linear boundaries around the minority class clusters (such as Exit wounds or Contact shots) without collapsing into the majority class, a common failure point for rigid MLPs.
+    \item \textbf{Parameter Efficiency:} The KAN requires significantly fewer parameters to achieve a highly complex mathematical mapping compared to an MLP, reducing the risk of over-parameterizing and overfitting the limited FDCPUnBGunshotDB dataset.
+\end{itemize}
+
+Through this strategic architectural design, TransferKAN aims to serve as an optimized, probabilistic discriminator tailored specifically to the nuances of forensic pathology.
