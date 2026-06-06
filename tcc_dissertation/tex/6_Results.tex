@@ -9,12 +9,14 @@ To provide a robust and scientifically sound evaluation of the models' capabilit
 
 Table~\ref{tab:results_entry_exit} delineates the classification metrics for distinguishing between gunshot entry and exit wounds. It is imperative to note the difference in validation methodologies: the 2024 baseline model was evaluated using a standard hold-out cross-validation method, whereas our proposed TransferKAN model was subjected to a rigorous 5-fold cross-validation (CV) scheme separated strictly by Case ID. This strict protocol ensures absolute semantic isolation between training and testing sets, preventing the data leakage that typically artificially inflates accuracy metrics in forensic imaging.
 
+
+
 \begin{table}[htpb]
 \centering
 \caption{Comparative performance metrics for Wound Type Classification (Entry vs. Exit). Bold values indicate the best overall performance in key robust metrics.}
 \label{tab:results_entry_exit}
 \resizebox{\textwidth}{!}{
-\begin{tabular}{@{}lcccccccccccccccc@{}}
+\begin{tabular}{@{}lccccccccccccccccc@{}}
 \toprule
 \multirow{2}{*}{\textbf{Architecture}} & \multirow{2}{*}{\textbf{Variant}} & \multirow{2}{*}{\textbf{ACC}} & \multicolumn{3}{c}{\textbf{Precision}} & \multicolumn{3}{c}{\textbf{Recall}} & \multicolumn{3}{c}{\textbf{F1-Score}} & \multicolumn{3}{c}{\textbf{AUC}} & \multicolumn{3}{c}{\textbf{Specificity}} \\ \cmidrule(l){4-6} \cmidrule(l){7-9} \cmidrule(l){10-12} \cmidrule(l){13-15} \cmidrule(l){16-18} 
  &  &  & M & m & W & M & m & W & M & m & W & M & m & W & M & m & W \\ \midrule
@@ -44,7 +46,7 @@ Table~\ref{tab:results_mlsd} presents the comparative results for the multiclass
 \caption{Comparative performance metrics for Medical-Legal Shooting Distance (MLSD) Classification.}
 \label{tab:results_mlsd}
 \resizebox{\textwidth}{!}{
-\begin{tabular}{@{}lcccccccccccccccc@{}}
+\begin{tabular}{@{}lccccccccccccccccc@{}}
 \toprule
 \multirow{2}{*}{\textbf{Architecture}} & \multirow{2}{*}{\textbf{Variant}} & \multirow{2}{*}{\textbf{ACC}} & \multicolumn{3}{c}{\textbf{Precision}} & \multicolumn{3}{c}{\textbf{Recall}} & \multicolumn{3}{c}{\textbf{F1-Score}} & \multicolumn{3}{c}{\textbf{AUC}} & \multicolumn{3}{c}{\textbf{Specificity}} \\ \cmidrule(l){4-6} \cmidrule(l){7-9} \cmidrule(l){10-12} \cmidrule(l){13-15} \cmidrule(l){16-18} 
  &  &  & M & m & W & M & m & W & M & m & W & M & m & W & M & m & W \\ \midrule

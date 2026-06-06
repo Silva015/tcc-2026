@@ -4,6 +4,7 @@ manuscript.pdf
 monografia.pdf
 
 ## Core latex/pdflatex auxiliary files:
+*.brf
 *.aux
 *.lof
 *.log
