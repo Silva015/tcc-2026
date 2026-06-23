@@ -1,0 +1,45 @@
+\label{chap:introduction}
+
+\section{Definição do Problema}
+\label{sec_problem}
+
+As armas de fogo correspondem a um dos instrumentos mais frequentemente utilizados em todo o mundo para o cometimento de homicídios~\cite{unodc2023homicide}. No trabalho pericial forense, é comum encontrar ferimentos por arma de fogo durante exames externos de corpos, seja em cenas de crime ou durante necropsias. Nesses exames, os peritos forenses precisam determinar com precisão a natureza do ferimento. Os principais desafios envolvem distinguir entre ferimentos de entrada e de saída e classificar os ferimentos de entrada de acordo com a distância a partir da qual o disparo foi efetuado, uma avaliação comumente chamada de Distância Médico-Legal do Disparo (MLSD).
+
+Sob condições ideais, certas características morfológicas---como forma, tamanho, presença de orla de escoriação e bordas---permitem uma diferenciação relativamente fácil entre ferimentos de entrada e de saída. No entanto, na realidade, essas características nem sempre estão claramente visíveis; podem estar parcialmente ausentes, sobrepostas ou drasticamente alteradas pela putrefação. Outros fatores de confusão, incluindo o calibre da arma, o tipo de munição, o ângulo do disparo, alvos intermediários e a região do corpo atingida, complicam ainda mais a classificação precisa, mesmo para patologistas forenses experientes.
+
+A aplicação de Inteligência Artificial (IA) e Aprendizado Profundo (Deep Learning, DL) em tarefas de visão computacional revolucionou recentemente o diagnóstico médico, oferecendo ferramentas robustas e automatizadas para a classificação de imagens complexas. Apesar desses avanços notáveis em ambientes clínicos, a transposição dessas tecnologias para o domínio forense permanece extremamente limitada. Um dos principais desafios reside na aquisição de bases de dados abrangentes, com dados de alta qualidade e cientificamente sólidos. As imagens forenses são geralmente capturadas sob diversas condições ambientais, com uma variedade de equipamentos fotográficos e dentro das circunstâncias caóticas e rotineiras das cenas de crime, tornando a padronização praticamente impossível e gerando bases de dados altamente desbalanceadas.
+
+A literatura existente no domínio forense, como modelos recentes de classificação treinados em bases de dados de necropsias humanas~\cite{Lira2025deep,cheng2024gunshot}, depende fortemente de Redes Neurais Convolucionais (CNNs) tradicionais. Essas arquiteturas empregam universalmente Perceptrons de Múltiplas Camadas (MLPs) convencionais, compostos por camadas lineares densas em seus estágios finais de classificação. Embora essas arquiteturas tenham desempenho adequado em circunstâncias generalizadas, elas têm dificuldade inerente em mapear de forma eficiente as fronteiras de características altamente não-lineares e complexas presentes em imagens forenses de ferimentos ruidosas, desbalanceadas e não padronizadas. Existe uma lacuna crítica e uma necessidade premente de um classificador mais avançado e eficiente, capaz de extrair e separar padrões não-lineares abstratos sem exigir bases de dados exponencialmente maiores ou contagens massivas de parâmetros.
+
+\section{Objetivos da Pesquisa}
+\label{sec_goals}
+
+O objetivo principal deste estudo é desenvolver, implementar e avaliar uma nova arquitetura híbrida de aprendizado profundo, denominada \textbf{TransferKAN}, para a classificação automatizada de ferimentos humanos por arma de fogo a partir de imagens reais de cenas de crime. Este trabalho concentra-se meticulosamente em duas tarefas forenses específicas: classificar o tipo de ferimento (Entrada vs. Saída) e determinar a Distância Médico-Legal do Disparo (MLSD) como Encostado, Curta distância ou À distância.
+
+Para alcançar esse objetivo geral, os seguintes objetivos específicos foram estabelecidos:
+\begin{itemize}
+    \item Implementar um arcabouço de Aprendizado por Transferência utilizando uma rede ResNet152 pré-treinada como \textit{backbone}, aproveitando sua comprovada capacidade de extração de características espaciais de alto nível a partir de imagens complexas.
+    \item Projetar e integrar uma Rede de Kolmogorov-Arnold (KAN) como classificador de decisão principal, substituindo as camadas densas tradicionais de MLP, a fim de capturar e parametrizar melhor relações não-lineares complexas por meio de \textit{splines} aprendíveis.
+    \item Implementar um esquema rigoroso de validação cruzada k-fold baseado em casos para avaliar o desempenho do modelo de forma confiável, eliminando qualquer possibilidade de vazamento semântico de dados que tipicamente infla as métricas na pesquisa de IA forense.
+    \item Comparar rigorosamente as métricas de desempenho (Acurácia, Precisão, Revocação, F1-Score, AUC e Especificidade) da arquitetura TransferKAN proposta com o desempenho de referência das CNNs do estado da arte, especificamente o modelo ResNet152 reportado no estudo de referência de Lira et al.~\cite{Lira2025deep}.
+\end{itemize}
+
+\subsection{Hipótese de Pesquisa}
+\label{sec_hypothesis}
+
+Hipotetizamos que substituir a cabeça de classificação padrão de Perceptron de Múltiplas Camadas (MLP) de uma rede convolucional profunda do estado da arte (ResNet152) por uma Rede de Kolmogorov-Arnold (KAN) resultará em uma arquitetura híbrida superior e altamente robusta (TransferKAN). Ao aprender funções de ativação nas arestas da rede, em vez de depender de ativações fixas nos nós, a arquitetura TransferKAN modelará melhor as fronteiras não-lineares das classes desbalanceadas de imagens forenses. Consequentemente, essa abordagem produzirá maior desempenho discriminativo e confiabilidade---particularmente evidenciada pela Área sob a Curva (AUC)---tanto na classificação do tipo de ferimento quanto na de MLSD, em comparação com a ResNet152 de referência.
+
+\section{Contribuições}
+\label{sec_contributions}
+
+As principais contribuições deste trabalho podem ser resumidas da seguinte forma:
+\begin{itemize}
+    \item A introdução pioneira da \textbf{arquitetura TransferKAN} no domínio da patologia forense. Esse modelo híbrido combina com sucesso a capacidade de extração profunda de características da ResNet152 com a classificação não-linear dinâmica e eficiente em parâmetros das Redes de Kolmogorov-Arnold.
+    \item A demonstração empírica de que a abordagem TransferKAN, aliada a uma robusta ampliação de dados (\textit{data augmentation}) e a uma validação cruzada k-fold estrita, supera decisivamente as CNNs tradicionais utilizadas na literatura forense anterior, mostrando especialmente grandes melhorias em robustez e na detecção de classes minoritárias para as classificações de Entrada/Saída e MLSD em uma base de dados real de cenas de crime.
+    \item A disponibilização de um \textit{pipeline} metodológico rigoroso que mitiga ativamente problemas de vazamento de dados por meio da divisão dos dados baseada em casos, oferecendo uma avaliação muito mais realista das verdadeiras capacidades de generalização do modelo em cenários investigativos forenses autênticos.
+\end{itemize}
+
+\section{Organização deste Documento}
+\label{sec_about}
+
+O restante desta monografia está organizado da seguinte forma. O Capítulo~\ref{chap:background} fornece a fundamentação essencial sobre a patologia forense de ferimentos por arma de fogo e introduz os fundamentos teóricos do Aprendizado Profundo e das Redes de Kolmogorov-Arnold (KAN). O Capítulo~\ref{chap:related} revisa criticamente a literatura relacionada à IA aplicada à classificação forense de ferimentos, identificando lacunas atuais. O Capítulo~\ref{chap:solution} apresenta a solução proposta, detalhando a arquitetura TransferKAN. O Capítulo~\ref{chap:methodology} descreve a metodologia, incluindo a base de dados, a ampliação de dados e os procedimentos de validação cruzada. O Capítulo~\ref{chap:results} apresenta uma análise comparativa abrangente dos resultados entre a TransferKAN e os modelos de referência. Por fim, o Capítulo~\ref{chap:conclusions} conclui o trabalho, resumindo os achados e sugerindo possíveis direções para pesquisas futuras.

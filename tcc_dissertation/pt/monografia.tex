@@ -1,0 +1,103 @@
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Classe do documento (versão em Português)
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+% Opções:
+%  - Graduação: bacharelado|engenharia|licenciatura
+%  - Pós-graduação: [qualificacao], mestrado|doutorado, ppca|ppginf
+
+\documentclass[bacharelado]{UnB-CIC}%
+
+\usepackage{pdfpages}% incluir PDFs, usado no apêndice
+
+% Custom (general)
+\usepackage{graphicx}
+\usepackage{subcaption}
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{adjustbox}
+\usepackage{multirow}
+\usepackage{booktabs}
+
+% Diagramas (arquitetura TransferKAN) e gráficos nativos (comparações)
+\usepackage{tikz}
+\usetikzlibrary{positioning,arrows.meta,shapes.geometric,fit,backgrounds,calc}
+\usepackage{pgfplots}
+\pgfplotsset{compat=1.18}
+
+\usepackage[acronym]{glossaries}
+\makeglossaries
+
+\usepackage{xcolor}
+\newcommand{\red}[1]{\textcolor{red}{#1}}
+
+% Results section
+\usepackage{makecell}
+\usepackage{arydshln}
+\usepackage{pifont}
+\newcommand{\cmark}{\ding{51}} % ✔
+\newcommand{\xmark}{\ding{55}} % ✘
+\usepackage{rotating}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Acrônimos
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+% Relacionados à universidade
+\newacronym{UnB}{UnB}{Universidade de Brasília}
+\newacronym{CIC}{CIC}{Departamento de Ciência da Computação}
+\newacronym{CAPES}{CAPES}{Coordenação de Aperfeiçoamento de Pessoal de Nível Superior}
+
+% Específicos deste trabalho
+\newacronym{IA}{IA}{Inteligência Artificial}
+\newacronym{DL}{DL}{Aprendizado Profundo (Deep Learning)}
+\newacronym{ML}{ML}{Aprendizado de Máquina (Machine Learning)}
+\newacronym{CV}{CV}{Visão Computacional (Computer Vision)}
+\newacronym{CNN}{CNN}{Rede Neural Convolucional (Convolutional Neural Network)}
+\newacronym{MLP}{MLP}{Perceptron de Múltiplas Camadas (Multi-Layer Perceptron)}
+\newacronym{KAN}{KAN}{Rede de Kolmogorov-Arnold (Kolmogorov-Arnold Network)}
+\newacronym{KAR}{KAR}{Representação de Kolmogorov-Arnold}
+\newacronym{ResNet}{ResNet}{Rede Residual (Residual Network)}
+\newacronym{MLSD}{MLSD}{Distância Médico-Legal do Disparo (Medical-Legal Shooting Distance)}
+\newacronym{AUC}{AUC}{Área sob a Curva (Area Under the Curve)}
+\newacronym{ROC}{ROC}{Característica de Operação do Receptor (Receiver Operating Characteristic)}
+\newacronym{OOF}{OOF}{Fora da Dobra (Out-of-Fold)}
+\newacronym{PCDF}{PCDF}{Polícia Civil do Distrito Federal}
+\newacronym{CLAHE}{CLAHE}{Equalização de Histograma Adaptativa Limitada por Contraste}
+\newacronym{SMOTE}{SMOTE}{Técnica de Sobreamostragem de Minorias Sintéticas}
+\newacronym{ReLU}{ReLU}{Unidade Linear Retificada (Rectified Linear Unit)}
+\newacronym{DNN}{DNN}{Rede Neural Profunda (Deep Neural Network)}
+\newacronym{GPU}{GPU}{Unidade de Processamento Gráfico (Graphics Processing Unit)}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Informações do Trabalho
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\orientador{\prof \dr Pedro Garcia Freitas}{CIC/UnB}%
+\coordenador[a]{\prof \dr Marcelo Grandi Mandelli}{Universidade de Brasília}%
+\diamesano{01}{Dezembro}{2025}%
+
+\membrobanca{\prof \dr Membro 1}{ENE/UnB}%
+\membrobanca{\prof \dr Membro 2}{ENE/UnB}%
+
+\autor{Arthur Silva}{Carneiro}%
+
+\titulo{TransferKAN: Classificação de Ferimentos Balísticos via Aprendizado por Transferência e Redes de Kolmogorov-Arnold}%
+
+\palavraschave{Ferimentos Balísticos, Aprendizado por Transferência, Redes de Kolmogorov-Arnold (KAN), Visão Computacional}
+
+\keywords{Ballistic Wounds, Transfer Learning, Kolmogorov-Arnold Networks (KAN), Computer Vision}
+
+\newcommand{\unbcic}{\texttt{UnB-CIC}}%
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Texto
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{document}%
+\capitulo{1_Introducao}{Introdução}%
+\capitulo{2_Fundamentacao}{Fundamentação Teórica}%
+\capitulo{3_TrabalhosRelacionados}{Trabalhos Relacionados}%
+\capitulo{4_SolucaoProposta}{Solução Proposta}%
+\capitulo{5_Metodologia}{Metodologia}%
+\capitulo{6_Resultados}{Resultados}%
+\capitulo{7_Conclusoes}{Conclusões}%
+\end{document}%
