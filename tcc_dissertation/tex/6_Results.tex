@@ -1,6 +1,6 @@
 \label{chap:results}
 
-This chapter presents the comprehensive comparative results of the proposed TransferKAN architecture against the baseline ResNet152 model established in the 2024 literature. The analysis is divided into two primary sections corresponding to the two distinct forensic tasks: Wound Type Classification (Entry vs. Exit) and Medical-Legal Shooting Distance (MLSD) Classification. 
+This chapter presents the comprehensive comparative results of the proposed TransferKAN architecture against the baseline ResNet152 model established in the benchmark study of Lira et al.~\cite{Lira2025deep}. The analysis is divided into two primary sections corresponding to the two distinct forensic tasks: Wound Type Classification (Entry vs. Exit) and Medical-Legal Shooting Distance (MLSD) Classification. 
 
 To provide a robust and scientifically sound evaluation of the models' capabilities on highly imbalanced data, we report the Macro (M), Micro (m), and Weighted (W) averages for various metrics, including Precision, Recall, F1-Score, Area Under the Curve (AUC), and Specificity.
 
@@ -29,9 +29,11 @@ TransferKAN [Ours] & K-Fold & 0.860 & 0.817 & 0.860 & 0.865 & \textbf{0.835} & 0
 }
 \end{table}
 
-The empirical results demonstrate that while the ResNet152 baseline exhibits a marginally higher raw accuracy (0.869 compared to TransferKAN's 0.860) in Table~\ref{tab:results_entry_exit}, this comparison is fundamentally asymmetric. The baseline's 0.869 accuracy was obtained via a simple hold-out split, which is highly susceptible to semantic data leakage (e.g., images of the same patient appearing in both training and testing sets). Crucially, when the authors of the 2024 study subjected their ResNet152 baseline to a strict Stratified Grouped K-fold cross-validation (as reported in the stability analysis boxplot in Figure 4 of their study), its median accuracy plummeted to approximately 0.817, accompanied by high variance across folds. 
+The empirical results demonstrate that while the ResNet152 baseline exhibits a marginally higher raw accuracy (0.869 compared to TransferKAN's 0.860) in Table~\ref{tab:results_entry_exit}, this comparison is fundamentally asymmetric. The baseline's 0.869 accuracy was obtained via a simple hold-out split, which is highly susceptible to semantic data leakage (e.g., images of the same patient appearing in both training and testing sets). Crucially, when the authors of the 2024 study~\cite{Lira2025deep} subjected their ResNet152 baseline to a strict Stratified Grouped K-fold cross-validation (reported in their stability analysis boxplot, reproduced here in Figure~\ref{fig:lira_boxplots}), its median accuracy dropped to roughly 0.73, with the bulk of the folds spanning approximately 0.70 to 0.78 and a notable dispersion across folds.
 
-In stark contrast, the proposed TransferKAN model achieved its 0.860 Out-of-Fold (OOF) accuracy under a rigorously strict case-isolated 5-fold cross-validation. When comparing the models under the same rigorous K-fold evaluation paradigm (0.860 for TransferKAN vs. $\sim$0.817 for ResNet152), it becomes unequivocally clear that TransferKAN is vastly superior and significantly more stable than the baseline. Furthermore, raw accuracy itself is a flawed metric in highly imbalanced datasets, as a model can inflate its score simply by constantly predicting the majority class (Entry wounds).
+\figuraBib[htpb]{lira2024/fig4_boxplots}{Stability analysis of the ResNet152 baseline over the k-folds, for wound type classification (a) and Medical-Legal Shooting Distance classification (b). The leftmost (gray) box in each panel corresponds to accuracy}{Lira2025deep}{fig:lira_boxplots}{width=0.8\textwidth}
+
+In stark contrast, the proposed TransferKAN model achieved its 0.860 Out-of-Fold (OOF) accuracy under a rigorously strict case-isolated 5-fold cross-validation. When comparing the models under the same rigorous K-fold evaluation paradigm (0.860 for TransferKAN vs. a median of $\sim$0.73 for ResNet152), it becomes unequivocally clear that TransferKAN is vastly superior and significantly more stable than the baseline. Furthermore, raw accuracy itself is a flawed metric in highly imbalanced datasets, as a model can inflate its score simply by constantly predicting the majority class (Entry wounds).
 Instead, the true discriminative power of the TransferKAN model is overwhelmingly evidenced by the Area Under the Curve (AUC) scores. TransferKAN achieved an extraordinary \textbf{Micro AUC of 0.928} and a \textbf{Macro AUC of 0.908}, completely dwarfing the baseline's uniform AUC of 0.821. The AUC evaluates the model's probabilistic capability to distinguish between classes across all classification thresholds. Furthermore, TransferKAN obtained higher Macro Recall (0.835 vs 0.821) and Macro F1-Score (0.825 vs 0.824), alongside higher Macro Specificity (0.835 vs 0.821). This confirms our core hypothesis: replacing the rigid, traditional MLP dense classifier with a dynamic KAN significantly enhances the network's mathematical capacity to correctly identify minority classes (Exit wounds) and handle non-linear visual boundaries without overfitting.
 
 To comprehensively evaluate the Kolmogorov-Arnold Network paradigm, we also trained and tested several alternative architectures (PureKAN, PureConvKAN, and ConvKAN+ResNet) using a strict, case-isolated hold-out validation. As demonstrated in Table~\ref{tab:results_entry_exit}, while these alternate models maintained semantic separation (thus preventing data leakage), their overall performance dropped significantly, with PureKAN achieving an accuracy of 0.692 and PureConvKAN achieving 0.707. The ConvKAN+ResNet hybrid performed better (0.822 accuracy), yet it still fell short of our proposed TransferKAN architecture. This comparative analysis mathematically confirms that the specific combination of deep spatial feature extraction (via the ResNet backbone) and dynamic, B-spline-based decision mapping (the KAN classifier) proposed in TransferKAN is strictly necessary to achieve optimal performance and robustness in forensic gunshot classification.
@@ -66,4 +68,41 @@ Furthermore, when evaluating the alternative KAN architectures (PureKAN and Pure
 \section{Summary of Findings}
 \label{sec:results_summary}
 
-In conclusion, the implementation of TransferKAN with strict, case-isolated K-fold cross-validation provides the most scientifically robust methodology for classifying forensic gunshot images to date. While traditional MLPs chase raw accuracy by over-predicting majority classes, the TransferKAN architecture leverages its adaptable B-splines to map complex decision boundaries, resulting in massive gains in Area Under the Curve (AUC) for both tasks. This proves that TransferKAN is highly effective at managing the intrinsic non-linear complexities and severe imbalances of real-world crime scene imagery.
+In conclusion, the implementation of TransferKAN with strict, case-isolated K-fold cross-validation provides the most scientifically robust methodology for classifying forensic gunshot images to date. While traditional MLPs chase raw accuracy by over-predicting majority classes, the TransferKAN architecture leverages its adaptable B-splines to map complex decision boundaries, resulting in massive gains in Area Under the Curve (AUC) for both tasks. This proves that TransferKAN is highly effective at managing the intrinsic non-linear complexities and severe imbalances of real-world crime scene imagery. Figure~\ref{fig:auc_comparison} summarizes the AUC comparison between the proposed TransferKAN model and the ResNet152 baseline across both forensic tasks.
+
+\begin{figure}[htpb]
+\centering
+\begin{tikzpicture}
+\begin{axis}[
+    ybar,
+    width=\textwidth,
+    height=7cm,
+    bar width=8pt,
+    enlarge x limits=0.12,
+    ymin=0.6, ymax=1.0,
+    ylabel={AUC},
+    symbolic x coords={E/E Macro, E/E Micro, E/E Weighted, MLSD Macro, MLSD Micro, MLSD Weighted},
+    xtick=data,
+    x tick label style={rotate=30, anchor=east, font=\small},
+    nodes near coords,
+    nodes near coords style={font=\tiny, /pgf/number format/fixed, /pgf/number format/precision=3},
+    every node near coord/.append style={rotate=90, anchor=west},
+    legend pos=south east,
+    legend style={font=\small},
+    ymajorgrids=true,
+    grid style=dashed,
+]
+\addplot[fill=blue!30] coordinates {
+    (E/E Macro,0.821) (E/E Micro,0.821) (E/E Weighted,0.821)
+    (MLSD Macro,0.733) (MLSD Micro,0.944) (MLSD Weighted,0.745)
+};
+\addplot[fill=orange!60] coordinates {
+    (E/E Macro,0.908) (E/E Micro,0.928) (E/E Weighted,0.908)
+    (MLSD Macro,0.749) (MLSD Micro,0.944) (MLSD Weighted,0.785)
+};
+\legend{ResNet152 (baseline), TransferKAN (ours)}
+\end{axis}
+\end{tikzpicture}
+\caption{Comparison of macro, micro, and weighted AUC between the ResNet152 baseline~\cite{Lira2025deep} and the proposed TransferKAN model, for Wound Type (Entry/Exit) and Medical-Legal Shooting Distance (MLSD) classification.}
+\label{fig:auc_comparison}
+\end{figure}

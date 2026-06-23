@@ -7,18 +7,54 @@ To address the limitations of traditional CNN architectures in classifying highl
 
 The core philosophy behind TransferKAN is to merge the proven spatial feature extraction capabilities of state-of-the-art Convolutional Neural Networks with the highly expressive and parameter-efficient classification potential of Kolmogorov-Arnold Networks (KAN). 
 
-Traditional architectures, such as the ResNet152 used in the 2024 benchmark, process an image through a series of convolutional blocks to generate a high-dimensional feature vector. This vector is then typically fed into a Multi-Layer Perceptron (MLP) classification head. While the ResNet backbone is exceptionally adept at recognizing visual patterns (edges, textures, shapes), the MLP head often struggles to map these features into discrete classes when the decision boundaries are highly complex, noisy, and non-linear---as is inherently the case with forensic imagery of gunshot wounds.
+Traditional architectures, such as the ResNet152~\cite{he2016resnet} used in the 2024 benchmark~\cite{Lira2025deep}, process an image through a series of convolutional blocks to generate a high-dimensional feature vector. This vector is then typically fed into a Multi-Layer Perceptron (MLP) classification head. While the ResNet backbone is exceptionally adept at recognizing visual patterns (edges, textures, shapes), the MLP head often struggles to map these features into discrete classes when the decision boundaries are highly complex, noisy, and non-linear---as is inherently the case with forensic imagery of gunshot wounds.
 
 \subsection{Architectural Components}
 
 The TransferKAN architecture consists of three distinct sequential stages:
 \begin{enumerate}
-    \item \textbf{Spatial Feature Extractor (ResNet152 Backbone):} We utilize a ResNet152 model pre-trained on ImageNet. The final fully connected dense layer (the original MLP classifier) is programmatically removed. Consequently, for a standard input image, the backbone outputs a flattened feature vector of size 2048. This leverages the paradigm of Transfer Learning, avoiding the need to train a deep feature extractor from scratch on a limited forensic dataset.
+    \item \textbf{Spatial Feature Extractor (ResNet152 Backbone):} We utilize a ResNet152 model~\cite{he2016resnet} pre-trained on ImageNet~\cite{deng2009imagenet}. The final fully connected dense layer (the original MLP classifier) is programmatically removed. Consequently, for a standard input image, the backbone outputs a flattened feature vector of size 2048. This leverages the paradigm of Transfer Learning, avoiding the need to train a deep feature extractor from scratch on a limited forensic dataset.
     
     \item \textbf{Regularization (Dropout):} To bridge the backbone and the new classifier while aggressively preventing overfitting, a Dropout layer with a probability of $p=0.5$ is introduced. This forces the network to learn redundant and robust representations rather than memorizing the training samples.
     
-    \item \textbf{Kolmogorov-Arnold Network (KAN) Classifier:} The core innovation lies in appending a KAN module directly to the feature vector. Instead of a dense layer matrix multiplication with fixed node activations, the KAN maps the 2048-dimensional vector into the desired number of output classes (e.g., 2 for Entry/Exit or 3 for MLSD) through an intermediate hidden layer of 128 dimensions. The connections between these layers are modeled as learnable B-splines.
+    \item \textbf{Kolmogorov-Arnold Network (KAN) Classifier:} The core innovation lies in appending a KAN module~\cite{liu2024kan} directly to the feature vector. Instead of a dense layer matrix multiplication with fixed node activations, the KAN maps the 2048-dimensional vector into the desired number of output classes (e.g., 2 for Entry/Exit or 3 for MLSD) through an intermediate hidden layer of 128 dimensions. The connections between these layers are modeled as learnable B-splines.
 \end{enumerate}
+
+The complete data flow of the proposed architecture is summarized in Figure~\ref{fig:transferkan_arch}.
+
+\begin{figure}[htpb]
+\centering
+\begin{tikzpicture}[
+    >=Stealth,
+    node distance=8mm,
+    block/.style={rectangle, rounded corners, draw=black, thick, align=center,
+                  minimum height=13mm, minimum width=20mm, fill=blue!8},
+    backbone/.style={block, fill=green!10, minimum width=24mm},
+    kan/.style={block, fill=orange!12, minimum width=24mm},
+    io/.style={block, fill=gray!12, minimum width=16mm},
+    every node/.style={font=\small},
+]
+    \node[io] (input) {Input\\image\\$224\times224$};
+    \node[backbone, right=of input] (resnet) {ResNet152\\backbone\\(ImageNet)};
+    \node[block, right=of resnet] (drop) {Dropout\\$p=0.5$};
+    \node[kan, right=of drop] (kanlayer) {KAN\\classifier\\$[2048,128,N]$};
+    \node[io, right=of kanlayer] (out) {Class\\logits\\($N{=}2$ or $3$)};
+
+    \draw[->, thick] (input) -- (resnet);
+    \draw[->, thick] (resnet) -- node[above, font=\scriptsize] {2048-d} (drop);
+    \draw[->, thick] (drop) -- (kanlayer);
+    \draw[->, thick] (kanlayer) -- (out);
+
+    \begin{scope}[on background layer]
+        \node[draw=green!50!black, dashed, rounded corners, inner sep=3mm,
+              fit=(resnet), label={[font=\scriptsize, green!50!black]below:Frozen in Phase~1}] {};
+        \node[draw=orange!70!black, dashed, rounded corners, inner sep=3mm,
+              fit=(kanlayer), label={[font=\scriptsize, orange!70!black]below:Trainable head}] {};
+    \end{scope}
+\end{tikzpicture}
+\caption{The proposed TransferKAN architecture. A ResNet152 backbone pre-trained on ImageNet extracts a 2048-dimensional feature vector, which is regularized by a dropout layer ($p=0.5$) and mapped to the output classes by a Kolmogorov-Arnold Network classifier with a $[2048,128,N]$ structure ($N=2$ for Entry/Exit, $N=3$ for MLSD).}
+\label{fig:transferkan_arch}
+\end{figure}
 
 \section{Justification of the Innovation}
 \label{sec:justification}
