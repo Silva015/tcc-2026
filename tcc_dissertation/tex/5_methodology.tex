@@ -5,7 +5,7 @@ This chapter details the data acquisition, the architectural implementation of t
 \section{Dataset Description}
 \label{sec:dataset_desc}
 
-The dataset utilized in this study is the FDCPUnBGunshotDB, a curated collection of real crime scene and autopsy photographs obtained by the Federal District Civil Police (PCDF) in Brazil. Unlike datasets composed of staged laboratory environments or animal models, this dataset authentically reflects the severe class imbalances, lighting variations, and morphological distortions naturally occurring in forensic fieldwork.
+The dataset utilized in this study is the FDCPUnBGunshotDB~\cite{Lira2025deep}, a curated collection of real crime scene and autopsy photographs obtained by the Federal District Civil Police (PCDF) in Brazil. Unlike datasets composed of staged laboratory environments or animal models, this dataset authentically reflects the severe class imbalances, lighting variations, and morphological distortions naturally occurring in forensic fieldwork.
 
 For the primary \textbf{Wound Type Classification} task (Entry vs. Exit), the dataset contains a total of 2,551 images. This is severely imbalanced, comprising:
 \begin{itemize}
@@ -20,31 +20,39 @@ For the secondary \textbf{Medical-Legal Shooting Distance (MLSD) Classification}
     \item \textbf{Contact (Label 0):} 42 images (2.23\%)
 \end{itemize}
 
+Beyond the class imbalance, the dataset reflects the demographic profile typical of firearm-related fatalities: the victims are predominantly young adult males, with a mean age of approximately 27 years and a pronounced right skew towards individuals in their twenties, as shown in Figure~\ref{fig:age_dist}.
+
+\figuraBib[htpb]{lira2024/fig3_age}{Frequency of age at the time of death in the FDCPUnBGunshotDB dataset, reported by selected cases (a) and by selected images (b)}{Lira2025deep}{fig:age_dist}{width=0.8\textwidth}
+
 \section{TransferKAN Implementation Details}
 \label{sec:kan_implementation}
 
-The core of our proposed solution is the \textbf{TransferKAN} architecture, implemented using PyTorch. 
+The core of our proposed solution is the \textbf{TransferKAN} architecture, implemented using PyTorch~\cite{paszke2019pytorch}.
 
 \subsection{Backbone and Regularization}
-We employed a pre-trained ResNet152 from TorchVision as the backbone for spatial feature extraction, leveraging its pre-existing weights to identify complex low-level visual patterns without requiring a massive dataset. The standard final fully connected layer was stripped, leaving the network to output a high-dimensional flattened feature vector of size 2048. To combat overfitting on the limited dataset, a heavy Dropout layer ($p=0.5$) was inserted immediately after the feature extractor.
+We employed a pre-trained ResNet152~\cite{he2016resnet} from TorchVision as the backbone for spatial feature extraction, leveraging its pre-existing weights to identify complex low-level visual patterns without requiring a massive dataset. The standard final fully connected layer was stripped, leaving the network to output a high-dimensional flattened feature vector of size 2048. To combat overfitting on the limited dataset, a heavy Dropout layer ($p=0.5$) was inserted immediately after the feature extractor.
 
 \subsection{KAN Classifier Configuration}
-Instead of conventional dense layers, we appended a dynamic KAN module (using the \texttt{efficient-kan} implementation) as the final classifier. 
+Instead of conventional dense layers, we appended a dynamic KAN module~\cite{liu2024kan} (using the \texttt{efficient-kan} implementation) as the final classifier.
 For the Entry/Exit classification, the KAN was configured with a structure of [2048, 128, 2]. To ensure the splines could map the complex decision boundaries of the imbalanced data, we used a cubic spline order of 3 and an increased grid size of 10. For the MLSD classification, the structure was slightly adapted to [2048, 128, 3] to accommodate the three distance classes. 
 
 \section{Experimental Setup}
 \label{sec:experimental_setup}
 
-To ensure reliable, reproducible, and robust evaluation, the experimental pipeline was strictly controlled.
+To ensure reliable, reproducible, and robust evaluation, the experimental pipeline was strictly controlled. The overall classification framework---spanning preprocessing, augmentation, the train/test split, model training, and evaluation---follows the pipeline established for this dataset by Lira et al., illustrated in Figure~\ref{fig:framework}.
+
+\figuraBib[htpb]{lira2024/fig1_framework}{General classification framework adopted for the FDCPUnBGunshotDB dataset, covering data preparation, augmentation, model training, and evaluation}{Lira2025deep}{fig:framework}{width=\textwidth}
 
 \subsection{Data Augmentation}
-Due to the scarcity and extreme imbalance of forensic data, advanced Data Augmentation was applied exclusively to the training set using the \textit{Albumentations} library. The augmentation pipeline included transformations specifically tailored to mimic forensic realities:
+Due to the scarcity and extreme imbalance of forensic data, advanced Data Augmentation was applied exclusively to the training set using the \textit{Albumentations} library~\cite{buslaev2020albumentations}. The augmentation pipeline included transformations specifically tailored to mimic forensic realities:
 \begin{itemize}
     \item \textbf{Geometric Transformations:} Horizontal and vertical flips, and shift-scale-rotate combinations to simulate different photographic angles.
     \item \textbf{Tissue Simulation:} Elastic transformations to simulate the natural elasticity and distortion of human skin.
     \item \textbf{Lighting and Detail:} Contrast-Limited Adaptive Histogram Equalization (CLAHE) to enhance tissue details, and Gaussian noise to simulate the varied, often poor lighting conditions found at crime scenes.
 \end{itemize}
-The testing set underwent strictly deterministic transformations, restricted to essential resizing ($224 \times 224$) and normalization.
+Figure~\ref{fig:augmentation} shows representative examples of these transformations applied to wound images of each type. The testing set underwent strictly deterministic transformations, restricted to essential resizing ($224 \times 224$) and normalization.
+
+\figuraBib[htpb]{lira2024/fig2_augmentation}{Examples of gunshot wound images and some of their augmented versions. From top to bottom: a close-range entry, a distant-shot entry, a contact-shot entry, and an exit wound. From left to right: original (preprocessed) image, Safe Rotation, Horizontal Flip, Blur, CLAHE, Elastic Transform, Gaussian Noise, Hue Saturation, ISO Noise, Random Brightness Contrast, RGBShift, grayscale, Sharpen, and Unsharp mask}{Lira2025deep}{fig:augmentation}{width=\textwidth}
 
 \subsection{Data Splitting: Preventing Semantic Data Leakage}
 A common flaw in forensic machine learning is performing a random split of images. Since a single victim (Case ID) might have multiple photographs of the same wound taken from slightly different angles, randomly splitting images can result in the same wound appearing in both the training and testing sets, causing semantic data leakage and artificially inflating test metrics. 
