@@ -1,0 +1,68 @@
+\label{chap:methodology}
+
+Este capítulo detalha a aquisição dos dados, a implementação arquitetural do modelo TransferKAN e a configuração experimental rigorosa utilizada para treinar e validar a arquitetura proposta. A metodologia foi meticulosamente projetada para garantir a separação estrita dos dados, prevenindo completamente o vazamento semântico de dados que frequentemente compromete as tarefas de classificação de imagens médicas.
+
+\section{Descrição da Base de Dados}
+\label{sec:dataset_desc}
+
+A base de dados utilizada neste estudo é a FDCPUnBGunshotDB~\cite{Lira2025deep}, uma coleção curada de fotografias reais de cenas de crime e necropsias obtidas pela Polícia Civil do Distrito Federal (PCDF), no Brasil. Diferentemente de bases compostas por ambientes laboratoriais encenados ou modelos animais, esta base reflete autenticamente os severos desbalanceamentos de classe, as variações de iluminação e as distorções morfológicas que ocorrem naturalmente no trabalho pericial forense.
+
+Para a tarefa principal de \textbf{Classificação do Tipo de Ferimento} (Entrada vs. Saída), a base contém um total de 2.551 imagens. Ela é severamente desbalanceada, compreendendo:
+\begin{itemize}
+    \item \textbf{Ferimentos de Entrada (Rótulo 0):} 1.883 imagens
+    \item \textbf{Ferimentos de Saída (Rótulo 1):} 668 imagens
+\end{itemize}
+
+Para a tarefa secundária de \textbf{Classificação da Distância Médico-Legal do Disparo (MLSD)}, apenas as 1.883 imagens de ferimentos de entrada são consideradas, já que ferimentos de saída não exibem características de distância. Estas são categorizadas em três classes distintas e altamente assimétricas:
+\begin{itemize}
+    \item \textbf{À distância (Rótulo 2):} 1.609 imagens (85,45\%)
+    \item \textbf{Curta distância (Rótulo 1):} 232 imagens (12,32\%)
+    \item \textbf{Encostado (Rótulo 0):} 42 imagens (2,23\%)
+\end{itemize}
+
+Além do desbalanceamento de classes, a base reflete o perfil demográfico típico de fatalidades relacionadas a armas de fogo: as vítimas são predominantemente homens adultos jovens, com idade média de aproximadamente 27 anos e uma forte assimetria à direita em direção a indivíduos na casa dos vinte anos, como mostra a Figura~\ref{fig:age_dist}.
+
+\figuraBib[htpb]{lira2024/fig3_age}{Frequência da idade no momento da morte na base FDCPUnBGunshotDB, reportada por casos selecionados (a) e por imagens selecionadas (b)}{Lira2025deep}{fig:age_dist}{width=0.8\textwidth}
+
+\section{Detalhes de Implementação da TransferKAN}
+\label{sec:kan_implementation}
+
+O núcleo da nossa solução proposta é a arquitetura \textbf{TransferKAN}, implementada utilizando PyTorch~\cite{paszke2019pytorch}.
+
+\subsection{Backbone e Regularização}
+Empregamos uma ResNet152~\cite{he2016resnet} pré-treinada da TorchVision como \textit{backbone} para a extração de características espaciais, aproveitando seus pesos pré-existentes para identificar padrões visuais de baixo nível complexos sem exigir uma base de dados massiva. A camada final totalmente conectada padrão foi removida, deixando a rede produzir um vetor de características achatado de alta dimensão, de tamanho 2048. Para combater o sobreajuste na base de dados limitada, uma camada pesada de \textit{Dropout} ($p=0{,}5$) foi inserida imediatamente após o extrator de características.
+
+\subsection{Configuração do Classificador KAN}
+Em vez de camadas densas convencionais, acoplamos um módulo KAN dinâmico~\cite{liu2024kan} (utilizando a implementação \texttt{efficient-kan}) como classificador final.
+Para a classificação Entrada/Saída, a KAN foi configurada com uma estrutura de [2048, 128, 2]. Para garantir que as splines pudessem mapear as fronteiras de decisão complexas dos dados desbalanceados, utilizamos uma ordem de spline cúbica igual a 3 e um tamanho de grade ampliado igual a 10. Para a classificação de MLSD, a estrutura foi levemente adaptada para [2048, 128, 3], a fim de acomodar as três classes de distância.
+
+\section{Configuração Experimental}
+\label{sec:experimental_setup}
+
+Para garantir uma avaliação confiável, reproduzível e robusta, o \textit{pipeline} experimental foi rigorosamente controlado. O arcabouço geral de classificação---abrangendo pré-processamento, ampliação de dados, a divisão treino/teste, o treinamento do modelo e a avaliação---segue o \textit{pipeline} estabelecido para esta base de dados por Lira et al., ilustrado na Figura~\ref{fig:framework}.
+
+\figuraBib[htpb]{lira2024/fig1_framework}{Arcabouço geral de classificação adotado para a base FDCPUnBGunshotDB, abrangendo preparação dos dados, ampliação, treinamento do modelo e avaliação}{Lira2025deep}{fig:framework}{width=\textwidth}
+
+\subsection{Ampliação de Dados}
+Devido à escassez e ao desbalanceamento extremo dos dados forenses, uma Ampliação de Dados avançada foi aplicada exclusivamente ao conjunto de treino utilizando a biblioteca \textit{Albumentations}~\cite{buslaev2020albumentations}. O \textit{pipeline} de ampliação incluiu transformações especificamente adaptadas para imitar as realidades forenses:
+\begin{itemize}
+    \item \textbf{Transformações Geométricas:} Espelhamentos horizontal e vertical e combinações de deslocamento-escala-rotação para simular diferentes ângulos fotográficos.
+    \item \textbf{Simulação de Tecido:} Transformações elásticas para simular a elasticidade e a distorção naturais da pele humana.
+    \item \textbf{Iluminação e Detalhe:} Equalização de Histograma Adaptativa Limitada por Contraste (CLAHE) para realçar detalhes do tecido e ruído gaussiano para simular as condições de iluminação variadas e, muitas vezes, ruins encontradas em cenas de crime.
+\end{itemize}
+A Figura~\ref{fig:augmentation} mostra exemplos representativos dessas transformações aplicadas a imagens de ferimentos de cada tipo. O conjunto de teste passou por transformações estritamente determinísticas, restritas ao redimensionamento essencial ($224 \times 224$) e à normalização.
+
+\figuraBib[htpb]{lira2024/fig2_augmentation}{Exemplos de imagens de ferimentos por arma de fogo e algumas de suas versões ampliadas. De cima para baixo: uma entrada de curta distância, uma entrada de disparo à distância, uma entrada de disparo encostado e um ferimento de saída. Da esquerda para a direita: imagem original (pré-processada), rotação segura, espelhamento horizontal, desfoque, CLAHE, transformação elástica, ruído gaussiano, saturação de matiz, ruído ISO, brilho/contraste aleatório, RGBShift, escala de cinza, nitidez e máscara de nitidez (\textit{unsharp})}{Lira2025deep}{fig:augmentation}{width=\textwidth}
+
+\subsection{Divisão dos Dados: Prevenção do Vazamento Semântico de Dados}
+Uma falha comum no aprendizado de máquina forense é realizar uma divisão aleatória das imagens. Como uma única vítima (Identificador de Caso) pode ter múltiplas fotografias do mesmo ferimento tiradas de ângulos ligeiramente diferentes, dividir as imagens aleatoriamente pode fazer com que o mesmo ferimento apareça tanto no conjunto de treino quanto no de teste, causando vazamento semântico de dados e inflando artificialmente as métricas de teste.
+
+Para evitar isso completamente, a base de dados foi dividida estritamente com base no \textit{Identificador de Caso} (extraído do nome do arquivo). Implementamos uma estratégia rigorosa de validação cruzada de 5 dobras, mantendo uma divisão de 80\%/20\% baseada em casos por dobra. Uma verificação programática de sanidade foi utilizada para garantir interseção semântica zero entre os subconjuntos de treino e teste.
+
+\subsection{Procedimento de Treinamento em Duas Fases}
+O treinamento foi conduzido ao longo de 60 épocas por dobra, utilizando uma metodologia estrita de aprendizado por transferência em duas fases:
+\begin{enumerate}
+    \item \textbf{Fase 1 (Épocas 1--15):} Os parâmetros do \textit{backbone} ResNet152 foram congelados. Apenas o classificador KAN foi treinado utilizando o otimizador AdamW com taxa de aprendizado de $1 \times 10^{-3}$ e decaimento de peso ($1 \times 10^{-2}$). Isso permitiu que as splines da KAN convergissem para uma linha de base estável utilizando as características brutas.
+    \item \textbf{Fase 2 (Épocas 16--60):} Toda a rede foi descongelada (\textit{fine-tuning}). O treinamento continuou com uma taxa de aprendizado reduzida de $1 \times 10^{-5}$ para otimizar conjuntamente os filtros convolucionais e as splines da KAN.
+\end{enumerate}
+Um agendador CosineAnnealingLR foi utilizado ao longo de ambas as fases para decair suavemente a taxa de aprendizado. Além disso, a ponderação por frequência inversa de classe foi aplicada à função de perda de Entropia Cruzada para penalizar matematicamente, de forma mais severa, os erros nas classes minoritárias (por exemplo, disparos Encostados). Durante cada dobra, os pesos do modelo que alcançaram a maior acurácia de teste foram salvos como ponto de verificação, e as predições fora da dobra (\textit{out-of-fold}) foram agregadas para calcular as métricas finais, verdadeiramente validadas por validação cruzada.

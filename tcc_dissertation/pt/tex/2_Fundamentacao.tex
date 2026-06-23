@@ -1,0 +1,51 @@
+\label{chap:background}
+
+Este capítulo fornece a fundamentação teórica essencial para compreender a natureza interdisciplinar deste trabalho, conectando a patologia forense e a inteligência artificial avançada. Ele detalha os conceitos fundamentais da classificação de ferimentos por arma de fogo, os mecanismos de aprendizado profundo para visão computacional e a teoria matemática que fundamenta as Redes de Kolmogorov-Arnold (KAN).
+
+\section{Patologia Forense de Ferimentos por Arma de Fogo}
+\label{sec:forensic_background}
+
+Na medicina forense, a análise precisa de ferimentos por arma de fogo é crucial para reconstruir os eventos de uma cena de crime. Quando um projétil atinge um corpo humano, ele produz um conjunto previsível de alterações morfológicas que variam significativamente dependendo da arma, da munição e da distância a partir da qual o disparo foi efetuado~\cite{dimaio2015gunshot,saukko2016knight}.
+
+\subsection{Ferimentos de Entrada versus Saída}
+As tarefas de classificação mais fundamentais envolvem distinguir um ferimento de entrada de um ferimento de saída.
+Um ferimento de entrada é tipicamente caracterizado por uma \textit{orla de escoriação} (uma borda marginal de pele raspada), inversão do tecido e uma forma geralmente regular, circular ou oval, dependendo do ângulo de incidência. As propriedades físicas da pele sendo empurrada para dentro pelo projétil causam esses sinais específicos.
+Por outro lado, um ferimento de saída geralmente apresenta tecido evertido (voltado para fora), formas irregulares ou estreladas e ausência de orla de escoriação ou resíduos de disparo, à medida que o projétil empurra o tecido de dentro para fora.
+
+No entanto, alvos intermediários, deflexões ósseas e alterações post-mortem como a putrefação podem obscurecer essas características, tornando a classificação visual uma tarefa altamente complexa e fortemente dependente da experiência pericial.
+
+\subsection{Distância Médico-Legal do Disparo (MLSD)}
+Além de distinguir entrada de saída, classificar a distância do disparo---a Distância Médico-Legal do Disparo (MLSD)---é vital para as investigações legais. A MLSD é categorizada com base nos vestígios macroscópicos deixados pela combustão da pólvora e dos componentes do espoleta sobre a pele~\cite{dimaio2015gunshot}:
+\begin{itemize}
+    \item \textbf{Encostado:} A boca do cano da arma é pressionada contra a pele. Esses ferimentos frequentemente exibem uma "marca do cano" e graves lacerações teciduais devido à entrada dos gases em expansão nas camadas subcutâneas.
+    \item \textbf{Curta distância:} Disparado a curta distância (tipicamente menos de 60 cm), esses ferimentos exibem \textit{tatuagem} ou \textit{esfumaçamento} (grãos de pólvora não queimados incrustados na pele) e deposição de fuligem ao redor do orifício de entrada.
+    \item \textbf{À distância:} Disparado de uma distância na qual os resíduos de pólvora não alcançam mais a pele. O ferimento apresenta principalmente a orla de escoriação, sem fuligem ou esfumaçamento ao redor.
+\end{itemize}
+
+\section{Aprendizado Profundo para Visão Computacional}
+\label{sec:dl_background}
+
+O Aprendizado Profundo (DL), um subconjunto do aprendizado de máquina, revolucionou o campo da Visão Computacional ao permitir que modelos computacionais descubram e extraiam automaticamente as representações necessárias para a detecção de características a partir de dados brutos.
+
+\subsection{Redes Neurais Convolucionais (CNNs) e ResNet}
+As Redes Neurais Convolucionais (CNNs) são a arquitetura padrão para classificação de imagens. Elas utilizam camadas convolucionais para extrair características espaciais hierárquicas---de bordas simples nas camadas inferiores a formas semânticas complexas nas camadas mais profundas.
+
+Um problema persistente no treinamento de CNNs profundas é o problema do desaparecimento do gradiente (\textit{vanishing gradient}), em que os gradientes se tornam pequenos demais para atualizar os pesos de forma eficaz nas camadas iniciais. A arquitetura de Rede Residual (ResNet)~\cite{he2016resnet} resolveu isso introduzindo "conexões de atalho" (ou blocos residuais), que permitem que o gradiente contorne certas camadas. A ResNet152, uma variante com 152 camadas, representa o ápice da extração profunda de características, amplamente utilizada como \textit{backbone} robusto em aplicações de aprendizado por transferência para imagens médicas e forenses, tipicamente inicializada com pesos pré-treinados na base de dados de larga escala ImageNet~\cite{deng2009imagenet}.
+
+Tradicionalmente, as características espaciais profundas extraídas por arquiteturas como a ResNet são achatadas e passadas por um Perceptron de Múltiplas Camadas (MLP)---composto por camadas lineares densas e totalmente conectadas, seguidas de funções de ativação não-lineares fixas (por exemplo, ReLU)---para produzir as probabilidades finais de classe.
+
+\section{Redes de Kolmogorov-Arnold (KAN)}
+\label{sec:kan_background}
+
+Embora os MLPs tenham sido o padrão onipresente para a cabeça de classificação no aprendizado profundo, eles são fundamentalmente baseados no Teorema da Aproximação Universal. Recentemente, uma nova arquitetura de rede neural conhecida como Redes de Kolmogorov-Arnold (KAN) foi proposta~\cite{liu2024kan}, inspirada no teorema de representação de Kolmogorov-Arnold.
+
+\subsection{Fundamento Teórico}
+O teorema de representação de Kolmogorov-Arnold afirma que qualquer função contínua multivariada pode ser representada como uma composição finita de funções contínuas de uma única variável e da operação de adição.
+
+Em um MLP tradicional, a rede aprende pesos fixos (transformações lineares) nas arestas e aplica uma função de ativação não-linear fixa e predefinida (como ReLU ou Sigmoide) nos nós.
+Em forte contraste, uma KAN inverte esse paradigma: ela coloca funções de ativação não-lineares \textit{aprendíveis} nas \textit{arestas} (conexões) e simplesmente as soma nos nós.
+
+\subsection{B-Splines e Eficiência de Parâmetros}
+Para tornar as funções das arestas aprendíveis, as KANs tipicamente as parametrizam usando B-splines (splines de base)~\cite{liu2024kan}. Uma B-spline é uma função polinomial por partes que pode adaptar sua forma de maneira flexível para modelar relações não-lineares altamente complexas.
+
+Como cada parâmetro de peso em um MLP é substituído por uma função spline altamente flexível em uma KAN, as KANs geralmente requerem muito menos parâmetros para alcançar o mesmo mapeamento, ou melhor, de fronteiras de decisão complexas. Isso as torna altamente eficientes em parâmetros e menos propensas ao sobreajuste em bases de dados desbalanceadas ou relativamente pequenas---uma vantagem crítica para a visão computacional forense, na qual obter milhares de imagens de ferimentos por arma de fogo perfeitamente padronizadas é praticamente impossível.

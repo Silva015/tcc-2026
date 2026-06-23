@@ -1,0 +1,31 @@
+\label{chap:related}
+
+Este capítulo revisa a literatura atual sobre a aplicação de inteligência artificial à patologia forense, com foco específico na classificação de ferimentos por arma de fogo. Ele analisa criticamente o \textit{benchmark} do estado da arte estabelecido por estudos recentes e identifica as lacunas arquiteturais que o modelo TransferKAN proposto busca preencher.
+
+\section{IA em Patologia Forense}
+\label{sec:ai_forensics}
+
+A integração da inteligência artificial às ciências forenses tem sido historicamente mais lenta em comparação com a medicina clínica. Estudos iniciais no domínio utilizaram predominantemente carcaças de animais, como suínos, para simular as propriedades da pele humana ao analisar ferimentos por arma de fogo~\cite{oura2021deep}. Embora esses ambientes laboratoriais controlados permitissem altas acurácias de classificação, eles careciam da variabilidade extrema, da contaminação e das alterações morfológicas complexas encontradas em cenas de crime humanas reais. Trabalhos posteriores avançaram em direção a amostras humanas: Cheng et al.~\cite{cheng2024gunshot} treinaram classificadores em fotografias de necropsia de ferimentos humanos por arma de fogo, mas essas imagens foram obtidas sob as condições relativamente controladas de exames de necropsia e não abordaram a tarefa de MLSD.
+
+\section{O Estudo de Referência de 2024}
+\label{sec:2024_benchmark}
+
+Um avanço significativo na área foi alcançado recentemente por Lira et al. em seu artigo \textit{Deep learning-based human gunshot wounds classification}~\cite{Lira2025deep}. Esse estudo foi pioneiro por utilizar uma base de dados forense substancial e do mundo real---a FDCPUnBGunshotDB---composta por 2.551 fotografias digitais capturadas diretamente em cenas de crime e necropsias pela Polícia Civil do Distrito Federal, no Brasil.
+
+Os autores avaliaram sistematicamente 59 arquiteturas diferentes de aprendizado profundo (incluindo diversas variantes de EfficientNet, MobileNet, ViT e ResNet) para realizar duas tarefas principais: distinguir entre ferimentos de entrada e de saída e classificar a Distância Médico-Legal do Disparo (MLSD).
+
+\subsection{Metodologias e Resultados de Referência}
+Em sua metodologia, Lira et al. empregaram extensa ampliação de dados para combater o desbalanceamento inerente da base de dados (por exemplo, 1.883 ferimentos de entrada contra apenas 668 de saída). Eles utilizaram uma abordagem de validação \textit{hold-out} e constataram que a arquitetura \textbf{ResNet152} demonstrou o melhor desempenho geral em ambas as tarefas.
+\begin{itemize}
+    \item Para a classificação binária \textbf{Entrada vs. Saída}, a ResNet152 alcançou uma acurácia de 86,90\% e uma Área sob a Curva (AUC) de 82,09\%.
+    \item Para a categorização multiclasse de \textbf{MLSD}, a mesma arquitetura alcançou uma acurácia expressiva de 92,48\% e uma AUC de até 94,36\%.
+\end{itemize}
+
+\section{Identificação da Lacuna de Pesquisa}
+\label{sec:research_gap}
+
+Embora o estudo de 2024 tenha estabelecido um \textit{benchmark} robusto e comprovado a viabilidade da visão computacional em investigações forenses do mundo real, uma limitação arquitetural crítica persiste.
+
+O modelo ResNet152 do estado da arte, como todas as CNNs tradicionais avaliadas no \textit{benchmark}, depende de um Perceptron de Múltiplas Camadas (MLP) padrão para sua cabeça de classificação final. Os MLPs consistem em camadas lineares densas seguidas de nós de ativação não-linear fixos. Em cenários que envolvem bases de dados forenses altamente desbalanceadas, nas quais as características visuais são obscurecidas por ruído, sangue e putrefação, as ativações rígidas baseadas em nós dos MLPs requerem quantidades massivas de parâmetros para mapear com sucesso fronteiras de decisão altamente complexas e não-lineares.
+
+Os autores do estudo de 2024 observaram que o desbalanceamento das amostras ainda afetava negativamente métricas como precisão e revocação para as classes minoritárias. Portanto, há uma necessidade clara e premente de uma cabeça de classificação leve, porém altamente expressiva, capaz de discriminar melhor, de forma probabilística, essas fronteiras não-lineares complexas sem aumentar exponencialmente o tamanho da base de dados. Essa lacuna constitui a motivação direta para a introdução das Redes de Kolmogorov-Arnold (KAN) como cabeça de classificação neste trabalho.

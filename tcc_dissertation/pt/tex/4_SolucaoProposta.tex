@@ -1,0 +1,70 @@
+\label{chap:solution}
+
+Para abordar as limitações das arquiteturas CNN tradicionais na classificação de bases de dados forenses de ferimentos por arma de fogo altamente desbalanceadas e não-lineares, este trabalho introduz uma nova arquitetura híbrida: a \textbf{TransferKAN}.
+
+\section{A Arquitetura TransferKAN}
+\label{sec:transferkan_arch}
+
+A filosofia central por trás da TransferKAN é combinar a comprovada capacidade de extração de características espaciais das Redes Neurais Convolucionais do estado da arte com o potencial de classificação altamente expressivo e eficiente em parâmetros das Redes de Kolmogorov-Arnold (KAN).
+
+Arquiteturas tradicionais, como a ResNet152~\cite{he2016resnet} utilizada no \textit{benchmark} de 2024~\cite{Lira2025deep}, processam uma imagem por meio de uma série de blocos convolucionais para gerar um vetor de características de alta dimensão. Esse vetor é então tipicamente alimentado em uma cabeça de classificação de Perceptron de Múltiplas Camadas (MLP). Embora o \textit{backbone} ResNet seja excepcionalmente hábil em reconhecer padrões visuais (bordas, texturas, formas), a cabeça MLP frequentemente tem dificuldade em mapear essas características em classes discretas quando as fronteiras de decisão são altamente complexas, ruidosas e não-lineares---como é inerentemente o caso das imagens forenses de ferimentos por arma de fogo.
+
+\subsection{Componentes da Arquitetura}
+
+A arquitetura TransferKAN é composta por três estágios sequenciais distintos:
+\begin{enumerate}
+    \item \textbf{Extrator de Características Espaciais (Backbone ResNet152):} Utilizamos um modelo ResNet152~\cite{he2016resnet} pré-treinado na ImageNet~\cite{deng2009imagenet}. A camada densa totalmente conectada final (o classificador MLP original) é removida programaticamente. Consequentemente, para uma imagem de entrada padrão, o \textit{backbone} produz um vetor de características achatado de tamanho 2048. Isso aproveita o paradigma do Aprendizado por Transferência, evitando a necessidade de treinar um extrator profundo de características do zero em uma base de dados forense limitada.
+
+    \item \textbf{Regularização (Dropout):} Para conectar o \textit{backbone} ao novo classificador e, ao mesmo tempo, prevenir agressivamente o sobreajuste, uma camada de \textit{Dropout} com probabilidade $p=0{,}5$ é introduzida. Isso força a rede a aprender representações redundantes e robustas, em vez de memorizar as amostras de treinamento.
+
+    \item \textbf{Classificador de Rede de Kolmogorov-Arnold (KAN):} A inovação central reside em acoplar um módulo KAN~\cite{liu2024kan} diretamente ao vetor de características. Em vez de uma multiplicação matricial de camada densa com ativações fixas nos nós, a KAN mapeia o vetor de 2048 dimensões para o número desejado de classes de saída (por exemplo, 2 para Entrada/Saída ou 3 para MLSD) por meio de uma camada oculta intermediária de 128 dimensões. As conexões entre essas camadas são modeladas como B-splines aprendíveis.
+\end{enumerate}
+
+O fluxo completo de dados da arquitetura proposta é resumido na Figura~\ref{fig:transferkan_arch}.
+
+\begin{figure}[htpb]
+\centering
+\begin{tikzpicture}[
+    >=Stealth,
+    node distance=8mm,
+    block/.style={rectangle, rounded corners, draw=black, thick, align=center,
+                  minimum height=13mm, minimum width=20mm, fill=blue!8},
+    backbone/.style={block, fill=green!10, minimum width=24mm},
+    kan/.style={block, fill=orange!12, minimum width=24mm},
+    io/.style={block, fill=gray!12, minimum width=16mm},
+    every node/.style={font=\small},
+]
+    \node[io] (input) {Imagem de\\entrada\\$224\times224$};
+    \node[backbone, right=of input] (resnet) {Backbone\\ResNet152\\(ImageNet)};
+    \node[block, right=of resnet] (drop) {Dropout\\$p=0{,}5$};
+    \node[kan, right=of drop] (kanlayer) {Classificador\\KAN\\$[2048,128,N]$};
+    \node[io, right=of kanlayer] (out) {Logits de\\classe\\($N{=}2$ ou $3$)};
+
+    \draw[->, thick] (input) -- (resnet);
+    \draw[->, thick] (resnet) -- node[above, font=\scriptsize] {2048-d} (drop);
+    \draw[->, thick] (drop) -- (kanlayer);
+    \draw[->, thick] (kanlayer) -- (out);
+
+    \begin{scope}[on background layer]
+        \node[draw=green!50!black, dashed, rounded corners, inner sep=3mm,
+              fit=(resnet), label={[font=\scriptsize, green!50!black]below:Congelado na Fase~1}] {};
+        \node[draw=orange!70!black, dashed, rounded corners, inner sep=3mm,
+              fit=(kanlayer), label={[font=\scriptsize, orange!70!black]below:Cabeça treinável}] {};
+    \end{scope}
+\end{tikzpicture}
+\caption{A arquitetura TransferKAN proposta. Um \textit{backbone} ResNet152 pré-treinado na ImageNet extrai um vetor de características de 2048 dimensões, que é regularizado por uma camada de \textit{dropout} ($p=0{,}5$) e mapeado para as classes de saída por um classificador de Rede de Kolmogorov-Arnold com estrutura $[2048,128,N]$ ($N=2$ para Entrada/Saída, $N=3$ para MLSD).}
+\label{fig:transferkan_arch}
+\end{figure}
+
+\section{Justificativa da Inovação}
+\label{sec:justification}
+
+A transição de uma cabeça de classificação MLP para um classificador KAN não é uma mera substituição estrutural; ela representa uma mudança fundamental na forma como a rede modela a fronteira de decisão final.
+
+Ao colocar as funções de ativação não-lineares nas arestas (splines), a KAN molda dinamicamente suas formas de ativação para melhor se ajustar aos dados durante o treinamento. Isso oferece duas vantagens significativas no contexto forense:
+\begin{itemize}
+    \item \textbf{Discriminação Superior em Dados Desbalanceados:} As splines permitem que a KAN crie fronteiras não-lineares altamente intrincadas ao redor dos agrupamentos das classes minoritárias (como ferimentos de Saída ou disparos Encostados) sem colapsar na classe majoritária, um ponto comum de falha dos MLPs rígidos.
+    \item \textbf{Eficiência de Parâmetros:} A KAN requer significativamente menos parâmetros para alcançar um mapeamento matemático altamente complexo em comparação com um MLP, reduzindo o risco de superparametrização e de sobreajuste à base de dados FDCPUnBGunshotDB, que é limitada.
+\end{itemize}
+
+Por meio desse projeto arquitetural estratégico, a TransferKAN busca atuar como um discriminador probabilístico otimizado, adaptado especificamente às nuances da patologia forense.
