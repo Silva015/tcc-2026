@@ -34,7 +34,9 @@ We employed a pre-trained ResNet152~\cite{he2016resnet} from TorchVision as the 
 
 \subsection{KAN Classifier Configuration}
 Instead of conventional dense layers, we appended a dynamic KAN module~\cite{liu2024kan} (using the \texttt{efficient-kan} implementation) as the final classifier.
-For the Entry/Exit classification, the KAN was configured with a structure of [2048, 128, 2]. To ensure the splines could map the complex decision boundaries of the imbalanced data, we used a cubic spline order of 3 and an increased grid size of 10. For the MLSD classification, the structure was slightly adapted to [2048, 128, 3] to accommodate the three distance classes. 
+For the Entry/Exit classification, the KAN was configured with a structure of [2048, 128, 2]. To ensure the splines could map the complex decision boundaries of the imbalanced data, we used a cubic spline order of 3 and an increased grid size of 10 (the implementation default is 5).
+
+For the MLSD classification, the structure was adapted to [2048, 128, 3] to accommodate the three distance classes. For that task we retained the cubic spline order of 3 but kept the implementation's default grid size of 5: since the \textit{Contact} class comprises only 42 images, a denser grid would increase the number of spline coefficients per edge without enough samples to estimate them reliably.
 
 \section{Experimental Setup}
 \label{sec:experimental_setup}
@@ -49,20 +51,58 @@ Due to the scarcity and extreme imbalance of forensic data, advanced Data Augmen
     \item \textbf{Geometric Transformations:} Horizontal and vertical flips, and shift-scale-rotate combinations to simulate different photographic angles.
     \item \textbf{Tissue Simulation:} Elastic transformations to simulate the natural elasticity and distortion of human skin.
     \item \textbf{Lighting and Detail:} Contrast-Limited Adaptive Histogram Equalization (CLAHE) to enhance tissue details, and Gaussian noise to simulate the varied, often poor lighting conditions found at crime scenes.
+    \item \textbf{Chromatic Variation:} Random perturbation of brightness, contrast, saturation, and hue (\textit{color jitter}), to reduce the model's dependence on the specific color balance of any given camera and capture condition.
 \end{itemize}
-Figure~\ref{fig:augmentation} shows representative examples of these transformations applied to wound images of each type. The testing set underwent strictly deterministic transformations, restricted to essential resizing ($224 \times 224$) and normalization.
+Figure~\ref{fig:augmentation} shows representative examples of these transformations applied to wound images of each type. The testing set underwent strictly deterministic transformations, restricted to essential resizing ($224 \times 224$) and normalization by the ImageNet per-channel statistics ($\mu = [0.485, 0.456, 0.406]$ and $\sigma = [0.229, 0.224, 0.225]$)---the same normalization applied to the training set after augmentation. Training and testing batches for TransferKAN comprised 32 images.
 
-\figuraBib[htpb]{lira2024/fig2_augmentation}{Examples of gunshot wound images and some of their augmented versions. From top to bottom: a close-range entry, a distant-shot entry, a contact-shot entry, and an exit wound. From left to right: original (preprocessed) image, Safe Rotation, Horizontal Flip, Blur, CLAHE, Elastic Transform, Gaussian Noise, Hue Saturation, ISO Noise, Random Brightness Contrast, RGBShift, grayscale, Sharpen, and Unsharp mask}{Lira2025deep}{fig:augmentation}{width=\textwidth}
+In the implementation, the two transformation policies are materialized as \textit{two distinct instances} of the same dataset object---one carrying the augmentation pipeline and one carrying only the deterministic pipeline---from which each fold's training and testing subsets are drawn by index. This arrangement structurally guarantees that no stochastic transformation ever reaches the evaluation images.
+
+\figuraBib[htpb]{lira2024/fig2_augmentation}{Examples of gunshot wound images and some of their augmented versions. From top to bottom: a close-range entry, a distant-shot entry, a contact-shot entry, and an exit wound. From left to right: original (preprocessed) image, Safe Rotation, Horizontal Flip, Blur, CLAHE, Elastic Transform, Gaussian Noise, Hue Saturation, ISO Noise, Random Brightness Contrast, RGBShift, grayscale, Sharpen, and Unsharp mask. The pipeline adopted in this work employs a subset of these transformations, listed in this section}{Lira2025deep}{fig:augmentation}{width=\textwidth}
+
+\subsection{Reproducibility}
+The pseudo-random number generator seeds for \texttt{PyTorch} and for Python's \texttt{random} module were fixed at 42, which makes the case-based partition and the batch sampling order deterministic. It should be noted that the \texttt{NumPy} seed was not explicitly fixed and that GPU convolution operations are not bit-for-bit deterministic; consequently, re-runs may exhibit small numerical variations in the reported metrics. We further note that the augmentation pipeline was built against the pre-2.0 \textit{Albumentations} interface---in which parameters such as \texttt{alpha\_affine} and \texttt{var\_limit} have since been removed or renamed---so exact reproduction of the experiments requires pinning the library version.
 
 \subsection{Data Splitting: Preventing Semantic Data Leakage}
 A common flaw in forensic machine learning is performing a random split of images. Since a single victim (Case ID) might have multiple photographs of the same wound taken from slightly different angles, randomly splitting images can result in the same wound appearing in both the training and testing sets, causing semantic data leakage and artificially inflating test metrics. 
 
 To completely prevent this, the dataset was split strictly based on the \textit{Case ID} (extracted from the filename). We implemented a rigorous 5-fold cross-validation strategy, maintaining an 80\%/20\% case-based split per fold. A programmatic sanity check was utilized to guarantee zero semantic intersection between the train and test subsets.
 
-\subsection{Two-Phase Training Procedure}
-The training was conducted over 60 epochs per fold, utilizing a strict two-phase transfer learning methodology:
+\subsection{Training Procedure}
+In both tasks, training was conducted over 60 epochs per fold, with the model re-initialized from the ImageNet weights at the start of every fold, so that no information is carried from one fold to the next. The optimization regime, however, differs between the two tasks.
+
+\subsubsection{Entry/Exit: two-phase transfer learning}
+For wound type classification, a strict two-phase transfer learning methodology was adopted:
 \begin{enumerate}
     \item \textbf{Phase 1 (Epochs 1-15):} The ResNet152 backbone parameters were frozen. Only the KAN classifier was trained using the AdamW optimizer with a learning rate of $1 \times 10^{-3}$ and weight decay ($1 \times 10^{-2}$). This allowed the KAN splines to converge to a stable baseline utilizing the raw features.
-    \item \textbf{Phase 2 (Epochs 16-60):} The entire network was unfrozen (Fine-tuning). Training continued with a reduced learning rate of $1 \times 10^{-5}$ to jointly optimize the convolutional filters and the KAN splines.
+    \item \textbf{Phase 2 (Epochs 16-60):} The entire network was unfrozen (Fine-tuning). Training continued with a reduced learning rate of $1 \times 10^{-5}$ and weight decay of $1 \times 10^{-3}$, to jointly optimize the convolutional filters and the KAN splines.
 \end{enumerate}
-A CosineAnnealingLR scheduler was utilized throughout both phases to smoothly decay the learning rate. Furthermore, inverse class frequency weighting was applied to the Cross-Entropy Loss function to mathematically penalize errors in the minority classes (e.g., Contact shots) more heavily. During each fold, the model weights achieving the highest test accuracy were checkpointed, and the out-of-fold predictions were aggregated to calculate the final, true cross-validated metrics.
+
+\subsubsection{MLSD: single phase with a conservative learning rate}
+For Medical-Legal Shooting Distance classification, the initial freezing stage was not employed: the network was optimized end-to-end from the very first epoch, with the AdamW optimizer set to a single, conservative learning rate of $1 \times 10^{-4}$ and weight decay of $1 \times 10^{-2}$, over the same 60 epochs. The choice follows from the nature of the task: the evidence separating the three distances---powder residue, soot, stippling---consists of fine-grained textures encoded in the backbone's intermediate convolutional layers and not fully represented in generic ImageNet features. Freezing those layers for a quarter of the training budget would deprive the classifier of precisely the task's discriminative signal; an intermediate learning rate, sitting between the two used for Entry/Exit, adapts the filters from the outset without destroying the pre-trained representation.
+
+\subsubsection{Elements common to both tasks}
+A CosineAnnealingLR scheduler was utilized in every regime to smoothly decay the learning rate. Furthermore, inverse class frequency weighting was applied to the Cross-Entropy Loss function to mathematically penalize errors in the minority classes (e.g., Contact shots) more heavily; the weights are recomputed within each fold, from the label distribution of that fold's training set alone. During each fold, the model weights achieving the highest accuracy on that fold's test set were checkpointed, and the out-of-fold predictions were aggregated to calculate the final cross-validated metrics. The implications of this checkpoint selection criterion are discussed in Section~\ref{sec:threats}.
+
+\subsection{Reference Architectures for the Ablation Study}
+\label{sec:ablation_setup}
+
+To isolate the contribution of each TransferKAN component, three alternative architectures were trained as ablation references. All share the same Case ID-based semantic partitioning, the same augmentation pipeline, and the same class weighting described above, but they differ from TransferKAN in input resolution, batch size, and validation protocol---differences that must be made explicit for the comparison to be read correctly:
+
+\begin{itemize}
+    \item \textbf{ResKANet-18:} a fully convolutional-KAN residual network (\texttt{reskanet\_18x32p}, from the \textit{torch-conv-kan} library), in which the convolutions themselves are parameterized by splines. Unlike TransferKAN, it is trained \textbf{from scratch, without any ImageNet pre-training}. Input of $128 \times 128$.
+    \item \textbf{PureConvKAN:} a shallow convolutional network built from three successive \texttt{ConvKAN} blocks (16, 32, and 64 channels), each followed by max-pooling and batch normalization, closed by global average pooling, dropout ($p=0.5$), and a single linear output layer. Also trained from scratch, with an input of $128 \times 128$.
+    \item \textbf{PureKAN:} the most austere baseline, in which the image is simply flattened into a pixel vector and fed directly to a KAN, with no convolutional stage whatsoever. Input reduced to $64 \times 64$ to keep the dimensionality of the flattened vector tractable ($3 \times 64 \times 64 = 12{,}288$ inputs).
+\end{itemize}
+
+The three references were trained for 60 end-to-end epochs with the AdamW optimizer, with batches of 8 images, and evaluated under a single 80\%/20\% \textit{hold-out} partition strictly separated by Case ID---not under 5-fold cross-validation. They therefore fully preserve the guarantee against semantic leakage, but they are not directly comparable to TransferKAN in absolute numerical terms; their purpose is to indicate the order of magnitude of the performance attainable by each paradigm, not to establish a ranking under identical conditions.
+
+\subsection{Threats to Validity}
+\label{sec:threats}
+
+Three methodological limitations must be made explicit for the correct interpretation of the results presented in Chapter~\ref{chap:results}.
+
+\textbf{Checkpoint selection on the evaluation set.} Within each fold, the preserved weights are those maximizing accuracy on that same fold's test set, whose predictions are then aggregated to compose the out-of-fold metrics. Because the same set is used both to select the epoch and to report performance, the out-of-fold metrics carry an optimistic bias: they measure the performance of the \textit{best} epoch on those cases, not the performance of an epoch chosen blind. The methodologically correct procedure would be to hold out, within each fold's training set and likewise separated by case, an inner validation partition dedicated exclusively to epoch selection. It should be noted that this bias falls on accuracy and the other threshold-dependent metrics; AUC, the primary metric this work relies upon, is less sensitive to it, as it integrates performance across all decision thresholds.
+
+\textbf{Non-isometric comparison across architectures.} As detailed in Section~\ref{sec:ablation_setup}, the ablation architectures operate at lower resolutions, with smaller batches, and under \textit{hold-out} validation, whereas TransferKAN operates at $224 \times 224$ under 5-fold cross-validation. The performance differences observed between them are therefore not attributable to architecture alone.
+
+\textbf{Provenance of the baseline metrics.} The ResNet152 metrics used as a baseline were taken from the published work of Lira et al.~\cite{Lira2025deep} and not from a local re-run of the model. The comparison consequently contrasts distinct evaluation protocols---\textit{hold-out} in the baseline, case-based cross-validation in this work---rather than two models subjected to the same experimental procedure. This asymmetry is analyzed in detail in Chapter~\ref{chap:results}.
