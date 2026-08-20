@@ -1069,6 +1069,8 @@ Depois das correções feitas na monografia, o texto e o código estão alinhado
 
 ## 11. Como rodar hoje
 
+> ✅ **Antes de mais nada: os 8 notebooks rodaram, e a prova está neles.** Todos guardam as saídas de execução, e nenhuma célula de nenhum deles contém erro. No `TransferKAN_EntradaSaida.ipynb`, a saída da célula 10 mostra as 5 dobras completas e termina com a tabela cujos valores são **exatamente** os da Tabela 6.1 da monografia: ACC 0,860 · AUC macro 0,908 · AUC micro 0,928 · Revocação macro 0,835 · F1 macro 0,825. Ou seja, os números que você defende vieram de uma execução real, e ela está registrada no arquivo. Se quiser conferir, é só abrir o notebook e rolar até o fim.
+
 ### 11.1. Onde rodar
 
 **Google Colab com GPU.** Não é preferência, é requisito: a ResNet152 tem ~60 milhões de parâmetros, e são 5 dobras × 60 épocas. Em CPU, o `TransferKAN_EntradaSaida` levaria dias.
@@ -1085,35 +1087,54 @@ git clone https://github.com/pedrogarciafreitas/FDCPUnBGunshotDB.git -q
 
 Nada precisa ser baixado à mão. Rode as células **em ordem**, de cima para baixo — o notebook tem estado, e pular a célula 6 quebra a célula 10.
 
-### 11.3. ⚠️ O problema do Albumentations
+### 11.3. ⚠️ O problema do Albumentations — e ele é mais sutil do que parece
 
 Os notebooks foram escritos contra a interface anterior à versão 2.0 da biblioteca. Nas versões atuais, três parâmetros que o código usa **não existem mais**:
 
 | No código | Situação hoje |
 |---|---|
 | `A.ElasticTransform(alpha_affine=50)` | `alpha_affine` foi removido |
-| `A.GaussNoise(var_limit=(10.0, 50.0))` | `var_limit` foi renomeado |
+| `A.GaussNoise(var_limit=(10.0, 50.0))` | `var_limit` foi removido (hoje é `std_range`) |
 | `A.ShiftScaleRotate(...)` | descontinuada em favor de `A.Affine` |
 
-**Rodar hoje sem ajuste dá `TypeError` na célula 6.** Duas saídas:
+**O código não quebra — e é justamente por isso que o problema é perigoso.** A Albumentations moderna não levanta exceção: ela emite um `UserWarning` e **descarta silenciosamente o argumento inválido**, seguindo com o valor padrão.
 
-1. **Fixar a versão** (mais simples, e é o que preserva o experimento original):
-   ```bash
-   pip install "albumentations<1.4.15" -q
-   ```
-2. **Migrar o código** para a interface nova — só faça isso se for re-executar tudo, porque muda o *augmentation* e portanto os números.
+E isso **já aconteceu na execução que gerou os resultados do TCC**. As saídas salvas na célula 6 do `TransferKAN_EntradaSaida.ipynb` mostram exatamente estes três avisos:
+
+```
+UserWarning: ShiftScaleRotate is a special case of Affine transform.
+UserWarning: Argument(s) 'alpha_affine' are not valid for transform ElasticTransform
+UserWarning: Argument(s) 'var_limit' are not valid for transform GaussNoise
+```
+
+Portanto, na prática:
+
+- `ElasticTransform` rodou **sem** o `alpha_affine=50`, no padrão da biblioteca;
+- `GaussNoise` rodou **sem** o `var_limit=(10, 50)` — o padrão atual é `std_range=(0.2, 0.44)`, uma escala completamente diferente;
+- `ShiftScaleRotate` funcionou normalmente, apenas depreciada.
+
+**O que isso significa para a defesa:** o *conjunto* de transformações aplicado é o que a monografia descreve — flip, rotação, CLAHE, elástica, ruído gaussiano, jitter de cor. Mas **duas delas rodaram com magnitudes diferentes das que estão escritas no código**. Se perguntarem, a resposta honesta é:
+
+> "As transformações aplicadas são as descritas. Dois parâmetros de intensidade, porém, foram descartados silenciosamente por uma mudança de interface da Albumentations entre a escrita do código e a execução, de modo que `ElasticTransform` e `GaussNoise` operaram nas magnitudes padrão da biblioteca. Isso está registrado na Seção 5.3.2 da monografia. Não invalida os resultados — a ampliação continuou ativa e diversificada —, mas significa que a reprodução exata exige fixar a versão da biblioteca."
+
+Se for **re-executar**, escolha conscientemente:
+
+1. **Reproduzir o experimento como ele de fato ocorreu** — use uma Albumentations 2.x e aceite os avisos. É o que corresponde aos números da monografia.
+2. **Rodar com os parâmetros que o código declara** — migre para a interface nova (`A.Affine`, `std_range`) e ajuste as escalas à mão. **Isso muda o *augmentation* e portanto muda os números**, que deixarão de bater com a Tabela 6.1.
 
 ### 11.4. O que você deve ver
 
 | Célula | Saída esperada |
 |---|---|
 | 2 | a "radiografia" das pastas, com as contagens de arquivos |
-| 4/6 | `Total de imagens encontradas: 2551` |
+| 4/6 | `Total de imagens encontradas: 2554` e `Total de Casos Únicos: 486` |
 | 6 | `✅ SUCESSO! Zero interseção semântica identificada pelo código.` |
 | 8 | `🚀 Modelo TransferKAN_Gunshot inicializado e enviado para: CUDA` |
 | 10 | 5 blocos de FOLD e, ao final, a tabela de métricas |
 
-Se a contagem de imagens não der 2.551, o `git clone` falhou ou a estrutura de pastas mudou — rode `inspecionar_diretorio` de novo e confira os caminhos da célula 4.
+Se a contagem de imagens não der 2.554, o `git clone` falhou ou a estrutura de pastas mudou — rode `inspecionar_diretorio` de novo e confira os caminhos da célula 4.
+
+> 📌 **Note a diferença: o código conta 2.554, a monografia diz 2.551.** Os 2.551 são a contagem publicada por Lira et al. (1.883 entradas + 668 saídas); a cópia atual do repositório público tem **três imagens de saída a mais**, totalizando 671 saídas e 2.554 imagens, em 486 casos. A tarefa MLSD bate exatamente: 1.883 imagens de entrada, em 441 casos. A diferença é de 0,12% e não muda nenhuma conclusão, mas está declarada na Seção 5.1 da monografia — porque a banca pode simplesmente comparar o número impresso no notebook com o número no texto.
 
 ---
 
