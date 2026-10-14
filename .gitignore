@@ -350,3 +350,11 @@ TSWLatexianTemp*
 # option is specified. Footnotes are the stored in a file with suffix Notes.bib.
 # Uncomment the next line to have this generated file ignored.
 #*Notes.bib
+
+# Experimentos (protocolo único): pesos, checkpoints e cache nunca entram no repositório
+*.pt
+*.pth
+*.npy
+
+# Repositório externo clonado só para consulta (gitlab.com/lisa-unb/leguwoi)
+references/leguwoi/
