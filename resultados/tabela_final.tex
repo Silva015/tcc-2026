@@ -1,0 +1,33 @@
+\begin{table*}[t]
+\centering
+\caption{Entry/exit classification under a single protocol (grouped stratified 5-fold by case, same two-phase recipe, last epoch). Mean $\pm$ s.d. across folds; AUC from predicted probabilities. Micro-averaged P/R/F1 equal accuracy and macro specificity equals macro recall in the binary case, so they are omitted. Time: training minutes per fold on an NVIDIA L4.}
+\label{tab:protocolo_unico}
+\footnotesize
+\begin{tabular}{lrcccccr}
+\hline
+Model & Params (M) & Acc & Prec. & Rec. & F1 & AUC & Min \\
+\hline
+\multicolumn{8}{l}{\textit{Head ablation (ResNet-152 backbone)}} \\
+ResNet152 + Linear (a) & 58.15 & $0.846 \pm 0.008$ & $0.800 \pm 0.019$ & $0.814 \pm 0.012$ & $0.805 \pm 0.012$ & $0.904 \pm 0.013$ & 8 \\
+ResNet152 + MLP-128 (b) & 58.41 & $0.846 \pm 0.011$ & $0.800 \pm 0.020$ & $0.815 \pm 0.015$ & $0.806 \pm 0.015$ & $0.905 \pm 0.014$ & 8 \\
+ResNet152 + MLP-iso (c) & 62.08 & $0.846 \pm 0.009$ & $0.801 \pm 0.019$ & $0.817 \pm 0.012$ & $0.807 \pm 0.013$ & $0.906 \pm 0.014$ & 8 \\
+ResNet152 + KAN (d) = TransKAN & 62.08 & $0.846 \pm 0.010$ & $0.800 \pm 0.018$ & $0.816 \pm 0.015$ & $0.806 \pm 0.013$ & $0.905 \pm 0.013$ & 8 \\
+ResNet152 + KAN-8 (e) & 58.39 & $0.846 \pm 0.012$ & $0.800 \pm 0.018$ & $0.819 \pm 0.013$ & $0.808 \pm 0.014$ & $0.903 \pm 0.014$ & 8 \\
+\hline
+\multicolumn{8}{l}{\textit{Backbones (linear head)}} \\
+ResNet152 & 58.15 & $0.846 \pm 0.008$ & $0.800 \pm 0.019$ & $0.814 \pm 0.012$ & $0.805 \pm 0.012$ & $0.904 \pm 0.013$ & 8 \\
+AlexNet & 57.01 & $0.803 \pm 0.036$ & $0.750 \pm 0.047$ & $0.782 \pm 0.045$ & $0.761 \pm 0.047$ & $0.859 \pm 0.040$ & 3 \\
+MobileNetV2 & 2.23 & $0.812 \pm 0.024$ & $0.763 \pm 0.029$ & $0.802 \pm 0.027$ & $0.776 \pm 0.029$ & $0.877 \pm 0.025$ & 4 \\
+MNASNet1.3 & 5.00 & $0.837 \pm 0.012$ & $0.829 \pm 0.022$ & $0.725 \pm 0.023$ & $0.753 \pm 0.022$ & $0.872 \pm 0.021$ & 4 \\
+ShuffleNetV2 x0.5 & 0.34 & $0.746 \pm 0.018$ & $0.706 \pm 0.014$ & $0.755 \pm 0.017$ & $0.713 \pm 0.018$ & $0.839 \pm 0.021$ & 4 \\
+SqueezeNet1.0 & 0.74 & $0.798 \pm 0.023$ & $0.749 \pm 0.031$ & $0.787 \pm 0.032$ & $0.760 \pm 0.030$ & $0.866 \pm 0.023$ & 3 \\
+DenseNet169 & 12.49 & $0.858 \pm 0.005$ & $0.814 \pm 0.010$ & $0.830 \pm 0.012$ & $0.821 \pm 0.008$ & $0.904 \pm 0.018$ & 8 \\
+MaxViT-T & 30.41 & $0.864 \pm 0.015$ & $0.821 \pm 0.025$ & $0.846 \pm 0.020$ & $0.831 \pm 0.021$ & $0.917 \pm 0.009$ & 12 \\
+Swin-B & 86.75 & $0.884 \pm 0.011$ & $0.850 \pm 0.017$ & $0.850 \pm 0.016$ & $0.850 \pm 0.015$ & $0.929 \pm 0.011$ & 15 \\
+EfficientNetV2-L & 117.24 & $0.868 \pm 0.010$ & $0.828 \pm 0.021$ & $0.836 \pm 0.011$ & $0.831 \pm 0.016$ & $0.916 \pm 0.007$ & 15 \\
+VGG16 & 134.27 & $0.841 \pm 0.013$ & $0.794 \pm 0.019$ & $0.796 \pm 0.034$ & $0.794 \pm 0.025$ & $0.891 \pm 0.025$ & 9 \\
+RegNetY-16GF & 80.57 & $0.852 \pm 0.015$ & $0.807 \pm 0.021$ & $0.824 \pm 0.021$ & $0.815 \pm 0.020$ & $0.906 \pm 0.011$ & 12 \\
+ResNet152 + KAN (d) = TransKAN & 62.08 & $0.846 \pm 0.010$ & $0.800 \pm 0.018$ & $0.816 \pm 0.015$ & $0.806 \pm 0.013$ & $0.905 \pm 0.013$ & 8 \\
+\hline
+\end{tabular}
+\end{table*}

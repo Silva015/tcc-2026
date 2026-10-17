@@ -1,0 +1,128 @@
+{
+  "es__swin_b": {
+    "tarefa": "es",
+    "a": "resnet152__kan",
+    "b": "swin_b__linear",
+    "delta_auc_oof": -0.022792370040831234,
+    "ic95": [
+      -0.035288592909575936,
+      -0.010798940331867226
+    ],
+    "n_boot_validos": 2000,
+    "delta_auc_dobras": {
+      "0": -0.0176,
+      "1": -0.015,
+      "2": -0.0343,
+      "3": -0.0267,
+      "4": -0.0243
+    },
+    "media_delta_dobras": -0.023590663732974047,
+    "dp_delta_dobras": 0.007683248069600171,
+    "dobras_a_vence": 0,
+    "n_dobras": 5,
+    "sementes_a": [
+      42,
+      43,
+      44
+    ],
+    "sementes_b": [
+      42,
+      43,
+      44
+    ]
+  },
+  "es__maxvit_t": {
+    "tarefa": "es",
+    "a": "resnet152__kan",
+    "b": "maxvit_t__linear",
+    "delta_auc_oof": -0.01038391190137189,
+    "ic95": [
+      -0.01992872724355114,
+      -0.0008536592092766704
+    ],
+    "n_boot_validos": 2000,
+    "delta_auc_dobras": {
+      "0": -0.0023,
+      "1": -0.0018,
+      "2": -0.0166,
+      "3": -0.0259,
+      "4": -0.0117
+    },
+    "media_delta_dobras": -0.011666745790744892,
+    "dp_delta_dobras": 0.010126255479186351,
+    "dobras_a_vence": 0,
+    "n_dobras": 5,
+    "sementes_a": [
+      42,
+      43,
+      44
+    ],
+    "sementes_b": [
+      42,
+      43,
+      44
+    ]
+  },
+  "dist__swin_b": {
+    "tarefa": "dist",
+    "a": "mlsd__resnet152__kan",
+    "b": "mlsd__swin_b__linear",
+    "delta_auc_oof": -0.033087564522802704,
+    "ic95": [
+      -0.06425105297076718,
+      -0.0004085790601917673
+    ],
+    "n_boot_validos": 2000,
+    "delta_auc_dobras": {
+      "0": 0.005,
+      "1": -0.0374,
+      "2": -0.043,
+      "3": -0.0521,
+      "4": -0.0748
+    },
+    "media_delta_dobras": -0.04045343021066543,
+    "dp_delta_dobras": 0.02913061951387867,
+    "dobras_a_vence": 1,
+    "n_dobras": 5,
+    "sementes_a": [
+      42,
+      43,
+      44
+    ],
+    "sementes_b": [
+      42,
+      43
+    ]
+  },
+  "dist__maxvit_t": {
+    "tarefa": "dist",
+    "a": "mlsd__resnet152__kan",
+    "b": "mlsd__maxvit_t__linear",
+    "delta_auc_oof": -0.03043894089501631,
+    "ic95": [
+      -0.05922993199241784,
+      0.0011347132446161339
+    ],
+    "n_boot_validos": 2000,
+    "delta_auc_dobras": {
+      "0": -0.0025,
+      "1": 0.0048,
+      "2": -0.0352,
+      "3": -0.066,
+      "4": -0.0541
+    },
+    "media_delta_dobras": -0.030593036567296773,
+    "dp_delta_dobras": 0.03110266850134277,
+    "dobras_a_vence": 1,
+    "n_dobras": 5,
+    "sementes_a": [
+      42,
+      43,
+      44
+    ],
+    "sementes_b": [
+      42,
+      43
+    ]
+  }
+}

@@ -1,0 +1,27 @@
+\begin{table}[t]
+\centering
+\caption{Entry/exit: numbers reported by Lira et al.\ (hold-out split in which wounds of the same case fall in training and test; models mostly trained from scratch; AUC computed from predicted classes) versus the same backbones under our protocol (grouped 5-fold by case, ImageNet pre-training, identical recipe; mean $\pm$ s.d.\ across folds). AUC$_c$ = AUC from predicted classes, as in Lira et al.; AUC$_p$ = from probabilities. M = macro.}
+\label{tab:comparacao2024_es}
+\scriptsize
+\setlength{\tabcolsep}{3pt}
+\begin{tabular}{lccc|cccc}
+\hline
+ & \multicolumn{3}{c|}{Lira et al.\ (hold-out)} & \multicolumn{4}{c}{Same protocol (grouped 5-fold)} \\
+Model & ACC & F1$_M$ & AUC$_{c,M}$ & ACC & F1$_M$ & AUC$_{c,M}$ & AUC$_{p,M}$ \\
+\hline
+ResNet152 & 0.869 & 0.824 & 0.821 & $0.846\pm0.008$ & $0.805\pm0.012$ & $0.814\pm0.012$ & $0.904\pm0.013$ \\
+AlexNet & 0.765 & 0.703 & 0.716 & $0.803\pm0.036$ & $0.761\pm0.047$ & $0.782\pm0.045$ & $0.859\pm0.040$ \\
+MobileNetV2 & 0.719 & 0.598 & 0.593 & $0.812\pm0.024$ & $0.776\pm0.029$ & $0.802\pm0.027$ & $0.877\pm0.025$ \\
+MNASNet1.3 & 0.746 & 0.657 & 0.656 & $0.837\pm0.012$ & $0.753\pm0.022$ & $0.725\pm0.023$ & $0.872\pm0.021$ \\
+ShuffleNetV2 x0.5 & 0.730 & 0.619 & 0.614 & $0.746\pm0.018$ & $0.713\pm0.018$ & $0.755\pm0.017$ & $0.839\pm0.021$ \\
+SqueezeNet1.0 & 0.750 & 0.429 & 0.500 & $0.798\pm0.023$ & $0.760\pm0.030$ & $0.787\pm0.032$ & $0.866\pm0.023$ \\
+DenseNet169 & 0.777 & 0.688 & 0.679 & $0.858\pm0.005$ & $0.821\pm0.008$ & $0.830\pm0.012$ & $0.904\pm0.018$ \\
+MaxViT-T & 0.780 & 0.668 & 0.653 & $0.864\pm0.015$ & $0.831\pm0.021$ & $0.846\pm0.020$ & $0.917\pm0.009$ \\
+Swin-B & 0.728 & 0.597 & 0.591 & $0.884\pm0.011$ & $0.850\pm0.015$ & $0.850\pm0.016$ & $0.929\pm0.011$ \\
+EfficientNetV2-L & 0.782 & 0.654 & 0.638 & $0.868\pm0.010$ & $0.831\pm0.016$ & $0.836\pm0.011$ & $0.916\pm0.007$ \\
+VGG16 & 0.782 & 0.694 & 0.685 & $0.841\pm0.013$ & $0.794\pm0.025$ & $0.796\pm0.034$ & $0.891\pm0.025$ \\
+RegNetY-16GF & 0.711 & 0.549 & 0.549 & $0.852\pm0.015$ & $0.815\pm0.020$ & $0.824\pm0.021$ & $0.906\pm0.011$ \\
+TransKAN (ResNet152 + KAN) & -- & -- & -- & $0.846\pm0.010$ & $0.806\pm0.013$ & $0.816\pm0.015$ & $0.905\pm0.013$ \\
+\hline
+\end{tabular}
+\end{table}

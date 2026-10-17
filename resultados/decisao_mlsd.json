@@ -1,0 +1,105 @@
+{
+  "desfecho": "C",
+  "melhor_mlp": "mlsd__resnet152__mlp_iso",
+  "uma_semente": false,
+  "comparacoes": {
+    "b": {
+      "tarefa": "dist",
+      "a": "mlsd__resnet152__kan",
+      "b": "mlsd__resnet152__mlp128",
+      "delta_auc_oof": -0.00519747638383572,
+      "ic95": [
+        -0.011830378272667192,
+        0.002573344795176201
+      ],
+      "n_boot_validos": 2000,
+      "delta_auc_dobras": {
+        "0": 0.0005,
+        "1": -0.0056,
+        "2": -0.0103,
+        "3": -0.0151,
+        "4": 0.0113
+      },
+      "media_delta_dobras": -0.0038501644385858123,
+      "dp_delta_dobras": 0.01025081357946043,
+      "dobras_a_vence": 2,
+      "n_dobras": 5,
+      "sementes_a": [
+        42,
+        43,
+        44
+      ],
+      "sementes_b": [
+        42,
+        43,
+        44
+      ]
+    },
+    "c": {
+      "tarefa": "dist",
+      "a": "mlsd__resnet152__kan",
+      "b": "mlsd__resnet152__mlp_iso",
+      "delta_auc_oof": -0.011331306487735615,
+      "ic95": [
+        -0.021240801139098615,
+        -0.002687463575949231
+      ],
+      "n_boot_validos": 2000,
+      "delta_auc_dobras": {
+        "0": 0.0036,
+        "1": -0.0213,
+        "2": -0.0003,
+        "3": -0.0159,
+        "4": -0.0122
+      },
+      "media_delta_dobras": -0.009191945926880796,
+      "dp_delta_dobras": 0.010527798100274073,
+      "dobras_a_vence": 1,
+      "n_dobras": 5,
+      "sementes_a": [
+        42,
+        43,
+        44
+      ],
+      "sementes_b": [
+        42,
+        43,
+        44
+      ]
+    },
+    "a": {
+      "tarefa": "dist",
+      "a": "mlsd__resnet152__kan",
+      "b": "mlsd__resnet152__linear",
+      "delta_auc_oof": 0.007860675108473991,
+      "ic95": [
+        -0.004521822180416987,
+        0.023191713075374567
+      ],
+      "n_boot_validos": 2000,
+      "delta_auc_dobras": {
+        "0": -0.007,
+        "1": 0.0132,
+        "2": -0.0172,
+        "3": -0.0043,
+        "4": 0.0809
+      },
+      "media_delta_dobras": 0.013124614470309815,
+      "dp_delta_dobras": 0.0394552757969277,
+      "dobras_a_vence": 2,
+      "n_dobras": 5,
+      "sementes_a": [
+        42,
+        43,
+        44
+      ],
+      "sementes_b": [
+        42,
+        43,
+        44
+      ]
+    }
+  },
+  "kan": "0.798±0.058",
+  "mlp": "0.807±0.055"
+}

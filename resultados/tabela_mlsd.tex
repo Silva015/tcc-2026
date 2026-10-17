@@ -1,0 +1,32 @@
+\begin{table*}[t]
+\centering
+\caption{Medico-legal shooting distance (contact, close range, distant; entry wounds only) under the same protocol as Table~\ref{tab:protocolo_unico}. Mean $\pm$ s.d.\ across folds; AUC = one-vs-rest macro AUC from predicted probabilities; Rec.\ = per-class recall (contact has 4--13 test images per fold and is descriptive only).}
+\label{tab:mlsd_protocolo_unico}
+\footnotesize
+\begin{tabular}{lrccccccr}
+\hline
+Model & Params (M) & Acc & Bal.\ acc & F1$_M$ & AUC & Rec.\ cont. & Rec.\ close & Min \\
+\hline
+\multicolumn{9}{l}{\textit{Head ablation (ResNet-152 backbone)}} \\
+ResNet152 + Linear (a) & 58.15 & $0.815 \pm 0.014$ & $0.524 \pm 0.077$ & $0.488 \pm 0.056$ & $0.785 \pm 0.087$ & 0.17 & 0.53 & 6 \\
+ResNet152 + MLP-128 (b) & 58.41 & $0.813 \pm 0.013$ & $0.520 \pm 0.072$ & $0.482 \pm 0.050$ & $0.802 \pm 0.062$ & 0.16 & 0.53 & 6 \\
+ResNet152 + MLP-iso (c) & 62.08 & $0.821 \pm 0.017$ & $0.510 \pm 0.064$ & $0.480 \pm 0.050$ & $0.807 \pm 0.055$ & 0.13 & 0.51 & 6 \\
+ResNet152 + KAN (d) = TransKAN & 62.08 & $0.813 \pm 0.017$ & $0.515 \pm 0.069$ & $0.477 \pm 0.045$ & $0.798 \pm 0.058$ & 0.15 & 0.52 & 6 \\
+\hline
+\multicolumn{9}{l}{\textit{Backbones (linear head)}} \\
+ResNet152 & 58.15 & $0.815 \pm 0.014$ & $0.524 \pm 0.077$ & $0.488 \pm 0.056$ & $0.785 \pm 0.087$ & 0.17 & 0.53 & 6 \\
+AlexNet & 57.02 & $0.780 \pm 0.033$ & $0.561 \pm 0.105$ & $0.498 \pm 0.084$ & $0.806 \pm 0.079$ & 0.26 & 0.59 & 2 \\
+MobileNetV2 & 2.23 & $0.778 \pm 0.025$ & $0.513 \pm 0.074$ & $0.464 \pm 0.042$ & $0.806 \pm 0.056$ & 0.20 & 0.50 & 3 \\
+MNASNet1.3 & 5.01 & $0.451 \pm 0.078$ & $0.455 \pm 0.051$ & $0.294 \pm 0.047$ & $0.710 \pm 0.095$ & 0.10 & 0.86 & 3 \\
+ShuffleNetV2 x0.5 & 0.34 & $0.854 \pm 0.016$ & $0.474 \pm 0.079$ & $0.474 \pm 0.088$ & $0.776 \pm 0.046$ & 0.10 & 0.38 & 3 \\
+SqueezeNet1.0 & 0.74 & $0.788 \pm 0.023$ & $0.525 \pm 0.090$ & $0.490 \pm 0.074$ & $0.805 \pm 0.051$ & 0.20 & 0.53 & 3 \\
+DenseNet169 & 12.49 & $0.820 \pm 0.034$ & $0.556 \pm 0.136$ & $0.519 \pm 0.120$ & $0.821 \pm 0.070$ & 0.24 & 0.55 & 7 \\
+MaxViT-T & 30.41 & $0.810 \pm 0.021$ & $0.555 \pm 0.086$ & $0.511 \pm 0.070$ & $0.828 \pm 0.047$ & 0.23 & 0.58 & 9 \\
+Swin-B & 86.75 & $0.825 \pm 0.021$ & $0.540 \pm 0.087$ & $0.505 \pm 0.091$ & $0.838 \pm 0.054$ & 0.18 & 0.55 & 11 \\
+EfficientNetV2-L & 117.24 & $0.830 \pm 0.026$ & $0.529 \pm 0.084$ & $0.495 \pm 0.076$ & $0.744 \pm 0.133$ & 0.15 & 0.55 & 12 \\
+VGG16 & 134.27 & $0.844 \pm 0.026$ & $0.510 \pm 0.067$ & $0.481 \pm 0.050$ & $0.776 \pm 0.079$ & 0.10 & 0.51 & 7 \\
+RegNetY-16GF & 80.57 & $0.826 \pm 0.024$ & $0.531 \pm 0.080$ & $0.496 \pm 0.071$ & $0.773 \pm 0.088$ & 0.13 & 0.58 & 9 \\
+ResNet152 + KAN (d) = TransKAN & 62.08 & $0.813 \pm 0.017$ & $0.515 \pm 0.069$ & $0.477 \pm 0.045$ & $0.798 \pm 0.058$ & 0.15 & 0.52 & 6 \\
+\hline
+\end{tabular}
+\end{table*}

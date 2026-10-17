@@ -1,0 +1,20 @@
+\begin{table}[t]
+\centering
+\caption{Effect of the data split under an identical recipe (ResNet-152, seed 42). \emph{Lira split}: the iterative hold-out of Lira et al.\ reproduced with three random seeds (image-level; on average 98.6\% of the test images share their case with a training image). \emph{Grouped}: our five case-grouped folds. Mean $\pm$ s.d.}
+\label{tab:vazamento}
+\scriptsize
+\begin{tabular}{llcccc}
+\hline
+Task & Model & Split & ACC & F1$_M$ & AUC \\
+\hline
+Entry/exit & ResNet152 + Linear (a) & Lira split & $0.876\pm0.005$ & $0.838\pm0.007$ & $0.940\pm0.003$ \\
+Entry/exit & ResNet152 + Linear (a) & Grouped & $0.848\pm0.010$ & $0.809\pm0.013$ & $0.906\pm0.013$ \\
+Entry/exit & ResNet152 + KAN (d) = TransKAN & Lira split & $0.881\pm0.006$ & $0.844\pm0.006$ & $0.940\pm0.003$ \\
+Entry/exit & ResNet152 + KAN (d) = TransKAN & Grouped & $0.846\pm0.008$ & $0.807\pm0.011$ & $0.906\pm0.011$ \\
+MLSD & ResNet152 + Linear (a) & Lira split & $0.857\pm0.006$ & $0.697\pm0.014$ & $0.937\pm0.004$ \\
+MLSD & ResNet152 + Linear (a) & Grouped & $0.817\pm0.014$ & $0.486\pm0.059$ & $0.779\pm0.088$ \\
+MLSD & ResNet152 + KAN (d) = TransKAN & Lira split & $0.863\pm0.002$ & $0.691\pm0.003$ & $0.942\pm0.003$ \\
+MLSD & ResNet152 + KAN (d) = TransKAN & Grouped & $0.810\pm0.018$ & $0.466\pm0.035$ & $0.788\pm0.063$ \\
+\hline
+\end{tabular}
+\end{table}

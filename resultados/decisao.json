@@ -1,0 +1,118 @@
+{
+  "desfecho": "B",
+  "melhor_mlp": "resnet152__mlp_iso",
+  "uma_semente": false,
+  "comparacoes": {
+    "b": {
+      "kan": "resnet152__kan",
+      "mlp": "resnet152__mlp128",
+      "delta_auc_oof": -0.0001076381111728697,
+      "ic95": [
+        -0.0014577605665180905,
+        0.0011443079649490649
+      ],
+      "delta_auc_dobras": {
+        "0": 0.0003,
+        "1": -0.0008,
+        "2": -0.0012,
+        "3": 0.0013,
+        "4": 0.0001
+      },
+      "media_delta_dobras": -6.596861519414521e-05,
+      "dp_delta_dobras": 0.0010063573841474476,
+      "dobras_kan_vence": 3,
+      "n_dobras": 5,
+      "sementes_kan": [
+        42,
+        43,
+        44
+      ],
+      "sementes_mlp": [
+        42,
+        43,
+        44
+      ]
+    },
+    "c": {
+      "kan": "resnet152__kan",
+      "mlp": "resnet152__mlp_iso",
+      "delta_auc_oof": -0.0010692580014294295,
+      "ic95": [
+        -0.0024699658384612936,
+        0.0003333267221973924
+      ],
+      "delta_auc_dobras": {
+        "0": 0.0005,
+        "1": -0.0013,
+        "2": -0.0019,
+        "3": 0.0003,
+        "4": -0.0015
+      },
+      "media_delta_dobras": -0.0007642123271996759,
+      "dp_delta_dobras": 0.001069020815803764,
+      "dobras_kan_vence": 2,
+      "n_dobras": 5,
+      "sementes_kan": [
+        42,
+        43,
+        44
+      ],
+      "sementes_mlp": [
+        42,
+        43,
+        44
+      ]
+    },
+    "a": {
+      "kan": "resnet152__kan",
+      "mlp": "resnet152__linear",
+      "delta_auc_oof": 0.0007186426834179249,
+      "ic95": [
+        -0.001269105283503938,
+        0.0028225973283974356
+      ],
+      "delta_auc_dobras": {
+        "0": -0.0013,
+        "1": 0.0004,
+        "2": 0.0055,
+        "3": -0.0028,
+        "4": 0.0028
+      },
+      "media_delta_dobras": 0.0008934845814601022,
+      "dp_delta_dobras": 0.0032951476071083454,
+      "dobras_kan_vence": 3,
+      "n_dobras": 5,
+      "sementes_kan": [
+        42,
+        43,
+        44
+      ],
+      "sementes_mlp": [
+        42,
+        43,
+        44
+      ]
+    }
+  },
+  "frase": "Under an identical protocol, the KAN head performed on par with linear and MLP heads (AUC 0.905±0.013 vs. 0.906±0.014; ΔAUC = -0.001, 95% CI [-0.002, +0.000] includes zero). TransKAN's advantage over the baselines of Lira et al. is explained by the pre-trained ResNet-152 backbone and the two-phase fine-tuning recipe rather than by the KAN head itself; we present the KAN head as a competitive alternative, not as the source of the gain.",
+  "pode_afirmar": {
+    "so_trocar_a_cabeca_melhora": false,
+    "new_SOTA": false,
+    "outperforms_transformer_baselines": false,
+    "parameter_efficiency": false
+  },
+  "baselines_reavaliados": [
+    "alexnet",
+    "densenet169",
+    "efficientnet_v2_l",
+    "maxvit_t",
+    "mnasnet1_3",
+    "mobilenet_v2",
+    "regnet_y_16gf",
+    "shufflenet_v2_x0_5",
+    "squeezenet1_0",
+    "swin_b",
+    "vgg16"
+  ],
+  "baselines_nao_reavaliados": []
+}
