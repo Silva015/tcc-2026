@@ -35,9 +35,10 @@ Pergunte antes de escrever. A recomendação vem primeiro em cada item.
 2. **Título e tese:**
    - (rec.) manter "TransferKAN" no título, mas com a tese de uma avaliação sem vazamento (ex.: *"TransferKAN under a leak-free protocol: …"*);
    - ou renomear o trabalho inteiro.
-3. **P2 (multitarefa) e P3 (Wav-KAN):**
-   - (rec.) escrever agora só com o P1 e deixar "trabalhos futuros" citando os dois;
-   - ou esperar os resultados deles.
+3. **P2 (multitarefa) e P3 (Wav-KAN): decidido em 19/10.** O usuário roda os dois **antes** do P4, na ordem da seção 9 de `NOTAS_P1_para_P2_P3.md`.
+   - Leia as saídas deles (`resultados/wavkan/`, `resultados/tabela_wavkan.*`, `resultados/multitarefa/`, `resultados/tabela_multitarefa.*`) e as regras de decisão de cada plano.
+   - Cada um vira uma seção curta em Métodos e Resultados.
+   - Se algum não tiver rodado, ele vai para "trabalhos futuros".
 4. **Semente 44 da Swin-B e da MaxViT-T no MLSD:**
    - (rec.) reportar com 2 sementes e dizer isso na legenda;
    - ou rodar antes (~2,6 unidades), o que obriga a rodar o 05b de novo e atualizar `resultados/`.
