@@ -9,7 +9,7 @@ Plano para uma sessão nova. Não treina nada: só reescreve `tcc_dissertation/`
 2. `resultados/frases_dissertacao.md` e `resultados/frase_manuscrito.md` (rascunhos automáticos; veja as ressalvas da seção 4);
 3. `resultados/decisao.json`, `resultados/decisao_mlsd.json`, `resultados/comparacao_transkan_transformers.json`;
 4. as tabelas `resultados/tabela_*.csv` e `.tex` e as figuras `resultados/*.png`;
-5. `docs/planos/P1_protocolo.md`, que registra a regra de decisão definida **antes** dos resultados (14/10, commit `c2a957c`);
+5. `docs/planos/P1_protocolo.md`, que registra a regra de decisão definida **antes** dos resultados (14/10, commit `eaf931b`);
 6. `auditoria-consistencia.md` (o que estava errado no texto antigo) e `references/2024_paper.txt` (Lira et al.).
 
 **Como compilar** (a memória do projeto `dissertation-build` também tem isto):
