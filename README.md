@@ -6,9 +6,13 @@ This repository contains the source code, experimental notebooks, and academic m
 
 ## Project Structure
 
-The project is structured into four main directories:
+The project is structured into the following directories:
 
-* **`notebooks/`** Contains all Jupyter Notebooks with the machine learning experiments, model training code (ConvKAN, PureKAN, TransferKAN, and ResNet152 hybrids), and raw data extraction text logs.
+* **`notebooks/`** Contains the machine learning code. The current experiments run under a single, leak-free protocol: `protocolo_comum.py` (training and evaluation module), `configs_mlsd.py` (shooting-distance task and the reproduction of the 2024 hold-out split) and notebooks `00`–`05b` (data and grouped folds, L4 calibration, head ablation, baselines, MLSD, leakage test and analyses). The eight original notebooks (ConvKAN, PureKAN, TransferKAN and ResNet152 hybrids) and their extracted logs are kept unchanged as a historical record.
+
+* **`resultados/`** Shared grouped folds and the analysis outputs of the single protocol (tables in CSV/LaTeX, figures, decisions and the transcription of Tables 4 and 5 of Lira et al.). Images, caches and checkpoints are never stored here.
+
+* **`docs/planos/`** Experiment plans: the pre-registered protocol (P1), multitask (P2), Wav-KAN heads (P3) and the dissertation rewrite (P4).
 
 * **`references/`** Stores relevant academic literature, reference papers, and text documentation used to support the research.
 
@@ -21,10 +25,7 @@ The project is structured into four main directories:
 ## Getting Started
 
 ### Machine Learning Environment
-To run the project notebooks, ensure you have a Python environment with PyTorch (GPU support recommended) and the KAN library installed:
-```bash
-pip install torch torchvision jupyterlab pykan
-```
+The protocol notebooks are meant for Google Colab with an NVIDIA L4 GPU and install their own pinned dependencies (PyTorch, torchvision, Albumentations, `efficient-kan`). The dataset (FDCPUnBGunshotDB, Lira et al., 2025, IJLM) is cloned at a fixed commit inside each session and is not redistributed in this repository.
 
 
 ### LaTeX Compilation

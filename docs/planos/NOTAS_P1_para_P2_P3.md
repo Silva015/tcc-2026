@@ -57,7 +57,14 @@ O P2 **não** treina `st_es_*` nem `st_dist_*`. As redes de tarefa única são e
 | Checkpoint completo | 3,8 s → `CKPT_INTERVALO_MIN = 5` |
 | Precisão | **AMP fp16** (decidida pela ponte); as cabeças sempre em fp32 |
 
-## 6. Drive e git
+## 6. Situação do P1 e lições do Colab (19/10)
+
+- **O P1 terminou.** As análises do 05 e do 05b estão em `resultados/` (commit `b8582ae`). Os resultados por unidade continuam no Drive, em `resultados/<experimento>/`. Só falta a semente 44 da Swin-B e da MaxViT-T no MLSD, que é opcional.
+- **Uma aba, um arquivo de notebook.** Duas abas com o mesmo notebook dividem o kernel e salvam uma por cima da outra. Para rodar em paralelo, use uma cópia com outro nome (ex.: `04_mlsd_mesmo_protocolo_abaB.ipynb`) e outro `ABA`.
+- **Não comece duas abas no mesmo experimento no mesmo segundo.** O Drive criou duas pastas `mlsd_baselines` com o mesmo nome. A sessão reaberta montou a outra pasta e refez cerca de 3 h de unidades. Comece as abas com um minuto de diferença e, antes de analisar, procure pastas de mesmo nome em `resultados/`. A cópia que sobrou se chama `mlsd_baselines_duplicado_abaA` e fica fora da análise.
+- **Unidades:** quando o saldo acaba, a L4 e a A100 ficam cinza e o Colab conecta na T4. O `exigir_gpu` para nesse caso; não ligue `PERMITIR_RESERVA` para rodadas comparáveis.
+
+## 7. Drive e git
 
 - **Drive:**
   - cada sessão sobe só os próprios arquivos;
