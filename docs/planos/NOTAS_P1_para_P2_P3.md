@@ -64,7 +64,61 @@ O P2 **não** treina `st_es_*` nem `st_dist_*`. As redes de tarefa única são e
 - **Não comece duas abas no mesmo experimento no mesmo segundo.** O Drive criou duas pastas `mlsd_baselines` com o mesmo nome. A sessão reaberta montou a outra pasta e refez cerca de 3 h de unidades. Comece as abas com um minuto de diferença e, antes de analisar, procure pastas de mesmo nome em `resultados/`. A cópia que sobrou se chama `mlsd_baselines_duplicado_abaA` e fica fora da análise.
 - **Unidades:** quando o saldo acaba, a L4 e a A100 ficam cinza e o Colab conecta na T4. O `exigir_gpu` para nesse caso; não ligue `PERMITIR_RESERVA` para rodadas comparáveis.
 
-## 7. Drive e git
+## 7. Ajustes válidos para os dois planos (P2 e P3), depois do P1
+
+1. **Custo real.** A taxa da L4 é **1,54 UC/h**, e não 4–5 UC/h como os planos estimam. Uma config × semente de 5 dobras na ResNet-152 custa ~0,7 h ≈ **1,1 UC** (E/S ou multitarefa) e ~0,6 h ≈ 0,95 UC no MLSD (pelas rodadas do P1: ~8,4 min por dobra em E/S e ~7,4 min no MLSD, já com avaliação e gravação). Todas as tabelas de UC dos planos ficam ~3–4× menores.
+2. **Sementes.** As referências do P1 (cabeças a–d, nas duas tarefas) têm as sementes **42, 43 e 44**. Recomendação: rodar as configs principais também com as 3 sementes. A comparação fica pareada por semente, o bootstrap usa por dobra a média das sementes (como no 05b) e a ressalva "single training seed" deixa de valer. As configs de sensibilidade ficam só com s42. Confirme com o usuário antes de rodar.
+3. **O que os resultados do P1 mudam na leitura:**
+   - a KAN spline (d) **empata** com as MLPs em E/S e fica **abaixo** da MLP isoparamétrica no MLSD;
+   - logo, o contraste que mais informa é contra a **melhor MLP do mesmo orçamento**, e não só contra (d);
+   - nenhum texto pode dizer que a KAN spline é "a referência que funciona".
+4. **Execução:**
+   - não existe CLI (veja a seção 1);
+   - **não existe** `salvar_pesos_finais` (seção 4);
+   - **caminho das dobras:** no Drive é `dados/folds_entrada_saida.csv`; no repositório é `resultados/folds_entrada_saida.csv`;
+   - **antes das rodadas longas**, o usuário roda a parte 7 do `01_calibracao_L4.ipynb` (alguns minutos de L4), quando o plugin da sessão já estiver no Drive. A célula do `cabecas_wavkan.py` mede W1/W5; a do `multitarefa.py` faz o smoke da multitarefa.
+5. **Git e branches:**
+   - o P1 já está em `main` (enviado em 19/10);
+   - se a sessão rodar **no mesmo diretório local** do usuário, não crie branch: commite em `main` por caminho e só envie com o OK dele;
+   - se rodar na nuvem, use branch + PR como os planos dizem;
+   - o repositório é **público**: nunca commite imagens da base, nem recortes em figuras ou pôsteres.
+
+## 8. Ajustes específicos
+
+**P2 (multitarefa):**
+- **Só treina `mt_kan` e `mt_mlp`** (seção 3). Os passos "sessão A com `st_dist_kan`" e "`st_dist_mlp`" do plano saem: a ST de distância é a `mlsd_cabeca` do P1, retreinada no mesmo protocolo (AUC 0,798 para a KAN; 0,802 para a MLP-128).
+- **Referências ST com 3 sementes:** `st_es_kan` = `resnet152__kan`, `st_es_mlp` = `resnet152__mlp128`, `st_dist_kan` = `mlsd__resnet152__kan` e `st_dist_mlp` = `mlsd__resnet152__mlp128`.
+- **Pesos finais no Drive:** não dá. O benchmark de inferência (1 forward da MT contra 2 do par ST) é medido dentro do 09, sobre um modelo recém-treinado com `limite_epocas` curto. O tempo de inferência não depende dos pesos.
+- **Checagens de sanidade, conferidas com o P1:**
+  - prever sempre a majoritária dá acurácia 0,854 no MLSD;
+  - F1 macro da distância > 0,31 (o P1 dá ~0,48);
+  - acc E/S por dobra entre 80% e 89% (o P1 dá ~0,83–0,86).
+- **Custo do núcleo com 3 sementes:** 2 configs × 3 sementes ≈ 4,5 h ≈ **7 UC**, mais ~0,5 UC de smoke e calibração.
+
+**P3 (Wav-KAN):**
+- As referências (a)–(d) têm 3 sementes. Rode **W1 e W2 com 42/43/44** (≈ 4,5 h ≈ **7 UC**). W3–W5, de sensibilidade, ficam só com s42 (≈ 2,3 h ≈ **3,6 UC**).
+- **Contraste que mais informa:** W2 × (b) (mesmo orçamento; a única porta para dizer "mais eficiente que um MLP") e W1/W5 × (c), a MLP isoparamétrica. O contraste W × (d) continua, mas como secundário.
+- **Margem de não inferioridade.** O plano usa −0,02. No P1, o IC pareado entre cabeças em E/S teve largura de ~0,003, então −0,02 é folgado. A sessão pode manter a margem (pré-registrada em 14/10) ou propor uma mais estreita, **antes** de rodar e com o OK do usuário.
+- **MLSD (opcional, decisão do usuário):** repetir W1/W2 no MLSD com `coluna_dobra = fold_dist_dk`, reaproveitando as funções de `configs_mlsd.py` sem editá-lo. Custa ≈ 3 sementes × 2 configs × 0,62 h ≈ **5,7 UC**. Responde se uma KAN com wavelets corrige o déficit da spline no MLSD.
+
+## 9. Ordem de execução recomendada (antes do P4)
+
+| Passo | Quem | O quê | UC |
+|---|---|---|---|
+| 0 | usuário | Confirmar o saldo de unidades, que foi a zero em 17/10 | — |
+| 1 | sessão P3 (local, CPU) | `cabecas_wavkan.py`, 06, 07 e 08; testes; enviar ao Drive | 0 |
+| 2 | sessão P2 (local, CPU) | `multitarefa.py`, 09 e 10; testes; enviar ao Drive. Só depois do commit do P3, para não dividir o diretório de trabalho | 0 |
+| 3 | usuário, L4 | `01` parte 7 (W1/W5 e smoke da MT); `06` do P3 e `07` com `SMOKE`; `09` em modo smoke | ~1 |
+| 4 | usuário, 2 abas L4 | Aba A: `07` com W1 → W2 (3 sementes). Aba B: `09` com `mt_kan` → `mt_mlp` (3 sementes). Experimentos diferentes, cada aba com o próprio notebook, começando com 1 min de diferença | ~14 |
+| 5 | usuário, L4, se houver saldo | W3–W5 (s42); P3 no MLSD; semente 44 da Swin-B e da MaxViT-T no MLSD (P1) | ~3,6 + ~5,7 + ~2,6 |
+| 6 | sessões P3 e P2 (CPU) | `08` e `10`; trazer os resultados para o repositório | 0 |
+| 7 | sessão P4 | Reescrever a dissertação incluindo P2 e P3 (decisão 3 do plano P4) | 0 |
+
+- **Núcleo (passos 3 e 4):** ~15 UC (~9–10 h de L4, ~5 h de parede com as 2 abas).
+- **Tudo:** ~27 UC.
+- Some ~20% de folga para quedas e sessões ociosas.
+
+## 10. Drive e git
 
 - **Drive:**
   - cada sessão sobe só os próprios arquivos;
