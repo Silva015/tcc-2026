@@ -1,0 +1,23 @@
+\begin{table*}[t]
+\centering
+\caption{Entry/exit: head ablation with wavelet-KAN (Wav-KAN) heads under the single protocol (ResNet-152 backbone, grouped stratified 5-fold by case, same two-phase recipe, last epoch). Mean $\pm$ s.d.\ across folds (each fold averaged over the training seeds); AUC from predicted probabilities; AUC$_{\mathrm{OOF}}$ pools the out-of-fold predictions. Time: minutes per fold on an NVIDIA L4 ($15\,t_{F1}+45\,t_{F2}$); head-only cost on random 2048-d inputs: forward+backward for a batch of 32 and inference per image (batch 256). Seeds: a: 42,43,44; b: 42,43,44; c: 42,43,44; d: 42,43,44; W1: 42,43,44; W2: 42,43,44; W3: 42; W4: 42; W5: 42.}
+\label{tab:wavkan_es}
+\scriptsize
+\setlength{\tabcolsep}{3pt}
+\begin{tabular}{lrrcccccrrrr}
+\hline
+Head & \multicolumn{2}{c}{Params} & Acc & Prec. & Rec. & F1 & AUC & AUC$_{\mathrm{OOF}}$ & Min/fold & Head ms & Head $\mu$s/img \\
+ & head & total (M) & & & & & & & & (fwd+bwd) & (inference) \\
+\hline
+Linear (a) & 4{,}098 & 58.15 & $0.846 \pm 0.008$ & $0.800 \pm 0.019$ & $0.814 \pm 0.012$ & $0.805 \pm 0.012$ & $0.904 \pm 0.013$ & 0.905 & 8.2 & 0.48 & 0.3 \\
+MLP-128 (b) & 262{,}530 & 58.41 & $0.846 \pm 0.011$ & $0.800 \pm 0.020$ & $0.815 \pm 0.015$ & $0.806 \pm 0.015$ & $0.905 \pm 0.014$ & 0.906 & 8.3 & 0.73 & 0.5 \\
+MLP-iso (c) & 3{,}935{,}871 & 62.08 & $0.846 \pm 0.009$ & $0.801 \pm 0.019$ & $0.817 \pm 0.012$ & $0.807 \pm 0.013$ & $0.906 \pm 0.014$ & 0.907 & 8.3 & 0.73 & 0.9 \\
+KAN spline (d) = TransKAN & 3{,}936{,}000 & 62.08 & $0.846 \pm 0.010$ & $0.800 \pm 0.018$ & $0.816 \pm 0.015$ & $0.806 \pm 0.013$ & $0.905 \pm 0.013$ & 0.906 & 8.5 & 3.30 & 21.4 \\
+Wav-KAN mexican hat, h=128 (W1) & 1{,}049{,}860 & 59.19 & $0.835 \pm 0.015$ & $0.788 \pm 0.022$ & $0.822 \pm 0.013$ & $0.800 \pm 0.019$ & $0.902 \pm 0.014$ & 0.905 & 8.8 & 8.84 & 95.4 \\
+Wav-KAN mexican hat, h=32 (W2) & 262{,}468 & 58.41 & $0.834 \pm 0.017$ & $0.787 \pm 0.025$ & $0.821 \pm 0.015$ & $0.799 \pm 0.022$ & $0.902 \pm 0.013$ & 0.905 & 8.5 & 2.95 & 24.2 \\
+Wav-KAN DoG, h=128 (W3) & 1{,}049{,}860 & 59.19 & $0.823 \pm 0.020$ & $0.779 \pm 0.027$ & $0.830 \pm 0.019$ & $0.793 \pm 0.026$ & $0.908 \pm 0.015$ & 0.907 & 8.7 & 7.60 & 77.2 \\
+Wav-KAN Morlet, h=128 (W4) & 1{,}049{,}860 & 59.19 & $0.807 \pm 0.023$ & $0.766 \pm 0.027$ & $0.824 \pm 0.022$ & $0.779 \pm 0.028$ & $0.901 \pm 0.015$ & 0.900 & 8.7 & 8.55 & 86.1 \\
+Wav-KAN mexican hat, h=480 (W5) & 3{,}936{,}964 & 62.08 & $0.834 \pm 0.017$ & $0.786 \pm 0.026$ & $0.821 \pm 0.012$ & $0.799 \pm 0.022$ & $0.903 \pm 0.013$ & 0.902 & 10.6 & 38.36 & 354.6 \\
+\hline
+\end{tabular}
+\end{table*}

@@ -1,0 +1,836 @@
+{
+  "quando": "2026-10-19T15:22:03+00:00",
+  "gpu": {
+    "disponivel": true,
+    "nome": "NVIDIA L4",
+    "memoria_gb": 22.03,
+    "capacidade": "8.9",
+    "cuda": "13.0",
+    "comparavel": true
+  },
+  "comparavel": true,
+  "ambiente": {
+    "protocolo_versao": "1.0.0",
+    "protocolo_sha256": "b7cd9baca53edd96c855cca10914fc258efa8ddfd0937cc0d3e9572de5ef9e13",
+    "python": "3.13.15",
+    "plataforma": "colab",
+    "host": "a7356dfb130c",
+    "id_sessao": "a7356dfb130c-1022-4683fed4",
+    "torch": "2.11.0+cu130",
+    "torchvision": "0.26.0+cu130",
+    "albumentations": "2.0.8",
+    "opencv": "4.14.0",
+    "sklearn": "1.6.1",
+    "numpy": "2.1.3",
+    "pandas": "2.2.3",
+    "efficient_kan_commit": "7b6ce1c87f18c8bc90c208f6b494042344216b11",
+    "gpu": {
+      "disponivel": true,
+      "nome": "NVIDIA L4",
+      "memoria_gb": 22.03,
+      "capacidade": "8.9",
+      "cuda": "13.0"
+    },
+    "tf32": {
+      "matmul_allow_tf32": false,
+      "cudnn_allow_tf32": true,
+      "matmul_fp32_precision": "none",
+      "cudnn_fp32_precision": "none",
+      "cudnn_benchmark": false,
+      "cudnn_deterministic": false
+    },
+    "num_cpus": 12
+  },
+  "protocolo_sha256": "b7cd9baca53edd96c855cca10914fc258efa8ddfd0937cc0d3e9572de5ef9e13",
+  "plugin_sha256": "d02f6ca6f41f0530df0f0cc3886382a8c35311ac1ec812c1f65fa74e18d800ed",
+  "plugin_versao": "1.0.0",
+  "parametros": {
+    "es": {
+      "a": {
+        "cabeca": 4098,
+        "treinaveis_fase2": 58147906
+      },
+      "b": {
+        "cabeca": 262530,
+        "treinaveis_fase2": 58406338
+      },
+      "c": {
+        "cabeca": 3935871,
+        "treinaveis_fase2": 62079679
+      },
+      "d": {
+        "cabeca": 3936000,
+        "treinaveis_fase2": 62079808
+      },
+      "W1": {
+        "cabeca": 1049860,
+        "treinaveis_fase2": 59193668
+      },
+      "W2": {
+        "cabeca": 262468,
+        "treinaveis_fase2": 58406276
+      },
+      "W3": {
+        "cabeca": 1049860,
+        "treinaveis_fase2": 59193668
+      },
+      "W4": {
+        "cabeca": 1049860,
+        "treinaveis_fase2": 59193668
+      },
+      "W5": {
+        "cabeca": 3936964,
+        "treinaveis_fase2": 62080772
+      }
+    },
+    "dist": {
+      "a": {
+        "cabeca": 6147,
+        "treinaveis_fase2": 58149955
+      },
+      "b": {
+        "cabeca": 262659,
+        "treinaveis_fase2": 58406467
+      },
+      "c": {
+        "cabeca": 3937791,
+        "treinaveis_fase2": 62081599
+      },
+      "d": {
+        "cabeca": 3937920,
+        "treinaveis_fase2": 62081728
+      },
+      "W1": {
+        "cabeca": 1050374,
+        "treinaveis_fase2": 59194182
+      },
+      "W2": {
+        "cabeca": 262598,
+        "treinaveis_fase2": 58406406
+      }
+    }
+  },
+  "equivalencia": {
+    "cpu_64x24": {
+      "dispositivo": "cpu",
+      "atol": 1e-05,
+      "camadas": [
+        {
+          "wavelet": "mexican_hat",
+          "modo_bn": "treino",
+          "max_dif_numpy": 6.602971773794764e-07,
+          "max_dif_torch_conv_kan": 0.0,
+          "max_dif_grad_torch_conv_kan": 0.0
+        },
+        {
+          "wavelet": "mexican_hat",
+          "modo_bn": "aval",
+          "max_dif_numpy": 6.061396149448228e-07,
+          "max_dif_torch_conv_kan": 0.0
+        },
+        {
+          "wavelet": "dog",
+          "modo_bn": "treino",
+          "max_dif_numpy": 5.162062832742009e-07,
+          "max_dif_torch_conv_kan": 0.0,
+          "max_dif_grad_torch_conv_kan": 0.0
+        },
+        {
+          "wavelet": "dog",
+          "modo_bn": "aval",
+          "max_dif_numpy": 4.894791429954637e-07,
+          "max_dif_torch_conv_kan": 0.0
+        },
+        {
+          "wavelet": "morlet",
+          "modo_bn": "treino",
+          "max_dif_numpy": 5.555722979444511e-07,
+          "max_dif_torch_conv_kan": 0.0,
+          "max_dif_grad_torch_conv_kan": 0.0
+        },
+        {
+          "wavelet": "morlet",
+          "modo_bn": "aval",
+          "max_dif_numpy": 4.6249079010962646e-07,
+          "max_dif_torch_conv_kan": 0.0
+        }
+      ],
+      "cabeca": [
+        {
+          "wavelet": "mexican_hat",
+          "max_dif_cabeca_torch_conv_kan": 0.0
+        },
+        {
+          "wavelet": "dog",
+          "max_dif_cabeca_torch_conv_kan": 0.0
+        },
+        {
+          "wavelet": "morlet",
+          "max_dif_cabeca_torch_conv_kan": 0.0
+        }
+      ],
+      "max_dif": 6.602971773794764e-07,
+      "ok": true,
+      "torch_conv_kan_commit": "b412a3b839e35d0ddce378f833c2e6aa258cc251"
+    },
+    "cpu_2048x128": {
+      "dispositivo": "cpu",
+      "atol": 1e-05,
+      "camadas": [
+        {
+          "wavelet": "mexican_hat",
+          "modo_bn": "treino",
+          "max_dif_numpy": 1.3626004699007765e-06,
+          "max_dif_torch_conv_kan": 0.0,
+          "max_dif_grad_torch_conv_kan": 0.0
+        },
+        {
+          "wavelet": "mexican_hat",
+          "modo_bn": "aval",
+          "max_dif_numpy": 1.0714779818954412e-06,
+          "max_dif_torch_conv_kan": 0.0
+        },
+        {
+          "wavelet": "dog",
+          "modo_bn": "treino",
+          "max_dif_numpy": 1.4534597134741034e-06,
+          "max_dif_torch_conv_kan": 0.0,
+          "max_dif_grad_torch_conv_kan": 0.0
+        },
+        {
+          "wavelet": "dog",
+          "modo_bn": "aval",
+          "max_dif_numpy": 1.0205433806920183e-06,
+          "max_dif_torch_conv_kan": 0.0
+        },
+        {
+          "wavelet": "morlet",
+          "modo_bn": "treino",
+          "max_dif_numpy": 1.3519644874726566e-06,
+          "max_dif_torch_conv_kan": 0.0,
+          "max_dif_grad_torch_conv_kan": 0.0
+        },
+        {
+          "wavelet": "morlet",
+          "modo_bn": "aval",
+          "max_dif_numpy": 1.1352609312620388e-06,
+          "max_dif_torch_conv_kan": 0.0
+        }
+      ],
+      "cabeca": [
+        {
+          "wavelet": "mexican_hat",
+          "max_dif_cabeca_torch_conv_kan": 0.0
+        },
+        {
+          "wavelet": "dog",
+          "max_dif_cabeca_torch_conv_kan": 0.0
+        },
+        {
+          "wavelet": "morlet",
+          "max_dif_cabeca_torch_conv_kan": 0.0
+        }
+      ],
+      "max_dif": 1.4534597134741034e-06,
+      "ok": true,
+      "torch_conv_kan_commit": "b412a3b839e35d0ddce378f833c2e6aa258cc251"
+    },
+    "cuda_64x24": {
+      "dispositivo": "cuda",
+      "atol": 1e-05,
+      "camadas": [
+        {
+          "wavelet": "mexican_hat",
+          "modo_bn": "treino",
+          "max_dif_numpy": 5.259028168502766e-07,
+          "max_dif_torch_conv_kan": 0.0,
+          "max_dif_grad_torch_conv_kan": 0.0
+        },
+        {
+          "wavelet": "mexican_hat",
+          "modo_bn": "aval",
+          "max_dif_numpy": 5.292969951220527e-07,
+          "max_dif_torch_conv_kan": 0.0
+        },
+        {
+          "wavelet": "dog",
+          "modo_bn": "treino",
+          "max_dif_numpy": 6.912927519309164e-07,
+          "max_dif_torch_conv_kan": 0.0,
+          "max_dif_grad_torch_conv_kan": 0.0
+        },
+        {
+          "wavelet": "dog",
+          "modo_bn": "aval",
+          "max_dif_numpy": 6.510740622189815e-07,
+          "max_dif_torch_conv_kan": 0.0
+        },
+        {
+          "wavelet": "morlet",
+          "modo_bn": "treino",
+          "max_dif_numpy": 4.6273136256047565e-07,
+          "max_dif_torch_conv_kan": 0.0,
+          "max_dif_grad_torch_conv_kan": 0.0
+        },
+        {
+          "wavelet": "morlet",
+          "modo_bn": "aval",
+          "max_dif_numpy": 3.847961613789863e-07,
+          "max_dif_torch_conv_kan": 0.0
+        }
+      ],
+      "cabeca": [
+        {
+          "wavelet": "mexican_hat",
+          "max_dif_cabeca_torch_conv_kan": 0.0
+        },
+        {
+          "wavelet": "dog",
+          "max_dif_cabeca_torch_conv_kan": 0.0
+        },
+        {
+          "wavelet": "morlet",
+          "max_dif_cabeca_torch_conv_kan": 0.0
+        }
+      ],
+      "max_dif": 6.912927519309164e-07,
+      "ok": true,
+      "torch_conv_kan_commit": "b412a3b839e35d0ddce378f833c2e6aa258cc251"
+    },
+    "cuda_2048x128": {
+      "dispositivo": "cuda",
+      "atol": 1e-05,
+      "camadas": [
+        {
+          "wavelet": "mexican_hat",
+          "modo_bn": "treino",
+          "max_dif_numpy": 7.843184484102039e-07,
+          "max_dif_torch_conv_kan": 0.0,
+          "max_dif_grad_torch_conv_kan": 0.0
+        },
+        {
+          "wavelet": "mexican_hat",
+          "modo_bn": "aval",
+          "max_dif_numpy": 6.563026664352378e-07,
+          "max_dif_torch_conv_kan": 0.0
+        },
+        {
+          "wavelet": "dog",
+          "modo_bn": "treino",
+          "max_dif_numpy": 1.2330482657141317e-06,
+          "max_dif_torch_conv_kan": 0.0,
+          "max_dif_grad_torch_conv_kan": 0.0
+        },
+        {
+          "wavelet": "dog",
+          "modo_bn": "aval",
+          "max_dif_numpy": 8.366463091213916e-07,
+          "max_dif_torch_conv_kan": 0.0
+        },
+        {
+          "wavelet": "morlet",
+          "modo_bn": "treino",
+          "max_dif_numpy": 8.628122705189867e-07,
+          "max_dif_torch_conv_kan": 0.0,
+          "max_dif_grad_torch_conv_kan": 0.0
+        },
+        {
+          "wavelet": "morlet",
+          "modo_bn": "aval",
+          "max_dif_numpy": 6.420395819439761e-07,
+          "max_dif_torch_conv_kan": 0.0
+        }
+      ],
+      "cabeca": [
+        {
+          "wavelet": "mexican_hat",
+          "max_dif_cabeca_torch_conv_kan": 0.0
+        },
+        {
+          "wavelet": "dog",
+          "max_dif_cabeca_torch_conv_kan": 0.0
+        },
+        {
+          "wavelet": "morlet",
+          "max_dif_cabeca_torch_conv_kan": 0.0
+        }
+      ],
+      "max_dif": 1.2330482657141317e-06,
+      "ok": true,
+      "torch_conv_kan_commit": "b412a3b839e35d0ddce378f833c2e6aa258cc251"
+    }
+  },
+  "so_cabeca": [
+    {
+      "cabeca": "a",
+      "nome": "(a) Linear",
+      "compile": false,
+      "modo": "fwd_bwd",
+      "lote": 32,
+      "ms_media": 0.4851580809056759,
+      "ms_dp": 0.026314039319927936,
+      "ms_mediana": 0.48230400681495667,
+      "ms_por_imagem": 0.015161190028302372,
+      "mem_pico_mb": 0.00146484375,
+      "n_aquec": 20,
+      "n_medidas": 200
+    },
+    {
+      "cabeca": "a",
+      "nome": "(a) Linear",
+      "compile": false,
+      "modo": "inferencia",
+      "lote": 1,
+      "ms_media": 0.05935104029253125,
+      "ms_dp": 0.0067371949772197254,
+      "ms_mediana": 0.05632000043988228,
+      "ms_por_imagem": 0.05935104029253125,
+      "mem_pico_mb": 0.00048828125,
+      "n_aquec": 20,
+      "n_medidas": 200
+    },
+    {
+      "cabeca": "a",
+      "nome": "(a) Linear",
+      "compile": false,
+      "modo": "inferencia",
+      "lote": 256,
+      "ms_media": 0.06701152006164193,
+      "ms_dp": 0.014062027551970292,
+      "ms_mediana": 0.06147199869155884,
+      "ms_por_imagem": 0.0002617637502407888,
+      "mem_pico_mb": 0.001953125,
+      "n_aquec": 20,
+      "n_medidas": 200
+    },
+    {
+      "cabeca": "b",
+      "nome": "(b) MLP-128",
+      "compile": false,
+      "modo": "fwd_bwd",
+      "lote": 32,
+      "ms_media": 0.7286431989073754,
+      "ms_dp": 0.022900597701943644,
+      "ms_mediana": 0.7280640006065369,
+      "ms_por_imagem": 0.02277009996585548,
+      "mem_pico_mb": 0.0166015625,
+      "n_aquec": 20,
+      "n_medidas": 200
+    },
+    {
+      "cabeca": "b",
+      "nome": "(b) MLP-128",
+      "compile": false,
+      "modo": "inferencia",
+      "lote": 1,
+      "ms_media": 0.12036080040037632,
+      "ms_dp": 0.009842932969263576,
+      "ms_mediana": 0.1157120019197464,
+      "ms_por_imagem": 0.12036080040037632,
+      "mem_pico_mb": 0.0009765625,
+      "n_aquec": 20,
+      "n_medidas": 200
+    },
+    {
+      "cabeca": "b",
+      "nome": "(b) MLP-128",
+      "compile": false,
+      "modo": "inferencia",
+      "lote": 256,
+      "ms_media": 0.13583152044564487,
+      "ms_dp": 0.011744984902398222,
+      "ms_mediana": 0.131071999669075,
+      "ms_por_imagem": 0.0005305918767408003,
+      "mem_pico_mb": 0.126953125,
+      "n_aquec": 20,
+      "n_medidas": 200
+    },
+    {
+      "cabeca": "c",
+      "nome": "(c) MLP-iso",
+      "compile": false,
+      "modo": "fwd_bwd",
+      "lote": 32,
+      "ms_media": 0.7341843214631081,
+      "ms_dp": 0.03149202285301159,
+      "ms_mediana": 0.7301120162010193,
+      "ms_por_imagem": 0.022943260045722128,
+      "mem_pico_mb": 0.2353515625,
+      "n_aquec": 20,
+      "n_medidas": 200
+    },
+    {
+      "cabeca": "c",
+      "nome": "(c) MLP-iso",
+      "compile": false,
+      "modo": "inferencia",
+      "lote": 1,
+      "ms_media": 0.12217184089124203,
+      "ms_dp": 0.01293093012054716,
+      "ms_mediana": 0.11721600219607353,
+      "ms_por_imagem": 0.12217184089124203,
+      "mem_pico_mb": 0.0078125,
+      "n_aquec": 20,
+      "n_medidas": 200
+    },
+    {
+      "cabeca": "c",
+      "nome": "(c) MLP-iso",
+      "compile": false,
+      "modo": "inferencia",
+      "lote": 256,
+      "ms_media": 0.23714800037443637,
+      "ms_dp": 0.009502984439841258,
+      "ms_mediana": 0.23552000522613525,
+      "ms_por_imagem": 0.0009263593764626421,
+      "mem_pico_mb": 1.8759765625,
+      "n_aquec": 20,
+      "n_medidas": 200
+    },
+    {
+      "cabeca": "d",
+      "nome": "(d) KAN spline",
+      "compile": false,
+      "modo": "fwd_bwd",
+      "lote": 32,
+      "ms_media": 3.296880798339844,
+      "ms_dp": 0.1785222248268997,
+      "ms_mediana": 3.226624011993408,
+      "ms_por_imagem": 0.10302752494812012,
+      "mem_pico_mb": 27.2666015625,
+      "n_aquec": 20,
+      "n_medidas": 200
+    },
+    {
+      "cabeca": "d",
+      "nome": "(d) KAN spline",
+      "compile": false,
+      "modo": "inferencia",
+      "lote": 1,
+      "ms_media": 1.534970880150795,
+      "ms_dp": 0.0920057152377278,
+      "ms_mediana": 1.5078400373458862,
+      "ms_por_imagem": 1.534970880150795,
+      "mem_pico_mb": 14.1025390625,
+      "n_aquec": 20,
+      "n_medidas": 200
+    },
+    {
+      "cabeca": "d",
+      "nome": "(d) KAN spline",
+      "compile": false,
+      "modo": "inferencia",
+      "lote": 256,
+      "ms_media": 5.482687706947327,
+      "ms_dp": 0.017660293579639927,
+      "ms_mediana": 5.480447769165039,
+      "ms_por_imagem": 0.021416748855262995,
+      "mem_pico_mb": 122.2421875,
+      "n_aquec": 20,
+      "n_medidas": 200
+    },
+    {
+      "cabeca": "W1",
+      "nome": "W1 Wav-KAN mexhat h=128",
+      "compile": false,
+      "modo": "fwd_bwd",
+      "lote": 32,
+      "ms_media": 8.838018565177917,
+      "ms_dp": 0.05250032005500807,
+      "ms_mediana": 8.8340482711792,
+      "ms_por_imagem": 0.2761880801618099,
+      "mem_pico_mb": 223.2666015625,
+      "n_aquec": 20,
+      "n_medidas": 200
+    },
+    {
+      "cabeca": "W1",
+      "nome": "W1 Wav-KAN mexhat h=128",
+      "compile": false,
+      "modo": "inferencia",
+      "lote": 1,
+      "ms_media": 0.8574379226565361,
+      "ms_dp": 0.014576950753481416,
+      "ms_mediana": 0.8550400137901306,
+      "ms_por_imagem": 0.8574379226565361,
+      "mem_pico_mb": 4.25,
+      "n_aquec": 20,
+      "n_medidas": 200
+    },
+    {
+      "cabeca": "W1",
+      "nome": "W1 Wav-KAN mexhat h=128",
+      "compile": false,
+      "modo": "inferencia",
+      "lote": 256,
+      "ms_media": 24.421093349456786,
+      "ms_dp": 0.03223171048107943,
+      "ms_mediana": 24.418304443359375,
+      "ms_por_imagem": 0.09539489589631557,
+      "mem_pico_mb": 1024.0,
+      "n_aquec": 20,
+      "n_medidas": 200
+    },
+    {
+      "cabeca": "W2",
+      "nome": "W2 Wav-KAN mexhat h=32",
+      "compile": false,
+      "modo": "fwd_bwd",
+      "lote": 32,
+      "ms_media": 2.9521865606307984,
+      "ms_dp": 0.1351113428943226,
+      "ms_mediana": 2.9184000492095947,
+      "ms_por_imagem": 0.09225583001971245,
+      "mem_pico_mb": 55.8173828125,
+      "n_aquec": 20,
+      "n_medidas": 200
+    },
+    {
+      "cabeca": "W2",
+      "nome": "W2 Wav-KAN mexhat h=32",
+      "compile": false,
+      "modo": "inferencia",
+      "lote": 1,
+      "ms_media": 0.8533463990688324,
+      "ms_dp": 0.016017238780425293,
+      "ms_mediana": 0.8519519865512848,
+      "ms_por_imagem": 0.8533463990688324,
+      "mem_pico_mb": 1.0625,
+      "n_aquec": 20,
+      "n_medidas": 200
+    },
+    {
+      "cabeca": "W2",
+      "nome": "W2 Wav-KAN mexhat h=32",
+      "compile": false,
+      "modo": "inferencia",
+      "lote": 256,
+      "ms_media": 6.192114722728729,
+      "ms_dp": 0.0120607913390005,
+      "ms_mediana": 6.192592144012451,
+      "ms_por_imagem": 0.0241879481356591,
+      "mem_pico_mb": 256.0,
+      "n_aquec": 20,
+      "n_medidas": 200
+    },
+    {
+      "cabeca": "W3",
+      "nome": "W3 Wav-KAN dog h=128",
+      "compile": false,
+      "modo": "fwd_bwd",
+      "lote": 32,
+      "ms_media": 7.596063673496246,
+      "ms_dp": 0.030016537552074934,
+      "ms_mediana": 7.590911865234375,
+      "ms_por_imagem": 0.2373769897967577,
+      "mem_pico_mb": 223.2666015625,
+      "n_aquec": 20,
+      "n_medidas": 200
+    },
+    {
+      "cabeca": "W3",
+      "nome": "W3 Wav-KAN dog h=128",
+      "compile": false,
+      "modo": "inferencia",
+      "lote": 1,
+      "ms_media": 0.8086436793208123,
+      "ms_dp": 0.020134990509819324,
+      "ms_mediana": 0.8038399815559387,
+      "ms_por_imagem": 0.8086436793208123,
+      "mem_pico_mb": 4.25,
+      "n_aquec": 20,
+      "n_medidas": 200
+    },
+    {
+      "cabeca": "W3",
+      "nome": "W3 Wav-KAN dog h=128",
+      "compile": false,
+      "modo": "inferencia",
+      "lote": 256,
+      "ms_media": 19.76203305244446,
+      "ms_dp": 0.04887406095659056,
+      "ms_mediana": 19.759103775024414,
+      "ms_por_imagem": 0.07719544161111117,
+      "mem_pico_mb": 1024.0,
+      "n_aquec": 20,
+      "n_medidas": 200
+    },
+    {
+      "cabeca": "W4",
+      "nome": "W4 Wav-KAN morlet h=128",
+      "compile": false,
+      "modo": "fwd_bwd",
+      "lote": 32,
+      "ms_media": 8.547795672416687,
+      "ms_dp": 0.03690033653368011,
+      "ms_mediana": 8.542719841003418,
+      "ms_por_imagem": 0.26711861476302146,
+      "mem_pico_mb": 255.2666015625,
+      "n_aquec": 20,
+      "n_medidas": 200
+    },
+    {
+      "cabeca": "W4",
+      "nome": "W4 Wav-KAN morlet h=128",
+      "compile": false,
+      "modo": "inferencia",
+      "lote": 1,
+      "ms_media": 0.8140911987423897,
+      "ms_dp": 0.017718051659135252,
+      "ms_mediana": 0.8120319843292236,
+      "ms_por_imagem": 0.8140911987423897,
+      "mem_pico_mb": 4.25,
+      "n_aquec": 20,
+      "n_medidas": 200
+    },
+    {
+      "cabeca": "W4",
+      "nome": "W4 Wav-KAN morlet h=128",
+      "compile": false,
+      "modo": "inferencia",
+      "lote": 256,
+      "ms_media": 22.03911789894104,
+      "ms_dp": 0.024355916138101626,
+      "ms_mediana": 22.040576934814453,
+      "ms_por_imagem": 0.08609030429273844,
+      "mem_pico_mb": 1024.0,
+      "n_aquec": 20,
+      "n_medidas": 200
+    },
+    {
+      "cabeca": "W5",
+      "nome": "W5 Wav-KAN mexhat h=480",
+      "compile": false,
+      "modo": "fwd_bwd",
+      "lote": 32,
+      "ms_media": 38.35701896667481,
+      "ms_dp": 0.03655098025652635,
+      "ms_mediana": 38.35647964477539,
+      "ms_por_imagem": 1.1986568427085877,
+      "mem_pico_mb": 837.2470703125,
+      "n_aquec": 20,
+      "n_medidas": 200
+    },
+    {
+      "cabeca": "W5",
+      "nome": "W5 Wav-KAN mexhat h=480",
+      "compile": false,
+      "modo": "inferencia",
+      "lote": 1,
+      "ms_media": 0.8477358400821686,
+      "ms_dp": 0.024895947472352648,
+      "ms_mediana": 0.8417279720306396,
+      "ms_por_imagem": 0.8477358400821686,
+      "mem_pico_mb": 15.9375,
+      "n_aquec": 20,
+      "n_medidas": 200
+    },
+    {
+      "cabeca": "W5",
+      "nome": "W5 Wav-KAN mexhat h=480",
+      "compile": false,
+      "modo": "inferencia",
+      "lote": 256,
+      "ms_media": 90.78839378356933,
+      "ms_dp": 0.062304343126290775,
+      "ms_mediana": 90.78630447387695,
+      "ms_por_imagem": 0.3546421632170677,
+      "mem_pico_mb": 3840.0,
+      "n_aquec": 20,
+      "n_medidas": 200
+    }
+  ],
+  "previsao": {
+    "taxa_uc_h": 1.54,
+    "lotes_por_epoca": {
+      "es": 63.6,
+      "dist": 46.8
+    },
+    "es": {
+      "_ref_d_treino_min_por_dobra": 8.487644444444443,
+      "resnet152__wavkan_mexhat_h128": {
+        "id": "W1",
+        "min_por_dobra": 9.140060806415345,
+        "uc_por_dobra": 0.23459489403132722,
+        "horas_por_semente": 0.7616717338679455,
+        "uc_por_semente": 1.172974470156636,
+        "min_pela_cabeca": 8.840060806415345,
+        "min_pelo_01": 8.656434883077953
+      },
+      "resnet152__wavkan_mexhat_h32": {
+        "id": "W2",
+        "min_por_dobra": 8.765721890926148,
+        "uc_por_dobra": 0.22498686186710448,
+        "horas_por_semente": 0.7304768242438456,
+        "uc_por_semente": 1.1249343093355224,
+        "min_pela_cabeca": 8.465721890926147,
+        "min_pelo_01": null
+      },
+      "resnet152__wavkan_dog_h128": {
+        "id": "W3",
+        "min_por_dobra": 9.06107247530439,
+        "uc_por_dobra": 0.23256752686614604,
+        "horas_por_semente": 0.7550893729420326,
+        "uc_por_semente": 1.1628376343307303,
+        "min_pela_cabeca": 8.76107247530439,
+        "min_pelo_01": null
+      },
+      "resnet152__wavkan_morlet_h128": {
+        "id": "W4",
+        "min_por_dobra": 9.121602630435731,
+        "uc_por_dobra": 0.23412113418118377,
+        "horas_por_semente": 0.760133552536311,
+        "uc_por_semente": 1.170605670905919,
+        "min_pela_cabeca": 8.82160263043573,
+        "min_pelo_01": null
+      },
+      "resnet152__wavkan_mexhat_h480": {
+        "id": "W5",
+        "min_por_dobra": 11.166245175079231,
+        "uc_por_dobra": 0.2866002928270336,
+        "horas_por_semente": 0.9305204312566027,
+        "uc_por_semente": 1.433001464135168,
+        "min_pela_cabeca": 10.717469231950547,
+        "min_pelo_01": 10.86624517507923
+      }
+    },
+    "dist": {
+      "_ref_d_treino_min_por_dobra": 6.460344444444444,
+      "mlsd__resnet152__wavkan_mexhat_h128": {
+        "id": "W1",
+        "min_por_dobra": 7.0196696919324655,
+        "uc_por_dobra": 0.18017152209293327,
+        "horas_por_semente": 0.5849724743277054,
+        "uc_por_semente": 0.9008576104646663,
+        "min_pela_cabeca": 6.719669691932466,
+        "min_pelo_01": 6.588818767283814
+      },
+      "mlsd__resnet152__wavkan_mexhat_h32": {
+        "id": "W2",
+        "min_por_dobra": 6.74421275411966,
+        "uc_por_dobra": 0.17310146068907128,
+        "horas_por_semente": 0.5620177295099716,
+        "uc_por_semente": 0.8655073034453563,
+        "min_pela_cabeca": 6.44421275411966,
+        "min_pelo_01": null
+      }
+    },
+    "etapas": [
+      {
+        "etapa": "07 principal, entrada/saída (W1, W2 × 42/43/44)",
+        "horas_L4": 4.56,
+        "UC": 7.0
+      },
+      {
+        "etapa": "07 MLSD (W1, W2 × 42/43/44)",
+        "horas_L4": 3.52,
+        "UC": 5.4
+      },
+      {
+        "etapa": "07 sensibilidade (W3, W4, W5 × 42)",
+        "horas_L4": 2.53,
+        "UC": 3.9
+      }
+    ]
+  }
+}

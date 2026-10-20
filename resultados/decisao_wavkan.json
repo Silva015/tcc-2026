@@ -1,0 +1,1044 @@
+{
+  "margem_ni": -0.02,
+  "n_boot": 2000,
+  "desfecho_contraste_1": {
+    "es": "inconclusivo",
+    "dist": "C"
+  },
+  "contrastes": {
+    "es__W2_vs_b": {
+      "tarefa": "es",
+      "a": "W2",
+      "b": "b",
+      "sementes": [
+        42,
+        43,
+        44
+      ],
+      "delta_auc_oof": -0.0009244214253661953,
+      "ic95_auc": [
+        -0.003896799643209706,
+        0.0021668045984408295
+      ],
+      "delta_f1_oof": -0.012406306808568246,
+      "ic95_f1": [
+        -0.02302114267511899,
+        -0.0026278192946456863
+      ],
+      "n_boot_validos": 2000,
+      "delta_auc_dobras": {
+        "0": -0.0059,
+        "1": -0.0027,
+        "2": -0.002,
+        "3": -0.002,
+        "4": -0.0035
+      },
+      "delta_f1_dobras": {
+        "0": 0.0034,
+        "1": 0.0004,
+        "2": -0.0171,
+        "3": -0.0157,
+        "4": -0.0052
+      },
+      "media_delta_auc_dobras": -0.0032232931141579434,
+      "dp_delta_auc_dobras": 0.001589969397262652,
+      "dobras_a_vence": 0,
+      "dobras_a_nao_perde": 0,
+      "n_dobras": 5,
+      "superior": false,
+      "inferior": false,
+      "nao_inferior": false,
+      "papel": "primário 1"
+    },
+    "es__W1_vs_c": {
+      "tarefa": "es",
+      "a": "W1",
+      "b": "c",
+      "sementes": [
+        42,
+        43,
+        44
+      ],
+      "delta_auc_oof": -0.0017206268653644496,
+      "ic95_auc": [
+        -0.00498531293193179,
+        0.0016746549996991126
+      ],
+      "delta_f1_oof": -0.0025396966458793857,
+      "ic95_f1": [
+        -0.014173414340761161,
+        0.008211857041376327
+      ],
+      "n_boot_validos": 2000,
+      "delta_auc_dobras": {
+        "0": -0.0032,
+        "1": -0.0065,
+        "2": -0.0,
+        "3": -0.0069,
+        "4": -0.0037
+      },
+      "delta_f1_dobras": {
+        "0": 0.0044,
+        "1": -0.0039,
+        "2": -0.0079,
+        "3": -0.017,
+        "4": -0.0114
+      },
+      "media_delta_auc_dobras": -0.004053810228847055,
+      "dp_delta_auc_dobras": 0.0028010554800114973,
+      "dobras_a_vence": 0,
+      "dobras_a_nao_perde": 0,
+      "n_dobras": 5,
+      "superior": false,
+      "inferior": false,
+      "nao_inferior": true,
+      "papel": "primário 2"
+    },
+    "es__W5_vs_c": {
+      "tarefa": "es",
+      "a": "W5",
+      "b": "c",
+      "sementes": [
+        42
+      ],
+      "delta_auc_oof": -0.0030534399478271412,
+      "ic95_auc": [
+        -0.007932902665038183,
+        0.0015651003764262997
+      ],
+      "delta_f1_oof": -0.008542006065366703,
+      "ic95_f1": [
+        -0.01939516037027581,
+        0.002566913693920811
+      ],
+      "n_boot_validos": 2000,
+      "delta_auc_dobras": {
+        "0": 0.0041,
+        "1": -0.0107,
+        "2": 0.004,
+        "3": -0.0115,
+        "4": -0.0054
+      },
+      "delta_f1_dobras": {
+        "0": 0.0261,
+        "1": -0.0255,
+        "2": -0.013,
+        "3": -0.024,
+        "4": -0.0071
+      },
+      "media_delta_auc_dobras": -0.0039000386035321633,
+      "dp_delta_auc_dobras": 0.007632390315294828,
+      "dobras_a_vence": 2,
+      "dobras_a_nao_perde": 2,
+      "n_dobras": 5,
+      "superior": false,
+      "inferior": false,
+      "nao_inferior": true,
+      "papel": "primário 2"
+    },
+    "es__W1_vs_d": {
+      "tarefa": "es",
+      "a": "W1",
+      "b": "d",
+      "sementes": [
+        42,
+        43,
+        44
+      ],
+      "delta_auc_oof": -0.0006513688639350201,
+      "ic95_auc": [
+        -0.003972529618374651,
+        0.002754349972644092
+      ],
+      "delta_f1_oof": -0.005488995042357114,
+      "ic95_f1": [
+        -0.01604076994169118,
+        0.005027705679383975
+      ],
+      "n_boot_validos": 2000,
+      "delta_auc_dobras": {
+        "0": -0.0036,
+        "1": -0.0052,
+        "2": 0.0018,
+        "3": -0.0073,
+        "4": -0.0022
+      },
+      "delta_f1_dobras": {
+        "0": 0.0109,
+        "1": -0.0021,
+        "2": -0.0104,
+        "3": -0.0152,
+        "4": -0.0139
+      },
+      "media_delta_auc_dobras": -0.0032895979016473787,
+      "dp_delta_auc_dobras": 0.003422386723901702,
+      "dobras_a_vence": 1,
+      "dobras_a_nao_perde": 1,
+      "n_dobras": 5,
+      "superior": false,
+      "inferior": false,
+      "nao_inferior": true,
+      "papel": "secundário"
+    },
+    "es__W2_vs_d": {
+      "tarefa": "es",
+      "a": "W2",
+      "b": "d",
+      "sementes": [
+        42,
+        43,
+        44
+      ],
+      "delta_auc_oof": -0.0008167833141933256,
+      "ic95_auc": [
+        -0.0034229666491565835,
+        0.0018496612945766758
+      ],
+      "delta_f1_oof": -0.010944965052950839,
+      "ic95_f1": [
+        -0.020630131521164722,
+        -0.0017516087208041327
+      ],
+      "n_boot_validos": 2000,
+      "delta_auc_dobras": {
+        "0": -0.0062,
+        "1": -0.0019,
+        "2": -0.0008,
+        "3": -0.0034,
+        "4": -0.0036
+      },
+      "delta_f1_dobras": {
+        "0": 0.0077,
+        "1": 0.003,
+        "2": -0.0178,
+        "3": -0.0195,
+        "4": -0.009
+      },
+      "media_delta_auc_dobras": -0.003157324498963798,
+      "dp_delta_auc_dobras": 0.0020310473250653716,
+      "dobras_a_vence": 0,
+      "dobras_a_nao_perde": 0,
+      "n_dobras": 5,
+      "superior": false,
+      "inferior": false,
+      "nao_inferior": false,
+      "papel": "secundário"
+    },
+    "es__W5_vs_d": {
+      "tarefa": "es",
+      "a": "W5",
+      "b": "d",
+      "sementes": [
+        42
+      ],
+      "delta_auc_oof": -0.001664433439678592,
+      "ic95_auc": [
+        -0.006598967594212158,
+        0.0031794327986442218
+      ],
+      "delta_f1_oof": -0.008442120934249342,
+      "ic95_f1": [
+        -0.019467894943555816,
+        0.0024604659001365384
+      ],
+      "n_boot_validos": 2000,
+      "delta_auc_dobras": {
+        "0": 0.0049,
+        "1": -0.0083,
+        "2": 0.0052,
+        "3": -0.0113,
+        "4": -0.0035
+      },
+      "delta_f1_dobras": {
+        "0": 0.022,
+        "1": -0.013,
+        "2": -0.0207,
+        "3": -0.0214,
+        "4": -0.0083
+      },
+      "media_delta_auc_dobras": -0.002606389852419366,
+      "dp_delta_auc_dobras": 0.0075253071715923915,
+      "dobras_a_vence": 2,
+      "dobras_a_nao_perde": 2,
+      "n_dobras": 5,
+      "superior": false,
+      "inferior": false,
+      "nao_inferior": true,
+      "papel": "secundário"
+    },
+    "es__W1_vs_b": {
+      "tarefa": "es",
+      "a": "W1",
+      "b": "b",
+      "sementes": [
+        42,
+        43,
+        44
+      ],
+      "delta_auc_oof": -0.0007590069751078898,
+      "ic95_auc": [
+        -0.004273122287436379,
+        0.0028397406665073305
+      ],
+      "delta_f1_oof": -0.006950336797974521,
+      "ic95_f1": [
+        -0.019068927741153825,
+        0.0044218572885105535
+      ],
+      "n_boot_validos": 2000,
+      "delta_auc_dobras": {
+        "0": -0.0033,
+        "1": -0.006,
+        "2": 0.0006,
+        "3": -0.0059,
+        "4": -0.0021
+      },
+      "delta_f1_dobras": {
+        "0": 0.0066,
+        "1": -0.0047,
+        "2": -0.0097,
+        "3": -0.0114,
+        "4": -0.0101
+      },
+      "media_delta_auc_dobras": -0.003355566516841524,
+      "dp_delta_auc_dobras": 0.002767797274555546,
+      "dobras_a_vence": 1,
+      "dobras_a_nao_perde": 1,
+      "n_dobras": 5,
+      "superior": false,
+      "inferior": false,
+      "nao_inferior": true,
+      "papel": "descritivo"
+    },
+    "es__W3_vs_W1": {
+      "tarefa": "es",
+      "a": "W3",
+      "b": "W1",
+      "sementes": [
+        42
+      ],
+      "delta_auc_oof": 0.0024796338404723395,
+      "ic95_auc": [
+        -0.0017553506159330627,
+        0.006421285792187223
+      ],
+      "delta_f1_oof": -0.008113821847957947,
+      "ic95_f1": [
+        -0.017971417247939683,
+        0.0010028522869648857
+      ],
+      "n_boot_validos": 2000,
+      "delta_auc_dobras": {
+        "0": 0.0055,
+        "1": 0.0066,
+        "2": -0.0028,
+        "3": 0.0016,
+        "4": 0.0031
+      },
+      "delta_f1_dobras": {
+        "0": 0.0071,
+        "1": -0.0119,
+        "2": -0.0258,
+        "3": -0.0102,
+        "4": 0.0007
+      },
+      "media_delta_auc_dobras": 0.002804573565440549,
+      "dp_delta_auc_dobras": 0.0037063848876828158,
+      "dobras_a_vence": 4,
+      "dobras_a_nao_perde": 4,
+      "n_dobras": 5,
+      "superior": false,
+      "inferior": false,
+      "nao_inferior": true,
+      "papel": "sensibilidade"
+    },
+    "es__W4_vs_W1": {
+      "tarefa": "es",
+      "a": "W4",
+      "b": "W1",
+      "sementes": [
+        42
+      ],
+      "delta_auc_oof": -0.004407622361184416,
+      "ic95_auc": [
+        -0.009594898082697857,
+        0.0008664756222543774
+      ],
+      "delta_f1_oof": -0.022709545762062966,
+      "ic95_f1": [
+        -0.034690935937390616,
+        -0.011735716768193873
+      ],
+      "n_boot_validos": 2000,
+      "delta_auc_dobras": {
+        "0": 0.0004,
+        "1": -0.0025,
+        "2": -0.0104,
+        "3": -0.0058,
+        "4": -0.0013
+      },
+      "delta_f1_dobras": {
+        "0": -0.0133,
+        "1": -0.0254,
+        "2": -0.0484,
+        "3": -0.0229,
+        "4": -0.0027
+      },
+      "media_delta_auc_dobras": -0.003924163978611128,
+      "dp_delta_auc_dobras": 0.004258613484419839,
+      "dobras_a_vence": 1,
+      "dobras_a_nao_perde": 1,
+      "n_dobras": 5,
+      "superior": false,
+      "inferior": false,
+      "nao_inferior": false,
+      "papel": "sensibilidade"
+    },
+    "es__W3_vs_d": {
+      "tarefa": "es",
+      "a": "W3",
+      "b": "d",
+      "sementes": [
+        42
+      ],
+      "delta_auc_oof": 0.0030756007354215686,
+      "ic95_auc": [
+        -0.0013038297121144376,
+        0.007293602575507573
+      ],
+      "delta_f1_oof": -0.013728294548590148,
+      "ic95_f1": [
+        -0.026639482760336612,
+        -0.00091030473591448
+      ],
+      "n_boot_validos": 2000,
+      "delta_auc_dobras": {
+        "0": 0.0068,
+        "1": 0.0023,
+        "2": 0.0029,
+        "3": -0.0066,
+        "4": 0.0027
+      },
+      "delta_f1_dobras": {
+        "0": 0.0224,
+        "1": -0.0193,
+        "2": -0.0386,
+        "3": -0.0252,
+        "4": -0.0075
+      },
+      "media_delta_auc_dobras": 0.0016065147638762323,
+      "dp_delta_auc_dobras": 0.004938953666691999,
+      "dobras_a_vence": 4,
+      "dobras_a_nao_perde": 4,
+      "n_dobras": 5,
+      "superior": false,
+      "inferior": false,
+      "nao_inferior": false,
+      "papel": "sensibilidade"
+    },
+    "es__W4_vs_d": {
+      "tarefa": "es",
+      "a": "W4",
+      "b": "d",
+      "sementes": [
+        42
+      ],
+      "delta_auc_oof": -0.0038116554662351865,
+      "ic95_auc": [
+        -0.009236952112996879,
+        0.0013853961931471067
+      ],
+      "delta_f1_oof": -0.028324018462695166,
+      "ic95_f1": [
+        -0.0436223640831159,
+        -0.013880573619017872
+      ],
+      "n_boot_validos": 2000,
+      "delta_auc_dobras": {
+        "0": 0.0016,
+        "1": -0.0068,
+        "2": -0.0047,
+        "3": -0.014,
+        "4": -0.0017
+      },
+      "delta_f1_dobras": {
+        "0": 0.002,
+        "1": -0.0328,
+        "2": -0.0613,
+        "3": -0.038,
+        "4": -0.0109
+      },
+      "media_delta_auc_dobras": -0.005122222780175445,
+      "dp_delta_auc_dobras": 0.005898069799265273,
+      "dobras_a_vence": 1,
+      "dobras_a_nao_perde": 1,
+      "n_dobras": 5,
+      "superior": false,
+      "inferior": false,
+      "nao_inferior": false,
+      "papel": "sensibilidade"
+    },
+    "dist__W2_vs_b": {
+      "tarefa": "dist",
+      "a": "W2",
+      "b": "b",
+      "sementes": [
+        42,
+        43
+      ],
+      "delta_auc_oof": -0.07648948122827814,
+      "ic95_auc": [
+        -0.10334125465545416,
+        -0.04952008690010892
+      ],
+      "delta_f1_oof": -0.0759209130016188,
+      "ic95_f1": [
+        -0.11661677129064459,
+        -0.035596124924525276
+      ],
+      "n_boot_validos": 2000,
+      "delta_auc_dobras": {
+        "0": -0.0179,
+        "1": -0.073,
+        "2": -0.0583,
+        "3": -0.1208,
+        "4": -0.1719
+      },
+      "delta_f1_dobras": {
+        "0": -0.1268,
+        "1": -0.0656,
+        "2": -0.0866,
+        "3": -0.068,
+        "4": -0.0408
+      },
+      "media_delta_auc_dobras": -0.08841145711542622,
+      "dp_delta_auc_dobras": 0.059426379951468725,
+      "dobras_a_vence": 0,
+      "dobras_a_nao_perde": 0,
+      "n_dobras": 5,
+      "superior": false,
+      "inferior": true,
+      "nao_inferior": false,
+      "papel": "primário 1"
+    },
+    "dist__W1_vs_c": {
+      "tarefa": "dist",
+      "a": "W1",
+      "b": "c",
+      "sementes": [
+        42,
+        43,
+        44
+      ],
+      "delta_auc_oof": -0.08641050760284796,
+      "ic95_auc": [
+        -0.12001363814557811,
+        -0.051728255768700084
+      ],
+      "delta_f1_oof": -0.07030279334255707,
+      "ic95_f1": [
+        -0.12116327005909086,
+        -0.023715985334856606
+      ],
+      "n_boot_validos": 2000,
+      "delta_auc_dobras": {
+        "0": -0.0163,
+        "1": -0.0874,
+        "2": -0.0427,
+        "3": -0.1406,
+        "4": -0.1917
+      },
+      "delta_f1_dobras": {
+        "0": -0.0963,
+        "1": -0.0359,
+        "2": -0.0807,
+        "3": -0.0517,
+        "4": -0.0436
+      },
+      "media_delta_auc_dobras": -0.09573763667845618,
+      "dp_delta_auc_dobras": 0.07143687313156678,
+      "dobras_a_vence": 0,
+      "dobras_a_nao_perde": 0,
+      "n_dobras": 5,
+      "superior": false,
+      "inferior": true,
+      "nao_inferior": false,
+      "papel": "primário 2"
+    },
+    "dist__W1_vs_d": {
+      "tarefa": "dist",
+      "a": "W1",
+      "b": "d",
+      "sementes": [
+        42,
+        43,
+        44
+      ],
+      "delta_auc_oof": -0.07507920111511235,
+      "ic95_auc": [
+        -0.10530504717422814,
+        -0.04429935434555543
+      ],
+      "delta_f1_oof": -0.06709181476908738,
+      "ic95_f1": [
+        -0.1132774067623878,
+        -0.024176508077278353
+      ],
+      "n_boot_validos": 2000,
+      "delta_auc_dobras": {
+        "0": -0.02,
+        "1": -0.0661,
+        "2": -0.0424,
+        "3": -0.1247,
+        "4": -0.1796
+      },
+      "delta_f1_dobras": {
+        "0": -0.1011,
+        "1": -0.0479,
+        "2": -0.0599,
+        "3": -0.0434,
+        "4": -0.042
+      },
+      "media_delta_auc_dobras": -0.0865456907515754,
+      "dp_delta_auc_dobras": 0.06501499864826868,
+      "dobras_a_vence": 0,
+      "dobras_a_nao_perde": 0,
+      "n_dobras": 5,
+      "superior": false,
+      "inferior": true,
+      "nao_inferior": false,
+      "papel": "secundário"
+    },
+    "dist__W2_vs_d": {
+      "tarefa": "dist",
+      "a": "W2",
+      "b": "d",
+      "sementes": [
+        42,
+        43
+      ],
+      "delta_auc_oof": -0.07210161920377756,
+      "ic95_auc": [
+        -0.10265680644824499,
+        -0.045219811255222064
+      ],
+      "delta_f1_oof": -0.07759256292025768,
+      "ic95_f1": [
+        -0.12201153443136978,
+        -0.034020892972475854
+      ],
+      "n_boot_validos": 2000,
+      "delta_auc_dobras": {
+        "0": -0.0219,
+        "1": -0.0648,
+        "2": -0.0506,
+        "3": -0.1041,
+        "4": -0.1939
+      },
+      "delta_f1_dobras": {
+        "0": -0.1129,
+        "1": -0.0629,
+        "2": -0.0522,
+        "3": -0.0531,
+        "4": -0.0489
+      },
+      "media_delta_auc_dobras": -0.0870763803717662,
+      "dp_delta_auc_dobras": 0.06663045716606875,
+      "dobras_a_vence": 0,
+      "dobras_a_nao_perde": 0,
+      "n_dobras": 5,
+      "superior": false,
+      "inferior": true,
+      "nao_inferior": false,
+      "papel": "secundário"
+    },
+    "dist__W1_vs_b": {
+      "tarefa": "dist",
+      "a": "W1",
+      "b": "b",
+      "sementes": [
+        42,
+        43,
+        44
+      ],
+      "delta_auc_oof": -0.08027667749894807,
+      "ic95_auc": [
+        -0.10880449715566669,
+        -0.04970563586463932
+      ],
+      "delta_f1_oof": -0.06574264272009978,
+      "ic95_f1": [
+        -0.11156592278045001,
+        -0.023827325686496915
+      ],
+      "n_boot_validos": 2000,
+      "delta_auc_dobras": {
+        "0": -0.0195,
+        "1": -0.0717,
+        "2": -0.0527,
+        "3": -0.1399,
+        "4": -0.1683
+      },
+      "delta_f1_dobras": {
+        "0": -0.1084,
+        "1": -0.0453,
+        "2": -0.0786,
+        "3": -0.0545,
+        "4": -0.0321
+      },
+      "media_delta_auc_dobras": -0.0903958551901612,
+      "dp_delta_auc_dobras": 0.06187427310342825,
+      "dobras_a_vence": 0,
+      "dobras_a_nao_perde": 0,
+      "n_dobras": 5,
+      "superior": false,
+      "inferior": true,
+      "nao_inferior": false,
+      "papel": "descritivo"
+    }
+  },
+  "tempo": {
+    "es__W2_vs_b": {
+      "tarefa": "es",
+      "a": "W2",
+      "b": "b",
+      "desfecho": "igual",
+      "cabeca_ms_lote32": [
+        2.9521865606307984,
+        0.1351113428943226,
+        0.7286431989073754,
+        0.022900597701943644
+      ],
+      "cabeca_mais_rapida_alem_do_ruido": false,
+      "min_por_dobra": [
+        8.45780888888889,
+        0.1049648998147558,
+        8.272977777777777,
+        0.10235183826534923
+      ],
+      "variacao_dobra_pct": 2.2341545701668686,
+      "razao_params_cabeca": 1.0002362192724445
+    },
+    "es__W1_vs_c": {
+      "tarefa": "es",
+      "a": "W1",
+      "b": "c",
+      "desfecho": "mais_lenta",
+      "cabeca_ms_lote32": [
+        8.838018565177917,
+        0.05250032005500807,
+        0.7341843214631081,
+        0.03149202285301159
+      ],
+      "cabeca_mais_rapida_alem_do_ruido": false,
+      "min_por_dobra": [
+        8.79289,
+        0.10291240396030411,
+        8.35016,
+        0.11376557207208524
+      ],
+      "variacao_dobra_pct": 5.3020540923766735,
+      "razao_params_cabeca": 3.7489484312194006
+    },
+    "es__W5_vs_c": {
+      "tarefa": "es",
+      "a": "W5",
+      "b": "c",
+      "desfecho": "mais_lenta",
+      "cabeca_ms_lote32": [
+        38.35701896667481,
+        0.03655098025652635,
+        0.7341843214631081,
+        0.03149202285301159
+      ],
+      "cabeca_mais_rapida_alem_do_ruido": false,
+      "min_por_dobra": [
+        10.60086,
+        0.11357016590343394,
+        8.35016,
+        0.11376557207208524
+      ],
+      "variacao_dobra_pct": 26.953974534619697,
+      "razao_params_cabeca": 0.9997223749061459
+    },
+    "es__W1_vs_d": {
+      "tarefa": "es",
+      "a": "W1",
+      "b": "d",
+      "desfecho": "mais_lenta",
+      "cabeca_ms_lote32": [
+        8.838018565177917,
+        0.05250032005500807,
+        3.296880798339844,
+        0.1785222248268997
+      ],
+      "cabeca_mais_rapida_alem_do_ruido": false,
+      "min_por_dobra": [
+        8.79289,
+        0.10291240396030411,
+        8.487643333333333,
+        0.10769610127650257
+      ],
+      "variacao_dobra_pct": 3.5963653829311992,
+      "razao_params_cabeca": 3.7490713047453945
+    },
+    "es__W2_vs_d": {
+      "tarefa": "es",
+      "a": "W2",
+      "b": "d",
+      "desfecho": "mais_rapida",
+      "cabeca_ms_lote32": [
+        2.9521865606307984,
+        0.1351113428943226,
+        3.296880798339844,
+        0.1785222248268997
+      ],
+      "cabeca_mais_rapida_alem_do_ruido": true,
+      "min_por_dobra": [
+        8.45780888888889,
+        0.1049648998147558,
+        8.487643333333333,
+        0.10769610127650257
+      ],
+      "variacao_dobra_pct": -0.35150445503847605,
+      "razao_params_cabeca": 14.99611381196946
+    },
+    "es__W5_vs_d": {
+      "tarefa": "es",
+      "a": "W5",
+      "b": "d",
+      "desfecho": "mais_lenta",
+      "cabeca_ms_lote32": [
+        38.35701896667481,
+        0.03655098025652635,
+        3.296880798339844,
+        0.1785222248268997
+      ],
+      "cabeca_mais_rapida_alem_do_ruido": false,
+      "min_por_dobra": [
+        10.60086,
+        0.11357016590343394,
+        8.487643333333333,
+        0.10769610127650257
+      ],
+      "variacao_dobra_pct": 24.897566776486467,
+      "razao_params_cabeca": 0.9997551412712943
+    },
+    "dist__W2_vs_b": {
+      "tarefa": "dist",
+      "a": "W2",
+      "b": "b",
+      "desfecho": "igual",
+      "cabeca_ms_lote32": [
+        2.9521865606307984,
+        0.1351113428943226,
+        0.7286431989073754,
+        0.022900597701943644
+      ],
+      "cabeca_mais_rapida_alem_do_ruido": false,
+      "min_por_dobra": [
+        6.470141666666666,
+        0.08983738884888161,
+        6.309,
+        0.08926084790239211
+      ],
+      "variacao_dobra_pct": 2.554155439319472,
+      "razao_params_cabeca": 1.0002322942292021
+    },
+    "dist__W1_vs_c": {
+      "tarefa": "dist",
+      "a": "W1",
+      "b": "c",
+      "desfecho": "mais_lenta",
+      "cabeca_ms_lote32": [
+        8.838018565177917,
+        0.05250032005500807,
+        0.7341843214631081,
+        0.03149202285301159
+      ],
+      "cabeca_mais_rapida_alem_do_ruido": false,
+      "min_por_dobra": [
+        6.734769999999999,
+        0.09025543034271859,
+        6.358086666666666,
+        0.10664222063621051
+      ],
+      "variacao_dobra_pct": 5.924476231319065,
+      "razao_params_cabeca": 3.748941805490235
+    },
+    "dist__W1_vs_d": {
+      "tarefa": "dist",
+      "a": "W1",
+      "b": "d",
+      "desfecho": "mais_lenta",
+      "cabeca_ms_lote32": [
+        8.838018565177917,
+        0.05250032005500807,
+        3.296880798339844,
+        0.1785222248268997
+      ],
+      "cabeca_mais_rapida_alem_do_ruido": false,
+      "min_por_dobra": [
+        6.734769999999999,
+        0.09025543034271859,
+        6.460327777777778,
+        0.10729917577359661
+      ],
+      "variacao_dobra_pct": 4.2481160656622885,
+      "razao_params_cabeca": 3.7490646188881294
+    },
+    "dist__W2_vs_d": {
+      "tarefa": "dist",
+      "a": "W2",
+      "b": "d",
+      "desfecho": "igual",
+      "cabeca_ms_lote32": [
+        2.9521865606307984,
+        0.1351113428943226,
+        3.296880798339844,
+        0.1785222248268997
+      ],
+      "cabeca_mais_rapida_alem_do_ruido": true,
+      "min_por_dobra": [
+        6.470141666666666,
+        0.08983738884888161,
+        6.460327777777778,
+        0.10729917577359661
+      ],
+      "variacao_dobra_pct": 0.15191007680208646,
+      "razao_params_cabeca": 14.99600149277603
+    }
+  },
+  "pode_afirmar": {
+    "more_parameter_efficient_than_an_MLP": {
+      "es": false,
+      "dist": false
+    },
+    "wavkan_faster": {
+      "es__W2_vs_b": false,
+      "es__W1_vs_c": false,
+      "es__W5_vs_c": false,
+      "es__W1_vs_d": false,
+      "es__W2_vs_d": true,
+      "es__W5_vs_d": false,
+      "dist__W2_vs_b": false,
+      "dist__W1_vs_c": false,
+      "dist__W1_vs_d": false,
+      "dist__W2_vs_d": false
+    },
+    "compare_with_0.908_or_0.893": false,
+    "spline_KAN_is_the_reference_that_works": false
+  },
+  "sementes_por_config": {
+    "es": {
+      "d": [
+        42,
+        43,
+        44
+      ],
+      "a": [
+        42,
+        43,
+        44
+      ],
+      "b": [
+        42,
+        43,
+        44
+      ],
+      "c": [
+        42,
+        43,
+        44
+      ],
+      "W3": [
+        42
+      ],
+      "W1": [
+        42,
+        43,
+        44
+      ],
+      "W2": [
+        42,
+        43,
+        44
+      ],
+      "W5": [
+        42
+      ],
+      "W4": [
+        42
+      ]
+    },
+    "dist": {
+      "d": [
+        42,
+        43,
+        44
+      ],
+      "a": [
+        42,
+        43,
+        44
+      ],
+      "b": [
+        42,
+        43,
+        44
+      ],
+      "c": [
+        42,
+        43,
+        44
+      ],
+      "W1": [
+        42,
+        43,
+        44
+      ],
+      "W2": [
+        42,
+        43
+      ]
+    }
+  },
+  "avisos": [
+    "MLSD (distância) W2: sementes ainda não concluídas [44]",
+    "sementes incompletas (fora da análise): MLSD (distância) W2 s44: dobras [0, 1, 2]"
+  ],
+  "frases_en": [
+    "On entry/exit classification, under an identical protocol, a wavelet-KAN head (Mexican hat, 0.26 M parameters) was not shown non-inferior to an MLP head of the same size (0.26 M; AUC 0.902 ± 0.013 vs. 0.905 ± 0.014; ΔAUC = -0.001, 95% CI [-0.004, +0.002]; better in 0/5 folds; ΔF1 = -0.012, 95% CI [-0.023, -0.003]; the lower bound of the ΔF1 CI is below the pre-registered -0.02 margin), although the pre-registered rule for a difference (≥ 4/5 folds and CI excluding zero) was not met either (seeds 42, 43, 44).",
+    "On entry/exit classification, a wavelet-KAN head (W1: Mexican hat, 1.05 M parameters) matched a parameter-matched MLP head (3.94 M) within the pre-registered non-inferiority margin (ΔAUC = -0.002, 95% CI [-0.005, +0.002]; ΔF1 = -0.003, 95% CI [-0.014, +0.008]) (seeds 42, 43, 44).",
+    "On entry/exit classification, a wavelet-KAN head (W5: Mexican hat, 3.94 M parameters) matched a parameter-matched MLP head (3.94 M) within the pre-registered non-inferiority margin (ΔAUC = -0.003, 95% CI [-0.008, +0.002]; ΔF1 = -0.009, 95% CI [-0.019, +0.003]) (single training seed).",
+    "On entry/exit classification, a wavelet-KAN head (W1: Mexican hat, 1.05 M parameters) matched the spline-KAN head (3.94 M) within the pre-registered non-inferiority margin (ΔAUC = -0.001, 95% CI [-0.004, +0.003]; ΔF1 = -0.005, 95% CI [-0.016, +0.005]) (seeds 42, 43, 44).",
+    "On entry/exit classification, a wavelet-KAN head (W2: Mexican hat, 0.26 M parameters) did not reach non-inferiority against the spline-KAN head (3.94 M; ΔAUC = -0.001, 95% CI [-0.003, +0.002]; ΔF1 = -0.011, 95% CI [-0.021, -0.002]) (seeds 42, 43, 44).",
+    "On entry/exit classification, a wavelet-KAN head (W5: Mexican hat, 3.94 M parameters) matched the spline-KAN head (3.94 M) within the pre-registered non-inferiority margin (ΔAUC = -0.002, 95% CI [-0.007, +0.003]; ΔF1 = -0.008, 95% CI [-0.019, +0.002]) (single training seed).",
+    "On shooting-distance (MLSD) classification, under an identical protocol, a wavelet-KAN head (Mexican hat, 0.26 M parameters) underperformed an MLP head of the same size (0.26 M; AUC 0.713 ± 0.112 vs. 0.802 ± 0.062; ΔAUC = -0.076, 95% CI [-0.103, -0.050]; better in 0/5 folds) (seeds 42, 43).",
+    "On shooting-distance (MLSD) classification, a wavelet-KAN head (W1: Mexican hat, 1.05 M parameters) did not reach non-inferiority against a parameter-matched MLP head (3.94 M; ΔAUC = -0.086, 95% CI [-0.120, -0.052]; ΔF1 = -0.070, 95% CI [-0.121, -0.024]) (seeds 42, 43, 44).",
+    "On shooting-distance (MLSD) classification, a wavelet-KAN head (W1: Mexican hat, 1.05 M parameters) did not reach non-inferiority against the spline-KAN head (3.94 M; ΔAUC = -0.075, 95% CI [-0.105, -0.044]; ΔF1 = -0.067, 95% CI [-0.113, -0.024]) (seeds 42, 43, 44).",
+    "On shooting-distance (MLSD) classification, a wavelet-KAN head (W2: Mexican hat, 0.26 M parameters) did not reach non-inferiority against the spline-KAN head (3.94 M; ΔAUC = -0.072, 95% CI [-0.103, -0.045]; ΔF1 = -0.078, 95% CI [-0.122, -0.034]) (seeds 42, 43).",
+    "On entry/exit classification, W2 has the same head-parameter budget as the MLP-128 head at equal wall-clock time (8.5 vs. 8.3 min per fold on an NVIDIA L4); the ResNet-152 backbone dominates the cost.",
+    "On entry/exit classification, W1 has 3.7× fewer head parameters than the spline-KAN head but trains 4% slower per fold (8.8 vs. 8.5 min on an NVIDIA L4), because each wavelet layer materialises a batch × output × input tensor.",
+    "On shooting-distance (MLSD) classification, W2 has the same head-parameter budget as the MLP-128 head at equal wall-clock time (6.5 vs. 6.3 min per fold on an NVIDIA L4); the ResNet-152 backbone dominates the cost.",
+    "On shooting-distance (MLSD) classification, W1 has 3.7× fewer head parameters than the spline-KAN head but trains 4% slower per fold (6.7 vs. 6.5 min on an NVIDIA L4), because each wavelet layer materialises a batch × output × input tensor."
+  ],
+  "frases_pt": [
+    "Em entrada/saída, no mesmo protocolo, uma cabeça Wav-KAN (chapéu mexicano, 0.26 M parâmetros) não se mostrou não inferior a uma cabeça MLP do mesmo tamanho (0.26 M; AUC 0.902 ± 0.013 contra 0.905 ± 0.014; ΔAUC = -0.001, IC 95 % [-0.004, +0.002]; melhor em 0/5 dobras; ΔF1 = -0.012, IC 95 % [-0.023, -0.003]; o limite inferior do IC de ΔF1 fica abaixo da margem pré-registrada de -0.02), mas a regra pré-registrada para uma diferença (≥ 4/5 dobras e IC sem o zero) também não foi cumprida (sementes 42, 43, 44).",
+    "Em entrada/saída, uma cabeça Wav-KAN (W1: chapéu mexicano, 1.05 M parâmetros) foi não inferior a uma cabeça MLP isoparamétrica (3.94 M) dentro da margem pré-registrada (ΔAUC = -0.002, IC 95 % [-0.005, +0.002]; ΔF1 = -0.003, IC 95 % [-0.014, +0.008]) (sementes 42, 43, 44).",
+    "Em entrada/saída, uma cabeça Wav-KAN (W5: chapéu mexicano, 3.94 M parâmetros) foi não inferior a uma cabeça MLP isoparamétrica (3.94 M) dentro da margem pré-registrada (ΔAUC = -0.003, IC 95 % [-0.008, +0.002]; ΔF1 = -0.009, IC 95 % [-0.019, +0.003]) (uma única semente de treino).",
+    "Em entrada/saída, uma cabeça Wav-KAN (W1: chapéu mexicano, 1.05 M parâmetros) foi não inferior à cabeça KAN spline (3.94 M) dentro da margem pré-registrada (ΔAUC = -0.001, IC 95 % [-0.004, +0.003]; ΔF1 = -0.005, IC 95 % [-0.016, +0.005]) (sementes 42, 43, 44).",
+    "Em entrada/saída, uma cabeça Wav-KAN (W2: chapéu mexicano, 0.26 M parâmetros) não atingiu a não inferioridade em relação à cabeça KAN spline (3.94 M; ΔAUC = -0.001, IC 95 % [-0.003, +0.002]; ΔF1 = -0.011, IC 95 % [-0.021, -0.002]) (sementes 42, 43, 44).",
+    "Em entrada/saída, uma cabeça Wav-KAN (W5: chapéu mexicano, 3.94 M parâmetros) foi não inferior à cabeça KAN spline (3.94 M) dentro da margem pré-registrada (ΔAUC = -0.002, IC 95 % [-0.007, +0.003]; ΔF1 = -0.008, IC 95 % [-0.019, +0.002]) (uma única semente de treino).",
+    "Em MLSD (distância), no mesmo protocolo, uma cabeça Wav-KAN (chapéu mexicano, 0.26 M parâmetros) ficou abaixo de uma cabeça MLP do mesmo tamanho (0.26 M; AUC 0.713 ± 0.112 contra 0.802 ± 0.062; ΔAUC = -0.076, IC 95 % [-0.103, -0.050]; melhor em 0/5 dobras) (sementes 42, 43).",
+    "Em MLSD (distância), uma cabeça Wav-KAN (W1: chapéu mexicano, 1.05 M parâmetros) não atingiu a não inferioridade em relação a uma cabeça MLP isoparamétrica (3.94 M; ΔAUC = -0.086, IC 95 % [-0.120, -0.052]; ΔF1 = -0.070, IC 95 % [-0.121, -0.024]) (sementes 42, 43, 44).",
+    "Em MLSD (distância), uma cabeça Wav-KAN (W1: chapéu mexicano, 1.05 M parâmetros) não atingiu a não inferioridade em relação à cabeça KAN spline (3.94 M; ΔAUC = -0.075, IC 95 % [-0.105, -0.044]; ΔF1 = -0.067, IC 95 % [-0.113, -0.024]) (sementes 42, 43, 44).",
+    "Em MLSD (distância), uma cabeça Wav-KAN (W2: chapéu mexicano, 0.26 M parâmetros) não atingiu a não inferioridade em relação à cabeça KAN spline (3.94 M; ΔAUC = -0.072, IC 95 % [-0.103, -0.045]; ΔF1 = -0.078, IC 95 % [-0.122, -0.034]) (sementes 42, 43).",
+    "Em entrada/saída, a W2 tem o mesmo orçamento de parâmetros na cabeça que a MLP-128 com o mesmo tempo de treino (8.5 contra 8.3 min por dobra na L4); o backbone ResNet-152 domina o custo.",
+    "Em entrada/saída, a W1 tem 3.7× menos parâmetros na cabeça que a KAN spline mas treina 4% mais devagar por dobra (8.8 contra 8.5 min na L4), porque cada camada com wavelets materializa um tensor lote × saída × entrada.",
+    "Em MLSD (distância), a W2 tem o mesmo orçamento de parâmetros na cabeça que a MLP-128 com o mesmo tempo de treino (6.5 contra 6.3 min por dobra na L4); o backbone ResNet-152 domina o custo.",
+    "Em MLSD (distância), a W1 tem 3.7× menos parâmetros na cabeça que a KAN spline mas treina 4% mais devagar por dobra (6.7 contra 6.5 min na L4), porque cada camada com wavelets materializa um tensor lote × saída × entrada."
+  ],
+  "plugin_sha256": "d02f6ca6f41f0530df0f0cc3886382a8c35311ac1ec812c1f65fa74e18d800ed",
+  "protocolo_sha256": "b7cd9baca53edd96c855cca10914fc258efa8ddfd0937cc0d3e9572de5ef9e13"
+}
