@@ -1,31 +1,35 @@
 \label{chap:related}
 
-This chapter reviews the current literature concerning the application of artificial intelligence to forensic pathology, specifically focusing on the classification of gunshot wounds. It critically analyzes the state-of-the-art benchmark established by recent studies and identifies the architectural gaps that the proposed TransferKAN model aims to address.
+This chapter reviews the work on deep learning for gunshot wounds, describes in detail the study of Lira et al.~\cite{Lira2025deep}, which provides the database and the baselines of this dissertation, and reviews the use of KANs as classification heads. It closes with the gap that motivates this work.
 
 \section{AI in Forensic Pathology}
 \label{sec:ai_forensics}
 
-The integration of artificial intelligence into forensic sciences has been historically slower compared to clinical medicine. Initial studies in the domain predominantly utilized animal carcasses, such as pigs, to simulate human skin properties when analyzing gunshot wounds~\cite{oura2021deep}. While these controlled laboratory environments allowed for high classification accuracies, they lacked the extreme variability, contamination, and complex morphological alterations encountered in actual human crime scenes. Subsequent work moved towards human samples: Cheng et al.~\cite{cheng2024gunshot} trained classifiers on autopsy photographs of human gunshot wounds, but these images were obtained under the relatively controlled conditions of necropsy examinations and did not address the MLSD task.
+Artificial intelligence has entered forensic science more slowly than clinical medicine. Early studies of gunshot wounds used animal carcasses, such as pigs, to simulate human skin~\cite{oura2021deep}. These controlled settings allowed high accuracies but lack the variability, contamination and morphological changes of real cases. Cheng et al.~\cite{cheng2024gunshot} trained classifiers on human autopsy photographs of entry and exit wounds, obtained under the relatively controlled conditions of necropsy, and did not address the shooting distance.
 
-\section{The 2024 Benchmark Study}
+\section{The Study of Lira et al.}
 \label{sec:2024_benchmark}
 
-A significant breakthrough in the field was recently achieved by Lira et al. in their paper \textit{Deep learning-based human gunshot wounds classification}~\cite{Lira2025deep}. This study was pioneering because it utilized a substantial, real-world forensic dataset---the FDCPUnBGunshotDB---comprising 2,551 digital photographs taken directly from crime scenes and autopsies by the Federal District Civil Police in Brazil. 
+Lira et al.~\cite{Lira2025deep} built the FDCPUnBGunshotDB, with 2,551 photographs (1,883 entry and 668 exit wounds) from 489 cases of the Federal District Civil Police, and evaluated 59 deep learning architectures from TorchVision on two tasks: entry versus exit and the medico-legal shooting distance (contact, close range, distant). Their hold-out tables (Tables~4 and~5 of the article) rank the ResNet-152 first in both tasks. In entry/exit it has accuracy 0.869 and macro AUC 0.821, the ``86.90\%'' and ``82.09\%'' of their abstract. In the distance task it has accuracy 0.925, macro AUC 0.733 and micro AUC 0.944; the ``AUC up to 94.36\%'' of the abstract is the micro average. The article also reports a k-fold analysis of the ResNet-152 as boxplots (their Figure~4, reproduced in Figure~\ref{fig:lira_boxplots}); in entry/exit the median accuracy over the folds is about 0.70.
 
-The authors systematically evaluated 59 different deep learning architectures (including various iterations of EfficientNet, MobileNet, ViT, and ResNet) to perform two primary tasks: distinguishing between entry and exit wounds, and classifying the Medical-Legal Shooting Distance (MLSD).
+\subsection{What the Article and the Public Code Say About the Split}
 
-\subsection{Baseline Methodologies and Results}
-In their methodology, Lira et al. employed extensive data augmentation to combat the inherent imbalance of the dataset (e.g., 1,883 entry wounds versus only 668 exit wounds). They utilized a hold-out cross-validation approach and found that the \textbf{ResNet152} architecture demonstrated the superior overall performance across both tasks.
+The article describes both evaluations as split by case: images of a case used in training would not be used for testing, and the k-fold would use stratified grouped folds with the crime cases as groups~\cite{Lira2025deep}. The public code of the study (\texttt{leguwoi}~\cite{leguwoi}, commit \texttt{83d82f1}) agrees for the k-fold, which uses \texttt{StratifiedGroupKFold} with the case number as group, but not for the hold-out. The function \texttt{iterative\_split} applies iterative stratification~\cite{sechidis2011stratification} to the columns \emph{case number} and \emph{label}, that is, it \emph{stratifies} by case instead of grouping by case. Stratifying on the case number spreads the images of each case over training and test. Reproducing that function on the distributed data, 98.7\% of the entry/exit test images and 98.4\% of the distance test images have their case in training (Section~\ref{sec:res_leak}). It cannot be established whether the published tables were produced by exactly this version of the code; the statements of this dissertation about the hold-out refer to the public code.
+
+Three other aspects of the public code matter for comparing numbers:
 \begin{itemize}
-    \item For the \textbf{Entry vs. Exit} binary classification, the ResNet152 achieved an accuracy of 86.90\% and an Area Under the Curve (AUC) of 82.09\%.
-    \item For the \textbf{MLSD} multiclass categorization, the same architecture achieved an impressive accuracy of 92.48\% and an AUC of up to 94.36\%.
+    \item \textbf{AUC from predicted classes.} The AUC is computed with \texttt{roc\_auc\_score} on the predicted labels, not on probabilities. With a single threshold, the macro AUC equals the average of recall and specificity, which in the binary case is the macro recall. This is visible in their Table~4, where the macro AUC of every model equals its macro recall (0.821 and 0.821 for the ResNet-152).
+    \item \textbf{Initialisation.} Only the ResNets start from ImageNet weights, and their first convolution is replaced by a randomly initialised layer; the other families are trained from scratch.
+    \item \textbf{Case identity.} Cases are identified by their number without the year, which merges cases from different years (417 groups instead of 486).
 \end{itemize}
+These observations do not reduce the value of the database or of the study, which is the first to classify gunshot wounds from real crime scenes at this scale. They do mean that the numbers of Tables~4 and~5 measure a different quantity from the case-grouped evaluation adopted here, and the earlier version of this dissertation compared the two as if they were the same.
 
-\section{Identifying the Research Gap}
+\section{KANs as Classification Heads}
+\label{sec:kan_related}
+
+Kolmogorov-Arnold Networks~\cite{liu2024kan} place learnable univariate functions on the edges of the network instead of fixed activations on the nodes (Section~\ref{sec:kan_background}). The original article argues for accuracy and parameter efficiency mainly on small scientific and symbolic tasks. In vision, KANs have been used both inside convolutions, as in the convolutional KANs of \texttt{torch-conv-kan}~\cite{drokin2024torchconvkan}, and as heads on top of pre-trained extractors, as in TransferKAN. Several bases have been proposed for the edge functions, among them the B-splines of the original KAN, implemented efficiently in \texttt{efficient-kan}~\cite{efficientkan}, and wavelets in Wav-KAN~\cite{bozorgasl2024wavkan}. When a KAN head is compared with a dense head, the comparison often changes the backbone, the training recipe or the number of parameters at the same time, which makes it hard to attribute a difference to the head itself.
+
+\section{Research Gap}
 \label{sec:research_gap}
 
-While the 2024 study established a robust benchmark and proved the viability of computer vision in real-world forensic investigations, a critical architectural limitation persists. 
-
-The state-of-the-art ResNet152 model, like all traditional CNNs evaluated in the benchmark, relies on a standard Multi-Layer Perceptron (MLP) for its final classification head. MLPs consist of dense linear layers followed by fixed, non-linear activation nodes. In scenarios involving highly imbalanced forensic datasets where visual features are obscured by noise, blood, and putrefaction, the rigid node-based activations of MLPs require massive amounts of parameters to successfully map highly complex, non-linear decision boundaries.
-
-The authors of the 2024 study noted that sample imbalance still negatively affected metrics such as precision and recall for minority classes. Therefore, there is a clear and pressing need for a lightweight yet highly expressive classification head that can better probabilistically discriminate these complex non-linear boundaries without exponentially increasing the dataset size. This gap forms the direct motivation for introducing Kolmogorov-Arnold Networks (KAN) as the classification head in this thesis.
+Three gaps motivate this work. First, the numbers available for this database come from a hold-out in which, according to the public code, images of the same case appear in training and test, with most architectures trained from scratch and the AUC computed from classes. No study had evaluated the architectures under a common protocol without case leakage. Second, the claim that a KAN head improves over a dense head on the same pre-trained backbone had not been tested with a controlled ablation that keeps the backbone, the recipe and the parameter budget fixed. Third, the two forensic tasks are learned by separate networks, although they share the same images. This dissertation addresses the three gaps with a single protocol (Chapter~\ref{chap:methodology}).

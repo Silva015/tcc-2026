@@ -1,26 +1,16 @@
 \label{chap:solution}
 
-To address the limitations of traditional CNN architectures in classifying highly imbalanced and non-linear forensic gunshot wound datasets, this thesis introduces a novel hybrid architecture: the \textbf{TransferKAN}.
+This chapter presents TransferKAN, the model this work set out to evaluate, the hypotheses that motivated it, and the experimental design used to test them. The design isolates the contribution of each component: the head, the backbone, the split and the number of tasks.
 
 \section{The TransferKAN Architecture}
 \label{sec:transferkan_arch}
 
-The core philosophy behind TransferKAN is to merge the proven spatial feature extraction capabilities of state-of-the-art Convolutional Neural Networks with the highly expressive and parameter-efficient classification potential of Kolmogorov-Arnold Networks (KAN). 
-
-Traditional architectures, such as the ResNet152~\cite{he2016resnet} used in the 2024 benchmark~\cite{Lira2025deep}, process an image through a series of convolutional blocks to generate a high-dimensional feature vector. This vector is then typically fed into a Multi-Layer Perceptron (MLP) classification head. While the ResNet backbone is exceptionally adept at recognizing visual patterns (edges, textures, shapes), the MLP head often struggles to map these features into discrete classes when the decision boundaries are highly complex, noisy, and non-linear---as is inherently the case with forensic imagery of gunshot wounds.
-
-\subsection{Architectural Components}
-
-The TransferKAN architecture consists of three distinct sequential stages:
+TransferKAN\footnote{The short paper derived from this work for SIBGRAPI 2026 calls the same model TransKAN.} combines a convolutional feature extractor pre-trained on ImageNet with a Kolmogorov-Arnold Network (KAN) as the classification head. It has three stages (Figure~\ref{fig:transferkan_arch}):
 \begin{enumerate}
-    \item \textbf{Spatial Feature Extractor (ResNet152 Backbone):} We utilize a ResNet152 model~\cite{he2016resnet} pre-trained on ImageNet~\cite{deng2009imagenet}. The final fully connected dense layer (the original MLP classifier) is programmatically removed. Consequently, for a standard input image, the backbone outputs a flattened feature vector of size 2048. This leverages the paradigm of Transfer Learning, avoiding the need to train a deep feature extractor from scratch on a limited forensic dataset.
-    
-    \item \textbf{Regularization (Dropout):} To bridge the backbone and the new classifier while aggressively preventing overfitting, a Dropout layer with a probability of $p=0.5$ is introduced. This forces the network to learn redundant and robust representations rather than memorizing the training samples.
-    
-    \item \textbf{Kolmogorov-Arnold Network (KAN) Classifier:} The core innovation lies in appending a KAN module~\cite{liu2024kan} directly to the feature vector. Instead of a dense layer matrix multiplication with fixed node activations, the KAN maps the 2048-dimensional vector into the desired number of output classes (e.g., 2 for Entry/Exit or 3 for MLSD) through an intermediate hidden layer of 128 dimensions. The connections between these layers are modeled as learnable B-splines.
+    \item \textbf{Feature extractor:} a ResNet-152~\cite{he2016resnet} with ImageNet weights~\cite{deng2009imagenet} and without its last fully connected layer. For a $224 \times 224$ image it outputs a vector of 2,048 features.
+    \item \textbf{Regularisation:} Dropout with $p=0.5$ on that vector.
+    \item \textbf{KAN head:} a two-layer KAN, $[2048, 128, K]$, with $K=2$ outputs for entry/exit and $K=3$ for the shooting distance. Each edge carries a learnable function made of a SiLU base term and a cubic B-spline on a grid of size 10 (Section~\ref{sec:kan_background}), implemented with \texttt{efficient-kan}~\cite{efficientkan}. The head has 3,936,000 parameters for entry/exit and 3,937,920 for distance.
 \end{enumerate}
-
-The complete data flow of the proposed architecture is summarized in Figure~\ref{fig:transferkan_arch}.
 
 \begin{figure}[htpb]
 \centering
@@ -35,10 +25,10 @@ The complete data flow of the proposed architecture is summarized in Figure~\ref
     every node/.style={font=\small},
 ]
     \node[io] (input) {Input\\image\\$224\times224$};
-    \node[backbone, right=of input] (resnet) {ResNet152\\backbone\\(ImageNet)};
+    \node[backbone, right=of input] (resnet) {ResNet-152\\backbone\\(ImageNet)};
     \node[block, right=of resnet] (drop) {Dropout\\$p=0.5$};
-    \node[kan, right=of drop] (kanlayer) {KAN\\classifier\\$[2048,128,N]$};
-    \node[io, right=of kanlayer] (out) {Class\\logits\\($N{=}2$ or $3$)};
+    \node[kan, right=of drop] (kanlayer) {KAN\\head\\$[2048,128,K]$};
+    \node[io, right=of kanlayer] (out) {Class\\logits\\($K{=}2$ or $3$)};
 
     \draw[->, thick] (input) -- (resnet);
     \draw[->, thick] (resnet) -- node[above, font=\scriptsize] {2048-d} (drop);
@@ -47,24 +37,63 @@ The complete data flow of the proposed architecture is summarized in Figure~\ref
 
     \begin{scope}[on background layer]
         \node[draw=green!50!black, dashed, rounded corners, inner sep=3mm,
-              fit=(resnet), label={[font=\scriptsize, green!50!black]below:Frozen in Phase~1}] {};
+              fit=(resnet), label={[font=\scriptsize, green!50!black]below:Frozen in phase~1}] {};
         \node[draw=orange!70!black, dashed, rounded corners, inner sep=3mm,
-              fit=(kanlayer), label={[font=\scriptsize, orange!70!black]below:Trainable head}] {};
+              fit=(kanlayer), label={[font=\scriptsize, orange!70!black]below:Head under study}] {};
     \end{scope}
 \end{tikzpicture}
-\caption{The proposed TransferKAN architecture. A ResNet152 backbone pre-trained on ImageNet extracts a 2048-dimensional feature vector, which is regularized by a dropout layer ($p=0.5$) and mapped to the output classes by a Kolmogorov-Arnold Network classifier with a $[2048,128,N]$ structure ($N=2$ for Entry/Exit, $N=3$ for MLSD).}
+\caption{TransferKAN. A ResNet-152 pre-trained on ImageNet extracts a 2,048-dimensional feature vector, which passes through Dropout ($p=0.5$) and a two-layer KAN head $[2048,128,K]$ with grid size 10 and cubic splines ($K=2$ for entry/exit, $K=3$ for the shooting distance). In the head ablation only the orange block changes.}
 \label{fig:transferkan_arch}
 \end{figure}
 
-\section{Justification of the Innovation}
+\section{Hypotheses Under Test}
 \label{sec:justification}
 
-The transition from an MLP classification head to a KAN classifier is not merely a structural substitution; it represents a fundamental shift in how the network models the final decision boundary. 
-
-By placing the non-linear activation functions on the edges (splines), the KAN dynamically molds its activation shapes to best fit the data during training. This provides two significant advantages in the forensic context:
+TransferKAN was motivated by two claims about KANs used as classification heads. In the earlier version of this work they were stated as advantages; here they are treated as hypotheses, each with the result that would support it:
 \begin{itemize}
-    \item \textbf{Superior Discrimination in Imbalanced Data:} Splines allow the KAN to create highly intricate, non-linear boundaries around the minority class clusters (such as Exit wounds or Contact shots) without collapsing into the majority class, a common failure point for rigid MLPs.
-    \item \textbf{Parameter Efficiency:} The KAN requires significantly fewer parameters to achieve a highly complex mathematical mapping compared to an MLP, reducing the risk of over-parameterizing and overfitting the limited FDCPUnBGunshotDB dataset.
+    \item \textbf{H1, better discrimination:} because its edge functions are learned, a KAN head would draw finer decision boundaries than an MLP head on the same features, especially for minority classes. This would be supported by a higher AUC than the best MLP head on the same backbone, under the pre-registered rule of Section~\ref{sec:stats} (outcome A).
+    \item \textbf{H2, parameter efficiency:} a KAN head would reach the same performance with fewer parameters. This would be supported by a KAN head beating an MLP head with the same number of parameters. Note that the TransferKAN head is not small: with 15 parameters per edge it has 3.94 million parameters, 15 times as many as an MLP with the same widths (262,530).
 \end{itemize}
 
-Through this strategic architectural design, TransferKAN aims to serve as an optimized, probabilistic discriminator tailored specifically to the nuances of forensic pathology.
+\section{Experimental Design}
+\label{sec:design}
+
+\textbf{Head ablation.} To test H1 and H2, the ResNet-152, the folds and the recipe are kept fixed and only the head changes (Table~\ref{tab:cabecas}). The linear head (a) is the simplest reference. The MLP-128 (b) has the same widths as the KAN. The matched MLP (c) has practically the same number of parameters as the KAN, so that a difference between (c) and (d) cannot be attributed to size. The KAN-8 (e) gives a KAN the parameter budget of (b). To check whether the conclusion depends on the spline basis, wavelet-KAN heads~\cite{bozorgasl2024wavkan} W1--W5 replace the B-splines by wavelets: W1 keeps the topology of (d), W2 the budget of (b) and W5 the budget of (d), and W3 and W4 change the wavelet.
+
+\input{comum/tabelas/tab_cabecas}
+
+\textbf{Backbones.} Twelve architectures of the study of Lira et al.~\cite{Lira2025deep}, among them the ResNet-152 and two transformers, are retrained with the same recipe and a linear head. This answers how much of the difference between TransferKAN and the published baselines comes from the backbone and its pre-training.
+
+\textbf{Split.} The hold-out of the public code of Lira et al.\ is reproduced and compared with the case-grouped folds with everything else fixed, to measure how much the split alone changes the numbers.
+
+\textbf{One network for both tasks.} Finally, a single ResNet-152 with two heads, one per task, is compared with the pair of single-task networks (Figure~\ref{fig:multitarefa_arch}). This variant changes the number of networks and keeps the type of head, so it measures the cost and the performance of sharing the backbone.
+
+\begin{figure}[htpb]
+\centering
+\begin{tikzpicture}[
+    >=Stealth,
+    node distance=7mm,
+    block/.style={rectangle, rounded corners, draw=black, thick, align=center,
+                  minimum height=11mm, minimum width=18mm, fill=blue!8},
+    backbone/.style={block, fill=green!10, minimum width=22mm},
+    head/.style={block, fill=orange!12, minimum width=22mm},
+    io/.style={block, fill=gray!12, minimum width=16mm},
+    every node/.style={font=\small},
+]
+    \node[io] (input) {Image};
+    \node[backbone, right=of input] (resnet) {ResNet-152\\(shared)};
+    \node[block, right=of resnet] (drop) {Dropout\\$p=0.5$};
+    \node[head, above right=2mm and 9mm of drop] (h1) {Entry/exit head\\$K=2$};
+    \node[head, below right=2mm and 9mm of drop] (h2) {Distance head\\$K=3$};
+    \node[io, right=of h1] (o1) {$L_{\mathrm{E/S}}$\\all images};
+    \node[io, right=of h2] (o2) {$L_{\mathrm{dist}}$\\entries only};
+    \draw[->, thick] (input) -- (resnet);
+    \draw[->, thick] (resnet) -- (drop);
+    \draw[->, thick] (drop.east) -- (h1.west);
+    \draw[->, thick] (drop.east) -- (h2.west);
+    \draw[->, thick] (h1) -- (o1);
+    \draw[->, thick] (h2) -- (o2);
+\end{tikzpicture}
+\caption{The multitask variant: one ResNet-152 and one Dropout shared by two heads of the same type (KAN or MLP-128). The loss is $L = L_{\mathrm{E/S}} + L_{\mathrm{dist}}$, with exit wounds masked out of the distance term.}
+\label{fig:multitarefa_arch}
+\end{figure}

@@ -1,51 +1,85 @@
 \label{chap:background}
 
-This chapter provides the essential theoretical foundation required to understand the interdisciplinary nature of this work, bridging forensic pathology and advanced artificial intelligence. It details the fundamental concepts of gunshot wound classification, the mechanisms of deep learning for computer vision, and the mathematical theory underlying Kolmogorov-Arnold Networks (KAN).
+This chapter gives the background needed for the rest of the dissertation: the forensic tasks, the deep learning components, the Kolmogorov-Arnold Networks with spline and wavelet bases, and the evaluation concepts on which the conclusions rest, namely grouped validation, the two ways of computing an AUC, multitask learning and paired comparisons.
 
 \section{Forensic Pathology of Gunshot Wounds}
 \label{sec:forensic_background}
 
-In forensic medicine, the accurate analysis of gunshot wounds is crucial for reconstructing the events of a crime scene. When a projectile strikes a human body, it produces a predictable set of morphological alterations that vary significantly depending on the firearm, the ammunition, and the distance from which it was fired~\cite{dimaio2015gunshot,saukko2016knight}.
+In forensic medicine, the analysis of gunshot wounds helps to reconstruct the events of a crime. A projectile produces morphological changes that depend on the firearm, the ammunition and the distance of the shot~\cite{dimaio2015gunshot,saukko2016knight}.
 
 \subsection{Entry versus Exit Wounds}
-The most fundamental classification tasks involve distinguishing an entry wound from an exit wound.
-An entry wound is typically characterized by an \textit{abrasion ring} (a marginal rim of scraped skin), tissue inversion, and a generally regular, circular, or oval shape, depending on the angle of incidence. The physical properties of the skin being pushed inward by the bullet cause these specific signs.
-Conversely, an exit wound usually presents with everted (outward-turning) tissue, irregular or stellate (star-like) shapes, and the absence of an abrasion ring or gunshot residue, as the projectile pushes the tissue outward from within. 
+An entry wound typically shows an \textit{abrasion ring} (a rim of scraped skin), inverted tissue and a regular, circular or oval shape that depends on the angle of incidence. An exit wound usually shows everted tissue, an irregular or stellate shape, and no abrasion ring or gunshot residue, because the projectile pushes the tissue outward from within. Intermediate targets, deflection on bone and post-mortem changes such as putrefaction can hide these signs, so the visual classification depends heavily on the experience of the expert.
 
-However, intermediate targets, skeletal deflections, and postmortem changes such as putrefaction can obscure these characteristics, making visual classification a highly complex task heavily reliant on expert forensic experience.
-
-\subsection{Medical-Legal Shooting Distance (MLSD)}
-Beyond distinguishing entry from exit, classifying the distance of the shot---the Medical-Legal Shooting Distance (MLSD)---is vital for legal investigations. MLSD is categorized based on macroscopic traces left by the combustion of gunpowder and primer components on the skin~\cite{dimaio2015gunshot}:
+\subsection{Medico-Legal Shooting Distance (MLSD)}
+For entry wounds, the medico-legal shooting distance is estimated from the macroscopic traces left by the combustion of gunpowder and primer~\cite{dimaio2015gunshot}:
 \begin{itemize}
-    \item \textbf{Contact:} The muzzle of the firearm is pressed against the skin. These wounds often display a "muzzle imprint" and severe tissue lacerations due to expanding gases entering the subcutaneous layers.
-    \item \textbf{Close Range:} Fired from a short distance (typically less than 60 cm), these wounds exhibit \textit{tattooing} or \textit{stippling} (unburned powder grains embedded in the skin) and soot deposition around the entry hole.
-    \item \textbf{Distant:} Fired from a distance where gunpowder residues no longer reach the skin. The wound primarily shows the abrasion ring without surrounding soot or stippling.
+    \item \textbf{Contact:} the muzzle touches the skin. The wound often shows a muzzle imprint and lacerations caused by the expanding gases.
+    \item \textbf{Close range:} the shot is fired from a short distance (typically less than about 60 cm), and the wound shows \textit{tattooing} or \textit{stippling} (unburned powder grains embedded in the skin) and soot.
+    \item \textbf{Distant:} powder residues no longer reach the skin, and the wound shows essentially the abrasion ring.
 \end{itemize}
+Exit wounds carry no distance information, which is why the distance task uses only entries.
 
 \section{Deep Learning for Computer Vision}
 \label{sec:dl_background}
 
-Deep Learning (DL), a subset of machine learning, has revolutionized the field of Computer Vision by enabling computational models to automatically discover and extract the representations needed for feature detection from raw data. 
+\subsection{Convolutional Networks, ResNet and Transfer Learning}
+Convolutional neural networks extract hierarchical features from images, from edges in the first layers to complex shapes in the deeper ones. Residual networks (ResNets)~\cite{he2016resnet} add skip connections that ease the training of very deep models; the ResNet-152 has 152 layers and produces a 2,048-dimensional feature vector before its last layer. In transfer learning, a network pre-trained on a large dataset such as ImageNet~\cite{deng2009imagenet} is reused as a feature extractor and fine-tuned on the target task. This is especially useful when the target dataset is small, as in forensic imaging. The last layer that maps the features to the classes is called the \emph{head}; it is usually a linear layer or a small multi-layer perceptron (MLP).
 
-\subsection{Convolutional Neural Networks (CNNs) and ResNet}
-Convolutional Neural Networks (CNNs) are the standard architecture for image classification. They utilize convolutional layers to extract hierarchical spatial features---from simple edges in the lower layers to complex semantic shapes in the deeper layers.
+\subsection{Vision Transformers}
+Transformers process an image as a sequence of patches with self-attention. Two of the architectures evaluated here are of this kind: the Swin Transformer~\cite{liu2021swin}, which computes attention inside shifted local windows and builds a hierarchy of resolutions, and MaxViT~\cite{tu2022maxvit}, which combines convolutions with local and dilated global attention.
 
-A persistent issue in training deep CNNs is the vanishing gradient problem, where gradients become too small to update the weights effectively in early layers. The Residual Network (ResNet) architecture~\cite{he2016resnet} solved this by introducing "skip connections" (or residual blocks), which allow the gradient to bypass certain layers. ResNet152, a variant with 152 layers, represents a pinnacle of deep feature extraction, widely used as a robust backbone in transfer learning applications for medical and forensic imaging, typically initialized with weights pre-trained on the large-scale ImageNet database~\cite{deng2009imagenet}.
-
-Traditionally, the deep spatial features extracted by architectures like ResNet are flattened and passed through a Multi-Layer Perceptron (MLP)---composed of dense, fully connected linear layers followed by fixed non-linear activation functions (e.g., ReLU)---to produce the final class probabilities.
-
-\section{Kolmogorov-Arnold Networks (KAN)}
+\section{Kolmogorov-Arnold Networks}
 \label{sec:kan_background}
 
-While MLPs have been the ubiquitous standard for the classification head in deep learning, they are fundamentally based on the Universal Approximation Theorem. Recently, a novel neural network architecture known as Kolmogorov-Arnold Networks (KAN) has been proposed~\cite{liu2024kan}, inspired by the Kolmogorov-Arnold representation theorem.
+\subsection{From the Representation Theorem to KAN Layers}
+The Kolmogorov-Arnold representation theorem states that any continuous multivariate function on a bounded domain can be written as a finite composition of continuous univariate functions and additions. Kolmogorov-Arnold Networks (KANs)~\cite{liu2024kan} turn this idea into a trainable layer. In an MLP, each edge carries a scalar weight and each node applies a fixed nonlinearity. In a KAN layer, each edge carries a learnable univariate function $\phi_{j,i}$, and the node only adds:
+\begin{equation}
+x^{(l+1)}_j = \sum_{i=1}^{n_l} \phi^{(l)}_{j,i}\!\left(x^{(l)}_i\right).
+\end{equation}
+A KAN $[n_0, n_1, n_2]$ has two such layers; the head of TransferKAN is $[2048, 128, K]$.
 
-\subsection{Theoretical Foundation}
-The Kolmogorov-Arnold representation theorem states that any multivariate continuous function can be represented as a finite composition of continuous functions of a single variable and the operation of addition. 
+\subsection{B-Spline Edges and Parameter Count}
+In the original KAN and in the \texttt{efficient-kan} implementation~\cite{efficientkan} used here, each edge function is the sum of a base term and a spline:
+\begin{equation}
+\phi(x) = w_b\,\mathrm{SiLU}(x) + w_s \sum_{m=1}^{G+k} c_m B_m(x),
+\end{equation}
+where the $B_m$ are B-splines of order $k$ on a grid of $G$ intervals over $[-1, 1]$, extended by $k$ intervals on each side. With $G=10$ and $k=3$ there are 13 coefficients $c_m$ per edge, plus the weights $w_b$ and $w_s$: 15 parameters per edge. Outside the extended grid the B-splines vanish and the edge reduces to its base term.
 
-In a traditional MLP, the network learns fixed weights (linear transformations) on the edges, and applies a fixed, predefined non-linear activation function (like ReLU or Sigmoid) at the nodes. 
-In stark contrast, a KAN flips this paradigm: it places \textit{learnable} non-linear activation functions on the \textit{edges} (connections) and simply sums them at the nodes. 
+The parameter count matters for the claims of this work. The KAN paper argues that KANs can be more parameter-efficient than MLPs, mainly on small scientific and symbolic tasks~\cite{liu2024kan}. As a classification head on 2,048 features, however, a KAN is large: the head $[2048, 128, 2]$ has $15 \times (2048 \times 128 + 128 \times 2) = 3{,}936{,}000$ parameters, whereas an MLP with the same widths has 262,530. Whether a KAN head is more efficient is therefore an empirical question, tested in this work against MLPs of the same size.
 
-\subsection{B-Splines and Parameter Efficiency}
-To make the edge functions learnable, KANs typically parameterize them using B-splines (Basis splines)~\cite{liu2024kan}. A B-spline is a piecewise polynomial function that can flexibly adapt its shape to model highly complex, non-linear relationships. 
+\subsection{Wavelet KANs}
+Wav-KAN~\cite{bozorgasl2024wavkan} replaces the spline by a wavelet with learnable scale $s$ and translation $\tau$ on each edge:
+\begin{equation}
+\phi(x) = w_\psi\, \psi\!\left(\frac{x - \tau}{s}\right) + w_b\,\mathrm{SiLU}(x),
+\end{equation}
+followed by batch normalisation of the layer output. This uses four parameters per edge instead of fifteen. Three mother wavelets are used here, written up to normalisation constants: the Mexican hat $\psi(t) = (1 - t^2)\,e^{-t^2/2}$, the derivative of Gaussian $\psi(t) = -t\,e^{-t^2/2}$ and the Morlet $\psi(t) = \cos(\omega_0 t)\,e^{-t^2/2}$ with $\omega_0 = 5$. The learnable scale and translation could, in principle, adapt each edge to the range of its input; whether they do is checked in Section~\ref{sec:res_wavkan}.
 
-Because every weight parameter in an MLP is replaced by a highly flexible spline function in a KAN, KANs generally require far fewer parameters to achieve the same or better mapping of complex decision boundaries. This makes them highly parameter-efficient and less prone to overfitting on imbalanced or relatively small datasets---a critical advantage for forensic computer vision, where obtaining thousands of perfectly standardized gunshot wound images is practically impossible.
+\section{Evaluation Without Leakage}
+\label{sec:leakage_background}
+
+Data leakage happens when information that would not be available at prediction time reaches the training of a model, so that its test performance overestimates its performance on new data~\cite{kapoor2023leakage}. A common form arises with grouped data: when several observations come from the same unit (a patient, a site, a case), observations of the same unit are more similar to each other than to the rest. If they are split across training and test, the model can recognise the unit instead of learning the task~\cite{roberts2017cross}. The remedy is grouped validation: every group is placed entirely in training or entirely in test.
+
+In the gunshot database, a case often contributes several photographs of the same wound or of wounds of the same victim. The evaluation unit is therefore the case. Grouped $k$-fold cross-validation assigns whole cases to folds; stratified grouped $k$-fold does the same while keeping the class proportions similar across folds. Stratifying \emph{by} the case identifier is different: iterative stratification~\cite{sechidis2011stratification} on the case number tries to put a proportional share of the images of each case in each subset, so it deliberately spreads every case over training and test. The difference between grouping and stratifying by case is at the centre of Section~\ref{sec:res_leak}.
+
+\section{AUC from Probabilities and from Classes}
+\label{sec:auc_background}
+
+The ROC curve plots the true positive rate against the false positive rate as the decision threshold on a continuous score varies, and the area under it (AUC) equals the probability that a randomly chosen positive example receives a higher score than a randomly chosen negative one~\cite{fawcett2006roc}. It measures how well the model ranks the examples, independently of the threshold. For more than two classes, the one-vs-rest macro AUC averages the AUC of each class against the others.
+
+If the AUC is computed from predicted labels instead of scores, there is a single threshold and the ROC ``curve'' has one interior point. Its area is then
+\begin{equation}
+\mathrm{AUC}_c = \frac{\mathrm{TPR} + \mathrm{TNR}}{2},
+\end{equation}
+the average of sensitivity and specificity, which in the binary case equals the balanced accuracy and the macro recall. AUC$_c$ depends on the threshold and is usually much lower than the AUC from probabilities of the same model. In this dissertation, AUC always means the AUC from probabilities; AUC$_c$ is computed only to compare with the tables of Lira et al., who report it (Chapter~\ref{chap:related}).
+
+\section{Multitask Learning}
+\label{sec:mt_background}
+
+Multitask learning trains one model on several related tasks so that they share a representation~\cite{caruana1997multitask,ruder2017overview}. In the most common form, hard parameter sharing, a single backbone feeds one head per task, and the loss is a weighted sum of the task losses. Sharing can help when the tasks use related features and can hurt when one task dominates the shared representation. When a label is undefined for some examples, as the shooting distance is for exit wounds, those examples are masked out of the corresponding loss term. A shared backbone also has a direct practical effect: both outputs come from one forward pass instead of two.
+
+\section{Paired Comparisons and Non-Inferiority}
+\label{sec:stats_background}
+
+When two models are evaluated on the same test images, their difference should be estimated in a paired way, since both are affected by the same hard and easy images. A nonparametric bootstrap~\cite{efron1993bootstrap} resamples the evaluation units with replacement and recomputes the difference in each resample; the percentiles of the resampled differences give a confidence interval. Because images of the same case are dependent, the units resampled here are cases, not images.
+
+A superiority question asks whether the interval of the difference lies above zero. A \emph{non-inferiority} question asks something weaker: whether a model is not worse than a reference by more than a margin $\delta$ fixed in advance, that is, whether the lower bound of the interval of the difference lies above $-\delta$. Non-inferiority is the appropriate question when the candidate has another advantage, such as fewer parameters or a lower cost, and the margin must be set before the results are seen.

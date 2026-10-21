@@ -1,0 +1,15 @@
+\label{chap:apendice_exploratorios}
+
+Antes do protocolo único, foram exploradas três arquiteturas KAN treinadas do zero, para ver até onde uma KAN chegaria sem um extrator de características pré-treinado. Elas ficam registradas aqui por completude. Os números vêm de outro cenário e \emph{não} são comparáveis com nenhum resultado do Capítulo~\ref{chap:results}.
+
+\begin{itemize}
+    \item \textbf{ResKANet-18:} uma rede residual cujas próprias convoluções são parametrizadas por splines (\texttt{reskanet\_18x32p} da \texttt{torch-conv-kan}~\cite{drokin2024torchconvkan}), treinada do zero com entradas de $128 \times 128$.
+    \item \textbf{PureConvKAN:} três blocos convolucionais KAN (16, 32 e 64 canais), cada um seguido de max-pooling e normalização em lote, depois pooling médio global, Dropout(0,5) e uma camada linear de saída; treinada do zero com entradas de $128 \times 128$.
+    \item \textbf{PureKAN:} a imagem achatada num vetor de pixels e passada diretamente a uma KAN, sem convolução; entradas de $64 \times 64$ ($3 \times 64 \times 64 = 12.288$ entradas).
+\end{itemize}
+
+As três foram treinadas por 60 épocas, de ponta a ponta, com AdamW e lotes de 8 imagens. Foram avaliadas num único hold-out 80/20 separado por caso, que evita o vazamento de casos, mas é uma única partição, com resolução menor e uma receita diferente da do protocolo único. A Tabela~\ref{tab:exploratorios} traz os resultados.
+
+\input{comum/tabelas/tab_exploratorios}
+
+A única leitura que esses números sustentam é qualitativa: sem um extrator pré-treinado, as arquiteturas KAN chegam a 0,69--0,82 de acurácia em entrada/saída, e na tarefa de distância a AUC macro delas fica perto do acaso ou abaixo dele (0,46--0,54), ou seja, aprendem pouco sobre as classes minoritárias. Isso é coerente com o achado principal de que é o backbone pré-treinado, e não a KAN, que faz a discriminação.

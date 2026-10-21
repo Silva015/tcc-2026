@@ -1,0 +1,15 @@
+\label{chap:apendice_exploratorios}
+
+Before the single protocol, three KAN architectures trained from scratch were explored to see how far a KAN could go without a pre-trained feature extractor. They are recorded here for completeness. Their numbers come from a different setting and are \emph{not} comparable with any result of Chapter~\ref{chap:results}.
+
+\begin{itemize}
+    \item \textbf{ResKANet-18:} a residual network whose convolutions are themselves parameterised by splines (\texttt{reskanet\_18x32p} from \texttt{torch-conv-kan}~\cite{drokin2024torchconvkan}), trained from scratch with $128 \times 128$ inputs.
+    \item \textbf{PureConvKAN:} three convolutional KAN blocks (16, 32 and 64 channels), each followed by max-pooling and batch normalisation, then global average pooling, Dropout(0.5) and a linear output layer; trained from scratch with $128 \times 128$ inputs.
+    \item \textbf{PureKAN:} the image flattened into a vector of pixels and fed directly to a KAN, with no convolution; $64 \times 64$ inputs ($3 \times 64 \times 64 = 12{,}288$ inputs).
+\end{itemize}
+
+All three were trained for 60 epochs end to end with AdamW and batches of 8 images. They were evaluated on a single 80/20 hold-out split separated by case, which avoids case leakage but is a single split, at lower resolution and with a recipe different from the single protocol. Table~\ref{tab:exploratorios} gives their results.
+
+\input{comum/tabelas/tab_exploratorios}
+
+The only reading these numbers support is qualitative: without a pre-trained extractor, the KAN architectures reach 0.69--0.82 accuracy in entry/exit, and in the distance task their macro AUC is close to or below chance (0.46--0.54), that is, they learn little about the minority classes. This is consistent with the main finding that the pre-trained backbone, and not the KAN, carries the discrimination.

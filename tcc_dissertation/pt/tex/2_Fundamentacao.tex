@@ -1,51 +1,85 @@
 \label{chap:background}
 
-Este capítulo fornece a fundamentação teórica essencial para compreender a natureza interdisciplinar deste trabalho, conectando a patologia forense e a inteligência artificial avançada. Ele detalha os conceitos fundamentais da classificação de ferimentos por arma de fogo, os mecanismos de aprendizado profundo para visão computacional e a teoria matemática que fundamenta as Redes de Kolmogorov-Arnold (KAN).
+Este capítulo traz a base necessária para o resto da dissertação: as tarefas forenses, os componentes de aprendizado profundo, as Redes de Kolmogorov-Arnold com bases de splines e de wavelets, e os conceitos de avaliação em que as conclusões se apoiam, a saber, a validação agrupada, as duas formas de calcular uma AUC, o aprendizado multitarefa e as comparações pareadas.
 
-\section{Patologia Forense de Ferimentos por Arma de Fogo}
+\section{Patologia Forense dos Ferimentos por Arma de Fogo}
 \label{sec:forensic_background}
 
-Na medicina forense, a análise precisa de ferimentos por arma de fogo é crucial para reconstruir os eventos de uma cena de crime. Quando um projétil atinge um corpo humano, ele produz um conjunto previsível de alterações morfológicas que variam significativamente dependendo da arma, da munição e da distância a partir da qual o disparo foi efetuado~\cite{dimaio2015gunshot,saukko2016knight}.
+Na medicina legal, a análise dos ferimentos por arma de fogo ajuda a reconstruir os fatos de um crime. Um projétil produz alterações morfológicas que dependem da arma, da munição e da distância do disparo~\cite{dimaio2015gunshot,saukko2016knight}.
 
-\subsection{Ferimentos de Entrada versus Saída}
-As tarefas de classificação mais fundamentais envolvem distinguir um ferimento de entrada de um ferimento de saída.
-Um ferimento de entrada é tipicamente caracterizado por uma \textit{orla de escoriação} (uma borda marginal de pele raspada), inversão do tecido e uma forma geralmente regular, circular ou oval, dependendo do ângulo de incidência. As propriedades físicas da pele sendo empurrada para dentro pelo projétil causam esses sinais específicos.
-Por outro lado, um ferimento de saída geralmente apresenta tecido evertido (voltado para fora), formas irregulares ou estreladas e ausência de orla de escoriação ou resíduos de disparo, à medida que o projétil empurra o tecido de dentro para fora.
-
-No entanto, alvos intermediários, deflexões ósseas e alterações post-mortem como a putrefação podem obscurecer essas características, tornando a classificação visual uma tarefa altamente complexa e fortemente dependente da experiência pericial.
+\subsection{Ferimentos de Entrada e de Saída}
+Um ferimento de entrada costuma ter uma \textit{orla de escoriação} (uma faixa de pele raspada), tecido invertido e forma regular, circular ou oval, conforme o ângulo de incidência. Um ferimento de saída costuma ter tecido evertido, forma irregular ou estrelada e nenhuma orla de escoriação nem resíduo do disparo, porque o projétil empurra o tecido de dentro para fora. Anteparos intermediários, desvios em ossos e alterações post mortem como a putrefação podem esconder esses sinais, de modo que a classificação visual depende muito da experiência do perito.
 
 \subsection{Distância Médico-Legal do Disparo (MLSD)}
-Além de distinguir entrada de saída, classificar a distância do disparo---a Distância Médico-Legal do Disparo (MLSD)---é vital para as investigações legais. A MLSD é categorizada com base nos vestígios macroscópicos deixados pela combustão da pólvora e dos componentes do espoleta sobre a pele~\cite{dimaio2015gunshot}:
+Nos ferimentos de entrada, a distância médico-legal do disparo é estimada pelos vestígios macroscópicos deixados pela combustão da pólvora e da espoleta~\cite{dimaio2015gunshot}:
 \begin{itemize}
-    \item \textbf{Encostado:} A boca do cano da arma é pressionada contra a pele. Esses ferimentos frequentemente exibem uma "marca do cano" e graves lacerações teciduais devido à entrada dos gases em expansão nas camadas subcutâneas.
-    \item \textbf{Curta distância:} Disparado a curta distância (tipicamente menos de 60 cm), esses ferimentos exibem \textit{tatuagem} ou \textit{esfumaçamento} (grãos de pólvora não queimados incrustados na pele) e deposição de fuligem ao redor do orifício de entrada.
-    \item \textbf{À distância:} Disparado de uma distância na qual os resíduos de pólvora não alcançam mais a pele. O ferimento apresenta principalmente a orla de escoriação, sem fuligem ou esfumaçamento ao redor.
+    \item \textbf{Encostado:} a boca do cano toca a pele. O ferimento costuma mostrar a marca da boca do cano e lacerações causadas pela expansão dos gases.
+    \item \textbf{Curta distância:} o disparo é feito de perto (em geral a menos de cerca de 60 cm), e o ferimento mostra \textit{tatuagem} (grãos de pólvora não queimados incrustados na pele) e fuligem.
+    \item \textbf{Distância:} os resíduos da pólvora já não chegam à pele, e o ferimento mostra essencialmente a orla de escoriação.
 \end{itemize}
+Os ferimentos de saída não trazem informação de distância; por isso a tarefa de distância usa só as entradas.
 
-\section{Aprendizado Profundo para Visão Computacional}
+\section{Aprendizado Profundo em Visão Computacional}
 \label{sec:dl_background}
 
-O Aprendizado Profundo (DL), um subconjunto do aprendizado de máquina, revolucionou o campo da Visão Computacional ao permitir que modelos computacionais descubram e extraiam automaticamente as representações necessárias para a detecção de características a partir de dados brutos.
+\subsection{Redes Convolucionais, ResNet e Aprendizado por Transferência}
+As redes neurais convolucionais extraem características hierárquicas das imagens, de bordas nas primeiras camadas a formas complexas nas mais profundas. As redes residuais (ResNets)~\cite{he2016resnet} acrescentam conexões de atalho que facilitam o treino de modelos muito profundos; a ResNet-152 tem 152 camadas e produz um vetor de 2.048 características antes da sua última camada. No aprendizado por transferência, uma rede pré-treinada numa base grande como o ImageNet~\cite{deng2009imagenet} é reaproveitada como extratora de características e ajustada à tarefa de destino. Isso é útil sobretudo quando a base de destino é pequena, como nas imagens forenses. A última camada, que leva as características às classes, é chamada de \emph{cabeça}; em geral é uma camada linear ou um pequeno perceptron de múltiplas camadas (MLP).
 
-\subsection{Redes Neurais Convolucionais (CNNs) e ResNet}
-As Redes Neurais Convolucionais (CNNs) são a arquitetura padrão para classificação de imagens. Elas utilizam camadas convolucionais para extrair características espaciais hierárquicas---de bordas simples nas camadas inferiores a formas semânticas complexas nas camadas mais profundas.
+\subsection{Transformers de Visão}
+Os transformers tratam uma imagem como uma sequência de blocos (\textit{patches}) com autoatenção. Duas das arquiteturas avaliadas aqui são desse tipo: o Swin Transformer~\cite{liu2021swin}, que calcula a atenção dentro de janelas locais deslocadas e monta uma hierarquia de resoluções, e o MaxViT~\cite{tu2022maxvit}, que combina convoluções com atenção local e atenção global dilatada.
 
-Um problema persistente no treinamento de CNNs profundas é o problema do desaparecimento do gradiente (\textit{vanishing gradient}), em que os gradientes se tornam pequenos demais para atualizar os pesos de forma eficaz nas camadas iniciais. A arquitetura de Rede Residual (ResNet)~\cite{he2016resnet} resolveu isso introduzindo "conexões de atalho" (ou blocos residuais), que permitem que o gradiente contorne certas camadas. A ResNet152, uma variante com 152 camadas, representa o ápice da extração profunda de características, amplamente utilizada como \textit{backbone} robusto em aplicações de aprendizado por transferência para imagens médicas e forenses, tipicamente inicializada com pesos pré-treinados na base de dados de larga escala ImageNet~\cite{deng2009imagenet}.
-
-Tradicionalmente, as características espaciais profundas extraídas por arquiteturas como a ResNet são achatadas e passadas por um Perceptron de Múltiplas Camadas (MLP)---composto por camadas lineares densas e totalmente conectadas, seguidas de funções de ativação não-lineares fixas (por exemplo, ReLU)---para produzir as probabilidades finais de classe.
-
-\section{Redes de Kolmogorov-Arnold (KAN)}
+\section{Redes de Kolmogorov-Arnold}
 \label{sec:kan_background}
 
-Embora os MLPs tenham sido o padrão onipresente para a cabeça de classificação no aprendizado profundo, eles são fundamentalmente baseados no Teorema da Aproximação Universal. Recentemente, uma nova arquitetura de rede neural conhecida como Redes de Kolmogorov-Arnold (KAN) foi proposta~\cite{liu2024kan}, inspirada no teorema de representação de Kolmogorov-Arnold.
+\subsection{Do Teorema da Representação às Camadas KAN}
+O teorema da representação de Kolmogorov-Arnold diz que qualquer função contínua de várias variáveis num domínio limitado pode ser escrita como uma composição finita de funções contínuas de uma variável e de somas. As Redes de Kolmogorov-Arnold (KANs)~\cite{liu2024kan} transformam essa ideia numa camada treinável. Numa MLP, cada aresta tem um peso escalar e cada nó aplica uma não linearidade fixa. Numa camada KAN, cada aresta tem uma função de uma variável aprendível $\phi_{j,i}$, e o nó só soma:
+\begin{equation}
+x^{(l+1)}_j = \sum_{i=1}^{n_l} \phi^{(l)}_{j,i}\!\left(x^{(l)}_i\right).
+\end{equation}
+Uma KAN $[n_0, n_1, n_2]$ tem duas dessas camadas; a cabeça da TransferKAN é $[2048, 128, K]$.
 
-\subsection{Fundamento Teórico}
-O teorema de representação de Kolmogorov-Arnold afirma que qualquer função contínua multivariada pode ser representada como uma composição finita de funções contínuas de uma única variável e da operação de adição.
+\subsection{Arestas com B-Splines e Contagem de Parâmetros}
+Na KAN original e na implementação \texttt{efficient-kan}~\cite{efficientkan} usada aqui, cada função de aresta é a soma de um termo base e de uma spline:
+\begin{equation}
+\phi(x) = w_b\,\mathrm{SiLU}(x) + w_s \sum_{m=1}^{G+k} c_m B_m(x),
+\end{equation}
+em que as $B_m$ são B-splines de ordem $k$ numa grade de $G$ intervalos sobre $[-1, 1]$, estendida por $k$ intervalos de cada lado. Com $G=10$ e $k=3$ há 13 coeficientes $c_m$ por aresta, mais os pesos $w_b$ e $w_s$: 15 parâmetros por aresta. Fora da grade estendida as B-splines se anulam, e a aresta se reduz ao seu termo base.
 
-Em um MLP tradicional, a rede aprende pesos fixos (transformações lineares) nas arestas e aplica uma função de ativação não-linear fixa e predefinida (como ReLU ou Sigmoide) nos nós.
-Em forte contraste, uma KAN inverte esse paradigma: ela coloca funções de ativação não-lineares \textit{aprendíveis} nas \textit{arestas} (conexões) e simplesmente as soma nos nós.
+A contagem de parâmetros importa para as afirmações deste trabalho. O artigo da KAN defende que as KANs podem ser mais eficientes em parâmetros que as MLPs, sobretudo em tarefas científicas e simbólicas pequenas~\cite{liu2024kan}. Como cabeça de classificação sobre 2.048 características, porém, uma KAN é grande: a cabeça $[2048, 128, 2]$ tem $15 \times (2048 \times 128 + 128 \times 2) = 3.936.000$ parâmetros, enquanto uma MLP com as mesmas larguras tem 262.530. Saber se uma cabeça KAN é mais eficiente é, portanto, uma questão empírica, testada neste trabalho contra MLPs do mesmo tamanho.
 
-\subsection{B-Splines e Eficiência de Parâmetros}
-Para tornar as funções das arestas aprendíveis, as KANs tipicamente as parametrizam usando B-splines (splines de base)~\cite{liu2024kan}. Uma B-spline é uma função polinomial por partes que pode adaptar sua forma de maneira flexível para modelar relações não-lineares altamente complexas.
+\subsection{KANs com Wavelets}
+A Wav-KAN~\cite{bozorgasl2024wavkan} troca a spline por uma wavelet com escala $s$ e translação $\tau$ aprendíveis em cada aresta:
+\begin{equation}
+\phi(x) = w_\psi\, \psi\!\left(\frac{x - \tau}{s}\right) + w_b\,\mathrm{SiLU}(x),
+\end{equation}
+seguida de normalização em lote da saída da camada. Isso usa quatro parâmetros por aresta em vez de quinze. Três wavelets-mãe são usadas aqui, escritas a menos de constantes de normalização: o chapéu mexicano $\psi(t) = (1 - t^2)\,e^{-t^2/2}$, a derivada de gaussiana $\psi(t) = -t\,e^{-t^2/2}$ e a Morlet $\psi(t) = \cos(\omega_0 t)\,e^{-t^2/2}$, com $\omega_0 = 5$. Em princípio, a escala e a translação aprendíveis poderiam adaptar cada aresta à faixa da sua entrada; se isso acontece é verificado na Seção~\ref{sec:res_wavkan}.
 
-Como cada parâmetro de peso em um MLP é substituído por uma função spline altamente flexível em uma KAN, as KANs geralmente requerem muito menos parâmetros para alcançar o mesmo mapeamento, ou melhor, de fronteiras de decisão complexas. Isso as torna altamente eficientes em parâmetros e menos propensas ao sobreajuste em bases de dados desbalanceadas ou relativamente pequenas---uma vantagem crítica para a visão computacional forense, na qual obter milhares de imagens de ferimentos por arma de fogo perfeitamente padronizadas é praticamente impossível.
+\section{Avaliação sem Vazamento}
+\label{sec:leakage_background}
+
+Há vazamento de dados quando informação que não estaria disponível no momento da predição chega ao treino de um modelo, de modo que o desempenho no teste superestima o desempenho em dados novos~\cite{kapoor2023leakage}. Uma forma comum aparece em dados agrupados: quando várias observações vêm da mesma unidade (um paciente, um local, um caso), as observações da mesma unidade se parecem mais entre si que com o resto. Se elas são divididas entre treino e teste, o modelo pode reconhecer a unidade em vez de aprender a tarefa~\cite{roberts2017cross}. O remédio é a validação agrupada: cada grupo fica inteiro no treino ou inteiro no teste.
+
+Na base de ferimentos, um caso costuma ter várias fotografias do mesmo ferimento ou de ferimentos da mesma vítima. A unidade de avaliação é, portanto, o caso. A validação cruzada $k$-fold agrupada atribui casos inteiros às dobras; a $k$-fold estratificada e agrupada faz o mesmo mantendo proporções de classes parecidas entre as dobras. Estratificar \emph{pelo} identificador do caso é diferente: a estratificação iterativa~\cite{sechidis2011stratification} sobre o número do caso tenta pôr em cada subconjunto uma parte proporcional das imagens de cada caso, e por isso espalha de propósito cada caso entre treino e teste. A diferença entre agrupar e estratificar pelo caso está no centro da Seção~\ref{sec:res_leak}.
+
+\section{AUC das Probabilidades e das Classes}
+\label{sec:auc_background}
+
+A curva ROC traça a taxa de verdadeiros positivos contra a taxa de falsos positivos à medida que o limiar de decisão sobre um escore contínuo varia, e a área sob ela (AUC) é igual à probabilidade de um exemplo positivo escolhido ao acaso receber um escore maior que um negativo escolhido ao acaso~\cite{fawcett2006roc}. Ela mede quão bem o modelo ordena os exemplos, independentemente do limiar. Com mais de duas classes, a AUC macro um-contra-o-resto é a média das AUC de cada classe contra as demais.
+
+Se a AUC é calculada a partir dos rótulos previstos em vez dos escores, há um único limiar e a ``curva'' ROC tem um só ponto interior. A área passa a ser
+\begin{equation}
+\mathrm{AUC}_c = \frac{\mathrm{TPR} + \mathrm{TNR}}{2},
+\end{equation}
+a média entre sensibilidade e especificidade, que no caso binário é igual à acurácia balanceada e à revocação macro. A AUC$_c$ depende do limiar e costuma ser bem menor que a AUC das probabilidades do mesmo modelo. Nesta dissertação, AUC significa sempre a AUC das probabilidades; a AUC$_c$ é calculada só para comparar com as tabelas de Lira et al., que a relatam (Capítulo~\ref{chap:related}).
+
+\section{Aprendizado Multitarefa}
+\label{sec:mt_background}
+
+O aprendizado multitarefa treina um único modelo em várias tarefas relacionadas, para que elas compartilhem uma representação~\cite{caruana1997multitask,ruder2017overview}. Na forma mais comum, o compartilhamento rígido de parâmetros, um único backbone alimenta uma cabeça por tarefa, e a perda é uma soma ponderada das perdas das tarefas. O compartilhamento pode ajudar quando as tarefas usam características parecidas e pode atrapalhar quando uma tarefa domina a representação comum. Quando um rótulo não existe para alguns exemplos, como a distância nos ferimentos de saída, esses exemplos ficam fora do termo correspondente da perda. Um backbone compartilhado também tem um efeito prático direto: as duas saídas vêm de um único passo para a frente em vez de dois.
+
+\section{Comparações Pareadas e Não Inferioridade}
+\label{sec:stats_background}
+
+Quando dois modelos são avaliados nas mesmas imagens de teste, a diferença entre eles deve ser estimada de forma pareada, já que os dois são afetados pelas mesmas imagens difíceis e fáceis. Um bootstrap não paramétrico~\cite{efron1993bootstrap} reamostra as unidades de avaliação com reposição e recalcula a diferença em cada reamostra; os percentis das diferenças reamostradas dão um intervalo de confiança. Como as imagens de um mesmo caso são dependentes, as unidades reamostradas aqui são os casos, e não as imagens.
+
+Uma pergunta de superioridade quer saber se o intervalo da diferença fica acima de zero. Uma pergunta de \emph{não inferioridade} pede algo mais fraco: se um modelo não é pior que uma referência por mais de uma margem $\delta$ fixada de antemão, isto é, se o limite inferior do intervalo da diferença fica acima de $-\delta$. A não inferioridade é a pergunta adequada quando o candidato tem outra vantagem, como menos parâmetros ou menor custo, e a margem precisa ser fixada antes de ver os resultados.
