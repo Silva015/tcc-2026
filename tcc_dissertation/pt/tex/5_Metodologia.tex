@@ -1,111 +1,111 @@
 \label{chap:methodology}
 
-Este capítulo detalha a aquisição dos dados, a implementação arquitetural do modelo TransferKAN e a configuração experimental rigorosa utilizada para treinar e validar a arquitetura proposta. A metodologia foi meticulosamente projetada para garantir a separação estrita dos dados, prevenindo completamente o vazamento semântico de dados que frequentemente compromete as tarefas de classificação de imagens médicas.
+Este capítulo descreve o protocolo único de avaliação sob o qual todos os modelos deste trabalho foram treinados e testados. Todos os modelos usam as mesmas imagens, as mesmas cinco dobras agrupadas por caso, a mesma receita de treino, as mesmas métricas e o mesmo procedimento estatístico; de um experimento para outro muda só o componente em estudo (a cabeça, o backbone, a partição ou o número de tarefas). O protocolo foi escrito como um único módulo Python (\texttt{protocolo\_comum.py}, versão 1.0.0, SHA-256 \texttt{b7cd9bac\ldots}) e congelado antes da primeira rodada de treino. Os experimentos posteriores (distância do disparo, reprodução da partição de Lira et al., cabeças Wav-KAN e rede multitarefa) entraram como plugins que registram novas cabeças, configurações ou perdas sem editar o módulo. Cada rodada grava os hashes do módulo, do plugin e do arquivo de dobras, o que permite conferir que todos os números vêm do mesmo código.
 
-\section{Descrição da Base de Dados}
+\section{Base de Dados}
 \label{sec:dataset_desc}
 
-A base de dados utilizada neste estudo é a FDCPUnBGunshotDB~\cite{Lira2025deep}, uma coleção curada de fotografias reais de cenas de crime e necropsias obtidas pela Polícia Civil do Distrito Federal (PCDF), no Brasil. Diferentemente de bases compostas por ambientes laboratoriais encenados ou modelos animais, esta base reflete autenticamente os severos desbalanceamentos de classe, as variações de iluminação e as distorções morfológicas que ocorrem naturalmente no trabalho pericial forense.
+As imagens vêm da FDCPUnBGunshotDB~\cite{Lira2025deep}, uma coleção de fotografias de ferimentos por arma de fogo feitas em locais de crime e em necropsias pela Polícia Civil do Distrito Federal (PCDF). A base não tem licença de redistribuição e o seu README exige citar Lira et al.~\cite{Lira2025deep}; ela foi clonada num commit fixo (\texttt{f679389}) em cada sessão~\cite{fdcpunbgunshotdb}, e nenhuma imagem nem cache de imagens saiu das sessões de treino.
 
-Para a tarefa principal de \textbf{Classificação do Tipo de Ferimento} (Entrada vs. Saída), a base contém um total de 2.551 imagens. Ela é severamente desbalanceada, compreendendo:
-\begin{itemize}
-    \item \textbf{Ferimentos de Entrada (Rótulo 0):} 1.883 imagens
-    \item \textbf{Ferimentos de Saída (Rótulo 1):} 668 imagens
-\end{itemize}
+Os rótulos são lidos da estrutura de pastas. A versão usada tem 2.554 imagens de 486 casos: 1.883 ferimentos de entrada e 671 de saída. As 1.883 entradas têm também o rótulo da distância médico-legal do disparo (MLSD): 1.609 a distância, 232 a curta distância e 42 encostados; as 42 imagens de encostado vêm de apenas 16 casos. Lira et al.\ descrevem 2.551 imagens (1.883 entradas e 668 saídas) de 489 casos~\cite{Lira2025deep}. A diferença tem duas origens. Três imagens de saída presentes nas pastas não estão no CSV distribuído com a base. Além disso, aqui o caso é identificado pelo ano e pelo número (os nove primeiros caracteres do nome do arquivo), enquanto o código de Lira et al.\ usa o número sem o ano, o que junta 56 números que aparecem em mais de um ano (417 grupos em vez de 486)~\cite{leguwoi}. Uma imagem de saída tem uma distância no CSV; vale o rótulo da pasta (saída). A distribuição de idade das vítimas aparece na Figura~\ref{fig:age_dist}.
 
-Essas contagens são as reportadas na descrição original da base~\cite{Lira2025deep}. A cópia do repositório efetivamente utilizada nos experimentos deste trabalho contabiliza 2.554 imagens---1.883 de entrada, em concordância exata com a descrição original, e 671 de saída, três a mais---distribuídas em 486 casos distintos. A diferença, inferior a $0{,}12\%$ do total, corresponde a acréscimos posteriores ao repositório público e não altera a estrutura de desbalanceamento nem qualquer conclusão deste estudo; ela é registrada aqui apenas para que as contagens impressas pelos \textit{notebooks} sejam plenamente rastreáveis. Para a tarefa de MLSD, as 1.883 imagens de entrada distribuem-se em 441 casos.
+\figuraBib[htpb]{lira2024/fig3_age}{Frequência da idade no momento do óbito na base FDCPUnBGunshotDB, por casos selecionados (a) e por imagens selecionadas (b)}{Lira2025deep}{fig:age_dist}{width=0.8\textwidth}
 
-Para a tarefa secundária de \textbf{Classificação da Distância Médico-Legal do Disparo (MLSD)}, apenas as 1.883 imagens de ferimentos de entrada são consideradas, já que ferimentos de saída não exibem características de distância. Estas são categorizadas em três classes distintas e altamente assimétricas:
-\begin{itemize}
-    \item \textbf{À distância (Rótulo 2):} 1.609 imagens (85,45\%)
-    \item \textbf{Curta distância (Rótulo 1):} 232 imagens (12,32\%)
-    \item \textbf{Encostado (Rótulo 0):} 42 imagens (2,23\%)
-\end{itemize}
+\section{Dobras Agrupadas por Caso}
+\label{sec:folds}
 
-Além do desbalanceamento de classes, a base reflete o perfil demográfico típico de fatalidades relacionadas a armas de fogo: as vítimas são predominantemente homens adultos jovens, com idade média de aproximadamente 27 anos e uma forte assimetria à direita em direção a indivíduos na casa dos vinte anos, como mostra a Figura~\ref{fig:age_dist}.
+As fotografias de um mesmo caso (muitas vezes vários ângulos do mesmo ferimento, ou ferimentos da mesma vítima) são muito correlacionadas. Se imagens de um caso caem no treino e no teste, o teste deixa de medir a generalização para casos novos (Seção~\ref{sec:leakage_background}). Por isso, todos os experimentos usam um único conjunto de cinco dobras em que cada caso pertence a exatamente uma dobra. As dobras foram geradas uma vez com o \texttt{StratifiedGroupKFold} do scikit-learn~\cite{pedregosa2011scikit} (cinco dobras, embaralhadas, semente 42) sobre a lista de imagens ordenada pelo caminho, com grupos dados pelo caso e estratificação por um rótulo de quatro classes (saída, encostado, curta, distância), para equilibrar as duas tarefas ao mesmo tempo. Uma regra de composição foi fixada antes de gerar as dobras: cada dobra de teste precisa ter pelo menos dois casos de encostado e pelo menos uma imagem de cada classe; se a semente 42 falhasse, seria usada a primeira semente $\geq 43$ que passasse. A semente 42 passou. A Tabela~\ref{tab:dobras} mostra o resultado; a fração de saídas por dobra fica entre 24,5\% e 28,9\% (26,3\% no total).
 
-\figuraBib[htpb]{lira2024/fig3_age}{Frequência da idade no momento da morte na base FDCPUnBGunshotDB, reportada por casos selecionados (a) e por imagens selecionadas (b)}{Lira2025deep}{fig:age_dist}{width=0.8\textwidth}
+\input{comum/tabelas/tab_dobras}
 
-\section{Detalhes de Implementação da TransferKAN}
-\label{sec:kan_implementation}
+A tarefa de distância usa as mesmas dobras restritas às entradas. Assim, nenhum caso atravessa dobras em nenhuma das tarefas, e as duas tarefas podem ser comparadas e combinadas imagem a imagem.
 
-O núcleo da nossa solução proposta é a arquitetura \textbf{TransferKAN}, implementada utilizando PyTorch~\cite{paszke2019pytorch}.
+\section{Receita de Treino}
+\label{sec:recipe}
 
-\subsection{Backbone e Regularização}
-Empregamos uma ResNet152~\cite{he2016resnet} pré-treinada da TorchVision como \textit{backbone} para a extração de características espaciais, aproveitando seus pesos pré-existentes para identificar padrões visuais de baixo nível complexos sem exigir uma base de dados massiva. A camada final totalmente conectada padrão foi removida, deixando a rede produzir um vetor de características achatado de alta dimensão, de tamanho 2048. Para combater o sobreajuste na base de dados limitada, uma camada pesada de \textit{Dropout} ($p=0{,}5$) foi inserida imediatamente após o extrator de características.
-
-\subsection{Configuração do Classificador KAN}
-Em vez de camadas densas convencionais, acoplamos um módulo KAN dinâmico~\cite{liu2024kan} (utilizando a implementação \texttt{efficient-kan}) como classificador final.
-Para a classificação Entrada/Saída, a KAN foi configurada com uma estrutura de [2048, 128, 2]. Para garantir que as splines pudessem mapear as fronteiras de decisão complexas dos dados desbalanceados, utilizamos uma ordem de spline cúbica igual a 3 e um tamanho de grade ampliado igual a 10 (o valor padrão da implementação é 5).
-
-Para a classificação de MLSD, a estrutura foi adaptada para [2048, 128, 3], a fim de acomodar as três classes de distância. Nessa tarefa, mantivemos a ordem de spline cúbica igual a 3, porém conservamos o tamanho de grade padrão da implementação, igual a 5: como a classe \textit{Encostado} dispõe de apenas 42 imagens, uma grade mais densa aumentaria o número de coeficientes de spline por aresta sem que houvesse amostras suficientes para estimá-los de forma confiável.
-
-\section{Configuração Experimental}
-\label{sec:experimental_setup}
-
-Para garantir uma avaliação confiável, reproduzível e robusta, o \textit{pipeline} experimental foi rigorosamente controlado. O arcabouço geral de classificação---abrangendo pré-processamento, ampliação de dados, a divisão treino/teste, o treinamento do modelo e a avaliação---segue o \textit{pipeline} estabelecido para esta base de dados por Lira et al., ilustrado na Figura~\ref{fig:framework}.
-
-\figuraBib[htpb]{lira2024/fig1_framework}{Arcabouço geral de classificação adotado para a base FDCPUnBGunshotDB, abrangendo preparação dos dados, ampliação, treinamento do modelo e avaliação}{Lira2025deep}{fig:framework}{width=\textwidth}
-
-\subsection{Ampliação de Dados}
-Devido à escassez e ao desbalanceamento extremo dos dados forenses, uma Ampliação de Dados avançada foi aplicada exclusivamente ao conjunto de treino utilizando a biblioteca \textit{Albumentations}~\cite{buslaev2020albumentations}. O \textit{pipeline} de ampliação incluiu transformações especificamente adaptadas para imitar as realidades forenses:
-\begin{itemize}
-    \item \textbf{Transformações Geométricas:} Espelhamentos horizontal e vertical e combinações de deslocamento-escala-rotação para simular diferentes ângulos fotográficos.
-    \item \textbf{Simulação de Tecido:} Transformações elásticas para simular a elasticidade e a distorção naturais da pele humana.
-    \item \textbf{Iluminação e Detalhe:} Equalização de Histograma Adaptativa Limitada por Contraste (CLAHE) para realçar detalhes do tecido e ruído gaussiano para simular as condições de iluminação variadas e, muitas vezes, ruins encontradas em cenas de crime.
-    \item \textbf{Variação Cromática:} Perturbação aleatória de brilho, contraste, saturação e matiz (\textit{color jitter}), para reduzir a dependência do modelo em relação ao balanço de cores específico de cada câmera e de cada condição de captura.
-\end{itemize}
-A Figura~\ref{fig:augmentation} mostra exemplos representativos dessas transformações aplicadas a imagens de ferimentos de cada tipo. O conjunto de teste passou por transformações estritamente determinísticas, restritas ao redimensionamento essencial ($224 \times 224$) e à normalização pelas estatísticas por canal da ImageNet ($\mu = [0{,}485;\ 0{,}456;\ 0{,}406]$ e $\sigma = [0{,}229;\ 0{,}224;\ 0{,}225]$), a mesma normalização aplicada ao conjunto de treino após a ampliação. Os lotes de treino e de teste da TransferKAN foram compostos por 32 imagens.
-
-Na implementação, as duas políticas de transformação são materializadas como \textit{duas instâncias distintas} do mesmo objeto de base de dados---uma com o \textit{pipeline} de ampliação e outra apenas com o \textit{pipeline} determinístico---das quais os subconjuntos de treino e de teste de cada dobra são extraídos por índice. Esse arranjo garante estruturalmente que nenhuma transformação estocástica alcance as imagens de avaliação.
-
-\figuraBib[htpb]{lira2024/fig2_augmentation}{Exemplos de imagens de ferimentos por arma de fogo e algumas de suas versões ampliadas. De cima para baixo: uma entrada de curta distância, uma entrada de disparo à distância, uma entrada de disparo encostado e um ferimento de saída. Da esquerda para a direita: imagem original (pré-processada), rotação segura, espelhamento horizontal, desfoque, CLAHE, transformação elástica, ruído gaussiano, saturação de matiz, ruído ISO, brilho/contraste aleatório, RGBShift, escala de cinza, nitidez e máscara de nitidez (\textit{unsharp}). O \textit{pipeline} adotado neste trabalho emprega um subconjunto dessas transformações, listado nesta seção}{Lira2025deep}{fig:augmentation}{width=\textwidth}
-
-\subsection{Reprodutibilidade}
-As sementes dos geradores pseudoaleatórios de \texttt{PyTorch} e do módulo \texttt{random} da linguagem Python foram fixadas em 42, o que torna determinísticas a partição por caso e a ordem de amostragem dos lotes. Ressalva-se que a semente do \texttt{NumPy} não foi fixada explicitamente e que as operações de convolução em GPU não são bit a bit determinísticas; consequentemente, re-execuções podem apresentar variações numéricas de pequena magnitude nas métricas reportadas. Registra-se ainda que o \textit{pipeline} de ampliação foi escrito sobre a interface da \textit{Albumentations} anterior à versão 2.0, ao passo que a execução registrada ocorreu sob uma versão posterior a essa fronteira. Nas versões recentes, argumentos como \texttt{alpha\_affine} (de \texttt{ElasticTransform}) e \texttt{var\_limit} (de \texttt{GaussNoise}) não provocam erro: a biblioteca emite um alerta e simplesmente os descarta. Em consequência, essas duas transformações operaram com as magnitudes padrão da biblioteca, e não com os valores declarados no código. O conjunto de transformações aplicado é, portanto, exatamente o descrito nesta seção, mas a reprodução numérica exata exige a fixação da versão da \textit{Albumentations}.
-
-
-\subsection{Divisão dos Dados: Prevenção do Vazamento Semântico de Dados}
-Uma falha comum no aprendizado de máquina forense é realizar uma divisão aleatória das imagens. Como uma única vítima (Identificador de Caso) pode ter múltiplas fotografias do mesmo ferimento tiradas de ângulos ligeiramente diferentes, dividir as imagens aleatoriamente pode fazer com que o mesmo ferimento apareça tanto no conjunto de treino quanto no de teste, causando vazamento semântico de dados e inflando artificialmente as métricas de teste.
-
-Para evitar isso completamente, a base de dados foi dividida estritamente com base no \textit{Identificador de Caso} (extraído do nome do arquivo). Implementamos uma estratégia rigorosa de validação cruzada de 5 dobras, mantendo uma divisão de 80\%/20\% baseada em casos por dobra. Uma verificação programática de sanidade foi utilizada para garantir interseção semântica zero entre os subconjuntos de treino e teste.
-
-\subsection{Procedimento de Treinamento}
-Em ambas as tarefas, o treinamento foi conduzido ao longo de 60 épocas por dobra, com o modelo reinicializado a partir dos pesos da ImageNet no início de cada dobra, de modo que nenhuma informação seja transportada de uma dobra para a seguinte. O regime de otimização, entretanto, difere entre as duas tarefas.
-
-\subsubsection{Entrada/Saída: aprendizado por transferência em duas fases}
-Para a classificação do tipo de ferimento, adotou-se uma metodologia estrita de aprendizado por transferência em duas fases:
-\begin{enumerate}
-    \item \textbf{Fase 1 (Épocas 1--15):} Os parâmetros do \textit{backbone} ResNet152 foram congelados. Apenas o classificador KAN foi treinado utilizando o otimizador AdamW com taxa de aprendizado de $1 \times 10^{-3}$ e decaimento de peso ($1 \times 10^{-2}$). Isso permitiu que as splines da KAN convergissem para uma linha de base estável utilizando as características brutas.
-    \item \textbf{Fase 2 (Épocas 16--60):} Toda a rede foi descongelada (\textit{fine-tuning}). O treinamento continuou com uma taxa de aprendizado reduzida de $1 \times 10^{-5}$ e decaimento de peso de $1 \times 10^{-3}$, para otimizar conjuntamente os filtros convolucionais e as splines da KAN.
-\end{enumerate}
-
-\subsubsection{MLSD: fase única com taxa de aprendizado conservadora}
-Para a classificação da Distância Médico-Legal do Disparo, o congelamento inicial não foi empregado: a rede foi otimizada de ponta a ponta desde a primeira época, com o otimizador AdamW ajustado a uma taxa de aprendizado única e conservadora de $1 \times 10^{-4}$ e decaimento de peso de $1 \times 10^{-2}$, ao longo das mesmas 60 épocas. A escolha decorre da natureza da tarefa: as evidências que separam as três distâncias---resíduos de pólvora, fuligem, tatuagem---são texturas de granulação fina, codificadas nas camadas convolucionais intermediárias do \textit{backbone} e não plenamente representadas nas características genéricas da ImageNet. Congelar essas camadas durante um quarto do orçamento de treinamento privaria o classificador justamente do sinal discriminante da tarefa; uma taxa de aprendizado intermediária, situada entre as duas empregadas na tarefa Entrada/Saída, permite adaptar os filtros desde o início sem destruir a representação pré-treinada.
-
-\subsubsection{Elementos comuns às duas tarefas}
-Um agendador CosineAnnealingLR foi utilizado em todos os regimes para decair suavemente a taxa de aprendizado. Além disso, a ponderação por frequência inversa de classe foi aplicada à função de perda de Entropia Cruzada para penalizar matematicamente, de forma mais severa, os erros nas classes minoritárias (por exemplo, disparos Encostados); os pesos são recalculados dentro de cada dobra, a partir exclusivamente da distribuição de rótulos do respectivo conjunto de treino. Durante cada dobra, os pesos do modelo que alcançaram a maior acurácia no conjunto de teste da dobra foram salvos como ponto de verificação, e as predições fora da dobra (\textit{out-of-fold}) foram agregadas para calcular as métricas finais validadas por validação cruzada. As implicações desse critério de seleção de ponto de verificação são discutidas na Seção~\ref{sec:threats}.
-
-\subsection{Arquiteturas de Referência para o Estudo de Ablação}
-\label{sec:ablation_setup}
-
-Para isolar a contribuição de cada componente da TransferKAN, três arquiteturas alternativas foram treinadas como referências de ablação. Todas compartilham o mesmo particionamento semântico por Identificador de Caso, o mesmo \textit{pipeline} de ampliação e a mesma ponderação de classes descritos acima, mas diferem da TransferKAN em resolução de entrada, tamanho de lote e protocolo de validação---diferenças que precisam ser explicitadas para que a leitura da comparação seja correta:
+Todos os modelos (cabeças, backbones, cabeças Wav-KAN e rede multitarefa) são treinados com a receita do notebook original da TransferKAN, agora aplicada a todos eles:
 
 \begin{itemize}
-    \item \textbf{ResKANet-18:} uma rede residual inteiramente convolucional-KAN (\texttt{reskanet\_18x32p}, da biblioteca \textit{torch-conv-kan}), na qual as próprias convoluções são parametrizadas por splines. Diferentemente da TransferKAN, é treinada \textbf{do zero, sem qualquer pré-treinamento na ImageNet}. Entrada de $128 \times 128$.
-    \item \textbf{PureConvKAN:} uma rede convolucional rasa, construída a partir de três blocos \texttt{ConvKAN} sucessivos (16, 32 e 64 canais), cada qual seguido de \textit{max-pooling} e normalização em lote, encerrada por \textit{global average pooling}, \textit{dropout} ($p=0{,}5$) e uma única camada linear de saída. Também treinada do zero, com entrada de $128 \times 128$.
-    \item \textbf{PureKAN:} a linha de base mais austera, na qual a imagem é simplesmente achatada em um vetor de pixels e alimentada diretamente a uma KAN, sem qualquer estágio convolucional. Entrada reduzida a $64 \times 64$ para tornar tratável a dimensionalidade do vetor achatado ($3 \times 64 \times 64 = 12.288$ entradas).
+    \item \textbf{Modelo:} um backbone do torchvision~\cite{paszke2019pytorch} com os pesos padrão do ImageNet~\cite{deng2009imagenet}, seguido de achatamento, Dropout ($p=0{,}5$) e a cabeça.
+    \item \textbf{Fase 1 (épocas 1--15):} backbone congelado (as estatísticas da normalização em lote continuam sendo atualizadas, como no código original); só os parâmetros novos são otimizados, com AdamW~\cite{loshchilov2019adamw} (taxa de aprendizado $10^{-3}$, decaimento de pesos $10^{-2}$) e decaimento cosseno~\cite{loshchilov2017sgdr} em 15 épocas.
+    \item \textbf{Fase 2 (épocas 16--60):} a rede inteira é treinada com AdamW (taxa $10^{-5}$, decaimento $10^{-3}$) e decaimento cosseno em 45 épocas.
+    \item \textbf{Lotes e perda:} lotes de 32 imagens, descartando o último lote incompleto; entropia cruzada com pesos de classe $n/(K\,n_c)$ calculados na parte de treino de cada dobra ($K$ classes, $n_c$ imagens da classe $c$).
+    \item \textbf{Sem validação interna e sem escolha de época:} toda a parte de treino da dobra é usada no treino, e o modelo avaliado é o da época 60. A dobra de teste é avaliada uma única vez.
+    \item \textbf{Aumento de dados} (só no treino, Albumentations~\cite{buslaev2020albumentations} 2.0.8, com os valores que de fato rodaram no notebook original): redimensionamento para $224 \times 224$; espelhamentos horizontal e vertical ($p=0{,}5$ cada); deslocamento, escala e rotação (deslocamento 0,05, escala 0,1, rotação até $30^\circ$, $p=0{,}5$); CLAHE (limite 2,0, blocos de $8 \times 8$, $p=0{,}3$); transformação elástica ($\alpha=1$, $\sigma=50$, $p=0{,}3$); ruído gaussiano (desvio-padrão entre 0,2 e 0,44 da faixa de intensidade, $p=0{,}2$); variação de cor (brilho, contraste e saturação 0,2, matiz 0,05, $p=0{,}5$); normalização do ImageNet. As imagens de teste são só redimensionadas e normalizadas.
+    \item \textbf{Sementes:} as dobras são fixas; a semente de treino (42, 43 ou 44) controla a inicialização da cabeça, as máscaras do dropout, a ordem dos lotes e o aumento de dados.
 \end{itemize}
 
-As três referências foram treinadas por 60 épocas de ponta a ponta com o otimizador AdamW, com lotes de 8 imagens, e avaliadas sob uma partição \textit{hold-out} única de 80\%/20\% estritamente separada por Identificador de Caso---e não sob validação cruzada de 5 dobras. Portanto, elas preservam integralmente a garantia contra o vazamento semântico, mas não são diretamente comparáveis à TransferKAN em termos numéricos absolutos; sua função é indicar a ordem de grandeza do desempenho alcançável por cada paradigma, e não estabelecer um ranking sob condições idênticas.
+O notebook original foi escrito para uma interface antiga da Albumentations; dois dos seus argumentos (\texttt{alpha\_affine} e \texttt{var\_limit}) são descartados sem erro pela versão 2. Por isso, a transformação elástica e o ruído gaussiano rodaram com os valores listados acima, e não com os escritos no notebook. O protocolo fixa explicitamente esses valores efetivos, de modo que o aumento de dados é idêntico ao que produziu os resultados originais e é o mesmo para todos os modelos.
 
-\subsection{Ameaças à Validade}
+\textbf{Precisão numérica e hardware.} Todas as rodadas comparáveis usaram uma GPU NVIDIA L4 no Google Colab. O backbone roda em precisão mista automática (fp16)~\cite{micikevicius2018mixed} e as cabeças sempre em fp32. A precisão mista só foi adotada depois de uma checagem definida antes de qualquer rodada: a TransferKAN foi treinada na dobra 1 com a semente 42 em fp32 e em precisão mista, e a precisão mista seria aceita se a acurácia mudasse no máximo 2 pontos percentuais e a AUC no máximo 0,015. A acurácia foi de 84,98\% em fp32 e 84,39\% em precisão mista, e a AUC de 0,9078 e 0,9076, enquanto o tempo por dobra caiu de 14,9 para 8,1 minutos; a precisão mista foi então usada em todos os modelos.
+
+\section{Cabeças Comparadas na ResNet-152}
+\label{sec:heads_setup}
+
+A ablação da cabeça mantém fixos o backbone ResNet-152 (58.143.808 parâmetros), as dobras e a receita, e muda só a camada que leva as 2.048 características às classes. As cinco cabeças, com as contagens de parâmetros, estão na Tabela~\ref{tab:cabecas} (Capítulo~\ref{chap:solution}):
+(a) uma camada linear; (b) uma MLP com 128 unidades ocultas; (c) uma MLP cuja largura oculta (1.919) lhe dá praticamente o mesmo número de parâmetros da KAN (3,94 milhões); (d) a cabeça KAN da TransferKAN, $[2048, 128, K]$, com grade de tamanho 10 e splines cúbicas, implementada com a \texttt{efficient-kan}~\cite{efficientkan} (15 parâmetros por aresta: 13 coeficientes de B-spline, um peso da base e uma escala da spline); e (e) uma KAN pequena, $[2048, 8, 2]$, com aproximadamente o orçamento de (b). As cabeças (a)--(d) foram treinadas com as sementes 42, 43 e 44 nas duas tarefas; a cabeça (e), só com a semente 42 e só em entrada/saída.
+
+\section{Backbones no Mesmo Protocolo}
+\label{sec:backbones_setup}
+
+Para situar a TransferKAN entre as arquiteturas avaliadas por Lira et al., doze das 59 arquiteturas da Tabela~4 deles foram retreinadas com a mesma receita. Elas cobrem redes convolucionais de 0,3 a 134 milhões de parâmetros e duas arquiteturas baseadas em transformers, e incluem o melhor modelo deles, a ResNet-152~\cite{he2016resnet} com cabeça linear, que é a cabeça (a). As outras onze são AlexNet~\cite{krizhevsky2012alexnet}, MobileNetV2~\cite{sandler2018mobilenetv2}, MNASNet 1.3~\cite{tan2019mnasnet}, ShuffleNetV2 $\times$0.5~\cite{ma2018shufflenetv2}, SqueezeNet 1.0~\cite{iandola2016squeezenet}, DenseNet-169~\cite{huang2017densenet}, MaxViT-T~\cite{tu2022maxvit}, Swin-B~\cite{liu2021swin}, EfficientNetV2-L~\cite{tan2021efficientnetv2}, VGG-16~\cite{simonyan2015vgg} e RegNetY-16GF~\cite{radosavovic2020regnet}. O catálogo segue o código de Lira et al.~\cite{leguwoi}: os mesmos construtores do torchvision e o mesmo ponto de troca da última camada. Há dois desvios declarados: todos os backbones partem dos pesos padrão do ImageNet (no código público de Lira et al.\ só as ResNets são pré-treinadas, e a primeira convolução delas é trocada por uma camada iniciada ao acaso), e a primeira convolução é mantida. A nova última camada é um Dropout(0,5) seguido de uma camada linear (uma convolução $1 \times 1$ na SqueezeNet). A EfficientNetV2-L, pré-treinada a 480 px, roda a 224 px como as demais. A Swin-B e a MaxViT-T foram treinadas com as sementes 42, 43 e 44 em entrada/saída e com as sementes 42 e 43 na distância do disparo; os demais backbones, só com a semente 42.
+
+\section{Distância do Disparo}
+\label{sec:mlsd_setup}
+
+A tarefa de distância (encostado, curta distância, distância) usa só os ferimentos de entrada, porque as saídas não trazem informação de distância. Para a dobra de teste $k$, a rede é treinada com as entradas das outras quatro dobras e avaliada nas entradas da dobra $k$. As cabeças têm $K=3$ saídas, e todo o resto (receita, sementes, grade 10 da KAN) é igual ao da tarefa de entrada/saída. O modelo de distância anterior deste trabalho, treinado numa fase só, com grade 5 e com a época escolhida no próprio teste, foi descartado e não é usado em nenhum ponto desta dissertação.
+
+\section{Reprodução da Partição de Lira et al.}
+\label{sec:leak_setup}
+
+Para medir quanto só a partição muda os resultados, o hold-out de Lira et al.\ foi reproduzido a partir do código público deles (\texttt{iterative\_split} do \texttt{leguwoi}, commit \texttt{83d82f1})~\cite{leguwoi}. Essa função separa as imagens em 80/20 com estratificação iterativa~\cite{sechidis2011stratification} (\texttt{IterativeStratification} do scikit-multilearn 0.2.0, ordem 2) sobre duas colunas, o número do caso e o rótulo. Estratificar pelo número do caso espalha as imagens de cada caso entre treino e teste, em vez de mantê-las juntas. A função não fixa semente, então três partições foram geradas com as sementes 42, 43 e 44 sobre as 2.551 imagens do CSV distribuído (entrada/saída: 2.074 imagens de treino e 477 de teste; distância: 1.520 e 363 entradas). A ResNet-152 com as cabeças (a) e (d) foi treinada em cada partição com a receita acima (semente 42) e comparada com os mesmos modelos nas dobras agrupadas por caso (semente 42). Isso reproduz o método do código público, e não necessariamente a partição exata usada nas tabelas publicadas, que não pode ser recuperada.
+
+\section{Cabeças Wav-KAN}
+\label{sec:wavkan_setup}
+
+Para testar se outra família de KAN muda a conclusão da ablação da cabeça, foram acrescentadas cabeças KAN com wavelets (Wav-KAN)~\cite{bozorgasl2024wavkan}. Cada camada segue a \texttt{WavKANLayer} da \texttt{torch-conv-kan}~\cite{drokin2024torchconvkan}: cada aresta tem uma escala e uma translação aprendíveis, um peso da wavelet e um peso para um ramo base SiLU, e a saída da camada passa por normalização em lote. A implementação usada aqui foi conferida contra a \texttt{torch-conv-kan} (commit \texttt{b412a3b}) e deu saídas e gradientes idênticos em CPU e em GPU. As cabeças têm duas camadas, $[2048, h, K]$, e $8202h + 4$ parâmetros para $K=2$. Foram treinadas cinco configurações (Tabela~\ref{tab:cabecas}): W1, chapéu mexicano com $h=128$ (a topologia da cabeça (d), com 3,7 vezes menos parâmetros); W2, chapéu mexicano com $h=32$ (o orçamento da MLP (b)); W3 e W4, wavelets derivada de gaussiana e Morlet com $h=128$ (sensibilidade à wavelet); e W5, chapéu mexicano com $h=480$ (o orçamento de (d)). O chapéu mexicano foi fixado de antemão para os orçamentos casados. W1 e W2 foram treinadas com as sementes 42--44 nas duas tarefas; W3--W5, só com a semente 42 e só em entrada/saída. Além do tempo por dobra, a cabeça sozinha foi medida em entradas aleatórias de 2048 dimensões (passo para a frente e para trás com lote de 32 e inferência por imagem; 20 aquecimentos e 200 medidas com eventos CUDA).
+
+\section{Uma Rede para as Duas Tarefas}
+\label{sec:mt_setup}
+
+Hoje as duas tarefas são resolvidas por duas redes separadas. O experimento multitarefa treina uma única ResNet-152, com backbone e Dropout compartilhados e duas cabeças, uma para entrada/saída ($K=2$) e outra para distância ($K=3$)~\cite{caruana1997multitask,ruder2017overview}. As duas cabeças são do mesmo tipo, a KAN (d) ou a MLP-128 (b). A perda é $L = L_{\mathrm{E/S}} + L_{\mathrm{dist}}$: cada termo é uma entropia cruzada com pesos de classe, e as saídas ficam fora do termo de distância (o rótulo de distância delas não existe). Assim, a cabeça de entrada/saída aprende com as 2.554 imagens e a de distância com as 1.883 entradas. Quando um lote não tem nenhuma entrada, o termo de distância vale zero. As referências de tarefa única são as redes da ablação da cabeça, (d) e (b), de cada tarefa, treinadas com as mesmas sementes (42--44); a comparação é, portanto, pareada nas mesmas imagens de teste.
+
+Duas medidas adicionais são relatadas. Um pipeline de quatro classes (saída, encostado, curta, distância) combina as duas saídas: com o par de redes de tarefa única, a rede de entrada/saída decide e, para as entradas previstas, a rede de distância decide; com a rede multitarefa, as suas duas cabeças fazem o mesmo. Essa medida é secundária e descritiva. O custo é relatado em parâmetros, tempo de treino por dobra e tempo para obter as duas saídas (um passo para a frente da rede multitarefa contra dois do par), medido na L4 em precisão mista com lotes de 1 e de 32 (20 aquecimentos e 200 medidas). O tempo de inferência não depende dos pesos e foi medido em modelos recém-criados; nenhum peso treinado foi guardado.
+
+\section{Métricas}
+\label{sec:metrics}
+
+Para cada dobra e cada semente, calculam-se nas imagens de teste: acurácia, acurácia balanceada, precisão, revocação e F1 macro, e a área sob a curva ROC (AUC)~\cite{fawcett2006roc} calculada das probabilidades previstas. Na tarefa binária, a AUC usa a probabilidade da classe saída; na tarefa de distância, é a média macro das três AUC um-contra-o-resto, calculada só nas entradas. Os resultados são dados como média $\pm$ desvio-padrão entre as cinco dobras, em que cada dobra é antes a média das sementes; também é dada a AUC fora da dobra (AUC$_{\mathrm{OOF}}$), calculada depois de tirar a média das probabilidades de cada imagem entre as sementes. Na tarefa de distância a acurácia engana: prever sempre ``distância'' já dá 0,854. Por isso, as métricas principais são a AUC e o F1 macro.
+
+Lira et al.\ calcularam a AUC a partir das classes previstas, e não das probabilidades~\cite{leguwoi}. Com um único limiar, a curva ROC tem um só ponto, e a AUC macro se reduz à média entre revocação e especificidade; essa grandeza, chamada aqui de AUC$_c$, é calculada só para comparar com as tabelas deles (Seção~\ref{sec:auc_background}).
+
+\section{Análise Estatística e Regras de Decisão Pré-Registradas}
+\label{sec:stats}
+
+Dois modelos são sempre comparados nas mesmas imagens de teste. A diferença $\Delta$ (o primeiro menos o segundo) é calculada nas predições fora da dobra, e o seu intervalo de confiança de 95\% vem de um bootstrap pareado sobre os casos~\cite{efron1993bootstrap}: os casos são reamostrados com reposição 2.000 vezes, o que respeita a dependência entre imagens do mesmo caso. Também são dados a diferença por dobra e o número de dobras em que cada modelo vence.
+
+As regras de decisão foram escritas antes das rodadas correspondentes. As regras da ablação da cabeça, dos backbones e da distância foram fixadas nos planos dos experimentos e nos notebooks de análise registrados no repositório em 14 de outubro de 2026 (commits \texttt{eaf931b} e \texttt{35c61a4}), antes da primeira rodada de treino:
+\begin{itemize}
+    \item \textbf{Comparação primária:} a cabeça KAN (d) contra a melhor das duas MLPs, (b) ou (c), em AUC.
+    \item \textbf{Desfecho A (a KAN melhora):} $\Delta$AUC $> 0$ em pelo menos quatro das cinco dobras \emph{e} intervalo de confiança acima de zero.
+    \item \textbf{Desfecho C (a KAN é pior):} a KAN vence no máximo uma dobra \emph{e} o intervalo fica abaixo de zero.
+    \item \textbf{Desfecho B (equivalente):} nos demais casos.
+    \item \textbf{Afirmações proibidas sem o resultado correspondente:} ``só trocar a cabeça melhora'', ``novo estado da arte'', ``supera os baselines transformer'' e ``eficiência de parâmetros''.
+\end{itemize}
+
+Os experimentos Wav-KAN e multitarefa foram planejados no mesmo commit, com margem de não inferioridade de $-0{,}02$: um modelo é \emph{não inferior} quando o limite inferior do intervalo do $\Delta$AUC (e, nas cabeças Wav-KAN, também o do $\Delta$F1) fica acima de $-0{,}02$. Superior e inferior seguem a regra dos desfechos A e C. Nas cabeças Wav-KAN, a frase ``mais eficiente em parâmetros que uma MLP'' só seria permitida se a W2 fosse superior à MLP (b) do mesmo tamanho, e ``mais rápida'' só se o benchmark da cabeça e o tempo por dobra melhorassem além do ruído entre rodadas. Em 19 de outubro de 2026, depois do primeiro experimento e antes de qualquer rodada Wav-KAN ou multitarefa, três ajustes foram registrados (commit \texttt{a1f12f9}): as configurações principais usariam as sementes 42--44, como as referências; W1 e W2 rodariam também na distância; e a comparação multitarefa reaproveitaria as redes de tarefa única da ablação da cabeça. A margem foi mantida.
+
+\section{Ameaças à Validade}
 \label{sec:threats}
 
-Três limitações metodológicas devem ser explicitadas para a correta interpretação dos resultados apresentados no Capítulo~\ref{chap:results}.
+\textbf{Sem partição de validação.} Avaliar a última época evita escolher a época no conjunto de teste, o que inflou os resultados anteriores deste trabalho, mas também não é uma escolha otimizada: um modelo parado por uma validação interna poderia ser um pouco melhor. A regra é a mesma para todos os modelos e, portanto, não favorece nenhum deles.
 
-\textbf{Seleção do ponto de verificação sobre o conjunto de avaliação.} Dentro de cada dobra, os pesos preservados são aqueles que maximizam a acurácia sobre o conjunto de teste da própria dobra, cujas predições são em seguida agregadas para compor as métricas fora da dobra. Como o mesmo conjunto é utilizado para selecionar a época e para reportar o desempenho, as métricas fora da dobra carregam um viés otimista: elas medem o desempenho da \textit{melhor} época sobre aqueles casos, e não o desempenho de uma época escolhida às cegas. O procedimento metodologicamente correto seria reservar, dentro do conjunto de treino de cada dobra e igualmente separada por caso, uma partição interna de validação destinada exclusivamente à seleção da época. Cabe registrar que esse viés incide sobre a acurácia e as demais métricas dependentes de limiar; a AUC, principal métrica sustentada neste trabalho, é menos sensível a ele, por integrar o desempenho sobre todos os limiares de decisão.
+\textbf{Aumento de dados como rodou.} O ruído gaussiano da receita original é forte (desvio-padrão de até 0,44 da faixa de intensidade) e pode apagar vestígios finos como a tatuagem, que importam para a classe curta distância. Ele vale igualmente para todos os modelos: é uma limitação da receita, não um viés das comparações.
 
-\textbf{Comparação não isométrica entre arquiteturas.} Como detalhado na Seção~\ref{sec:ablation_setup}, as arquiteturas de ablação operam em resoluções menores, com lotes menores e sob validação \textit{hold-out}, ao passo que a TransferKAN opera em $224 \times 224$ sob validação cruzada de 5 dobras. As diferenças de desempenho observadas entre elas, portanto, não são atribuíveis exclusivamente à arquitetura.
+\textbf{Sementes.} A ablação da cabeça, a Swin-B e a MaxViT-T (entrada/saída), W1, W2 e as redes multitarefa usam três sementes. Os demais backbones, a cabeça (e) e W3--W5 usam uma semente, e a Swin-B e a MaxViT-T usam duas sementes na distância; esses resultados são dados com essa ressalva.
 
-\textbf{Origem das métricas de referência.} As métricas da ResNet152 utilizadas como referência foram extraídas do trabalho publicado por Lira et al.~\cite{Lira2025deep} e não de uma re-execução local do modelo. A comparação, consequentemente, contrasta protocolos de avaliação distintos---\textit{hold-out} na referência, validação cruzada por caso neste trabalho---e não dois modelos submetidos ao mesmo procedimento experimental. Essa assimetria é analisada em detalhe no Capítulo~\ref{chap:results}.
+\textbf{A partição de Lira et al.} O experimento de vazamento reproduz o método do código público com três sementes; a partição exata por trás das tabelas publicadas não pode ser recuperada, e o código pode diferir do usado no artigo.
+
+\textbf{Poder estatístico e a classe encostado.} Cinco dobras dão pouco poder para detectar diferenças pequenas entre cabeças. A classe encostado tem 42 imagens de 16 casos (de 4 a 13 imagens de teste por dobra), então nada específico é afirmado sobre ela.
+
+\textbf{Uma única base.} Todas as imagens vêm de uma única polícia e de uma única região; não houve validação externa.

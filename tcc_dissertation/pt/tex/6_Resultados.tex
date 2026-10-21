@@ -1,109 +1,147 @@
 \label{chap:results}
 
-Este capítulo apresenta os resultados comparativos abrangentes da arquitetura TransferKAN proposta em relação ao modelo ResNet152 de referência estabelecido no estudo de Lira et al.~\cite{Lira2025deep}. A análise é dividida em duas seções principais, correspondentes às duas tarefas forenses distintas: Classificação do Tipo de Ferimento (Entrada vs. Saída) e Classificação da Distância Médico-Legal do Disparo (MLSD).
+Este capítulo relata os experimentos do Capítulo~\ref{chap:methodology} na ordem das perguntas de pesquisa: primeiro o efeito da partição usada em 2024 (Seção~\ref{sec:res_leak}), depois a ablação da cabeça e os backbones nas duas tarefas (Seções~\ref{sec:results_entry_exit} e~\ref{sec:results_mlsd}), a comparação com os números publicados por Lira et al.\ (Seção~\ref{sec:res_lira}) e com os transformers (Seção~\ref{sec:res_transformers}) e, por fim, as cabeças Wav-KAN (Seção~\ref{sec:res_wavkan}) e a rede multitarefa (Seção~\ref{sec:res_mt}). Salvo indicação em contrário, os números são médias $\pm$ desvios-padrão entre as cinco dobras agrupadas por caso, a AUC é calculada das probabilidades, e as diferenças vêm com intervalos de confiança de 95\% do bootstrap pareado de casos.
 
-Para fornecer uma avaliação robusta e cientificamente sólida das capacidades dos modelos em dados altamente desbalanceados, reportamos as médias Macro (M), micro (m) e Ponderada (P) para diversas métricas, incluindo Precisão, Revocação, F1-Score, Área sob a Curva (AUC) e Especificidade.
+\section{O Hold-Out de 2024 Vaza Casos}
+\label{sec:res_leak}
 
-\section{Classificação do Tipo de Ferimento}
+Reproduzindo em três partições o hold-out do código público de Lira et al., 98,7\% das imagens de teste de entrada/saída e 98,4\% das imagens de teste de distância pertencem a um caso que também tem imagens no treino. A Tabela~\ref{tab:vazamento} e a Figura~\ref{fig:vazamento} comparam, com a mesma rede, a mesma receita e a mesma semente, os resultados nessas partições e nas dobras agrupadas por caso.
+
+\input{comum/tabelas/tab_vazamento}
+
+\begin{figure}[!htbp]
+\centering
+\input{comum/figuras/fig_vazamento}
+\caption{AUC da ResNet-152 com a cabeça linear (a) e com a cabeça KAN (d), semente 42, em cada dobra agrupada por caso (círculos) e em cada partição reproduzida de Lira et al.\ (quadrados). Mesma rede, receita e semente; só a partição muda.}
+\label{fig:vazamento}
+\end{figure}
+
+Em entrada/saída, a AUC sobe de 0,906 nas dobras agrupadas para 0,940 nas partições com vazamento, com as duas cabeças ($+0{,}034$). Na distância do disparo o efeito é cerca de cinco vezes maior: de 0,779 para 0,937 com a cabeça linear ($+0{,}158$) e de 0,788 para 0,942 com a cabeça KAN ($+0{,}155$); a acurácia balanceada vai de cerca de 0,51 para cerca de 0,78. As partições com vazamento também parecem muito mais estáveis (desvio-padrão de 0,003--0,004 na AUC, contra 0,06--0,09 entre as dobras agrupadas). Ou seja, uma partição que deixa a rede ver outras fotografias do mesmo caso faz a tarefa de distância parecer quase tão fácil quanto a de entrada/saída, enquanto as dobras agrupadas mostram que ela é bem mais difícil. Os números agrupados desta tabela usam só a semente 42 e por isso diferem um pouco dos números com três sementes das seções seguintes (0,906 em vez de 0,904 para a cabeça linear).
+
+A análise k-fold que Lira et al.\ relatam para a ResNet-152 deles aponta na mesma direção: com dobras agrupadas por caso, a mediana da acurácia do modelo deles em entrada/saída é de cerca de 0,70 (lida do boxplot, Figura~\ref{fig:lira_boxplots}), bem abaixo do 0,869 da tabela de hold-out.
+
+\figuraBib[htpb]{lira2024/fig4_boxplots}{Análise de estabilidade da ResNet-152 de Lira et al.\ em k-folds agrupados, para o tipo de ferimento (a) e a distância do disparo (b); a caixa mais à esquerda (cinza) de cada painel é a acurácia}{Lira2025deep}{fig:lira_boxplots}{width=0.8\textwidth}
+
+\section{Entrada/Saída: Cabeças e Backbones}
 \label{sec:results_entry_exit}
 
-A Tabela~\ref{tab:results_entry_exit} detalha as métricas de classificação para distinguir entre ferimentos de entrada e de saída por arma de fogo. É imperativo notar a diferença nas metodologias de validação: o modelo de referência de 2024 foi avaliado utilizando um método padrão de validação \textit{hold-out}, ao passo que nosso modelo TransferKAN proposto foi submetido a um rigoroso esquema de validação cruzada de 5 dobras (VC), separado estritamente por Identificador de Caso. Esse protocolo estrito garante isolamento semântico absoluto entre os conjuntos de treino e teste, prevenindo o vazamento de dados que tipicamente infla artificialmente as métricas de acurácia em imagens forenses.
+A Tabela~\ref{tab:protocolo_es} reúne todos os resultados de entrada/saída no protocolo único.
 
-\begin{table}[htpb]
+\input{comum/tabelas/tab_protocolo_es}
+
+\textbf{Cabeças.} Com a ResNet-152 fixa, as cinco cabeças são indistinguíveis: AUC de 0,903 (KAN-8) a 0,906 (MLP isoparamétrica), e acurácia de 0,846 em todas. A regra pré-registrada dá o desfecho B. A melhor MLP é a isoparamétrica (c), e a cabeça KAN (d) difere dela em $\Delta$AUC $= -0{,}001$ (IC 95\% $[-0{,}002; +0{,}0003]$), vencendo 2 das 5 dobras. Contra a MLP-128 (b) a diferença é de $-0{,}0001$ ($[-0{,}001; +0{,}001]$, 3 de 5 dobras), e contra a cabeça linear (a), de $+0{,}001$ ($[-0{,}001; +0{,}003]$, 3 de 5 dobras); todos os intervalos incluem o zero. As curvas ROC das quatro cabeças praticamente coincidem (Figura~\ref{fig:roc_es}). No mesmo protocolo, portanto, a cabeça KAN tem desempenho equivalente ao das cabeças linear e MLP; ela não é a fonte dos resultados da TransferKAN.
+
+\begin{figure}[!htbp]
 \centering
-\caption{Métricas comparativas de desempenho para a Classificação do Tipo de Ferimento (Entrada vs. Saída). Valores em negrito indicam o melhor desempenho geral nas principais métricas robustas. A coluna \textbf{Variante} registra o protocolo de validação e a resolução de entrada de cada modelo; as arquiteturas de ablação operam em resolução menor e sob partição \textit{hold-out} única, de modo que a comparação entre linhas não é isométrica (Seção~\ref{sec:threats}).}
-\label{tab:results_entry_exit}
-\resizebox{\textwidth}{!}{
-\begin{tabular}{@{}lccccccccccccccccc@{}}
-\toprule
-\multirow{2}{*}{\textbf{Arquitetura}} & \multirow{2}{*}{\textbf{Variante}} & \multirow{2}{*}{\textbf{ACC}} & \multicolumn{3}{c}{\textbf{Precisão}} & \multicolumn{3}{c}{\textbf{Revocação}} & \multicolumn{3}{c}{\textbf{F1-Score}} & \multicolumn{3}{c}{\textbf{AUC}} & \multicolumn{3}{c}{\textbf{Especificidade}} \\ \cmidrule(l){4-6} \cmidrule(l){7-9} \cmidrule(l){10-12} \cmidrule(l){13-15} \cmidrule(l){16-18}
- &  &  & M & m & P & M & m & P & M & m & P & M & m & P & M & m & P \\ \midrule
-ResNet [Referência] & Hold-out & \textbf{0.869} & \textbf{0.827} & \textbf{0.869} & \textbf{0.868} & 0.821 & \textbf{0.869} & \textbf{0.869} & 0.824 & \textbf{0.869} & \textbf{0.869} & 0.821 & 0.821 & 0.821 & 0.821 & \textbf{0.869} & \textbf{0.869} \\
-ResKANet-18 [do zero] & Hold-out 128px & 0.822 & 0.767 & 0.822 & 0.820 & 0.762 & 0.822 & 0.822 & 0.765 & 0.822 & 0.821 & 0.839 & 0.885 & 0.839 & 0.762 & 0.822 & 0.703 \\
-PureConvKAN [do zero] & Hold-out 128px & 0.707 & 0.614 & 0.707 & 0.704 & 0.611 & 0.707 & 0.707 & 0.613 & 0.707 & 0.706 & 0.682 & 0.768 & 0.682 & 0.611 & 0.707 & 0.516 \\
-PureKAN [do zero] & Hold-out 64px & 0.692 & 0.614 & 0.692 & 0.692 & 0.614 & 0.692 & 0.692 & 0.614 & 0.692 & 0.692 & 0.684 & 0.733 & 0.684 & 0.614 & 0.692 & 0.536 \\
-TransferKAN [Nossa] & 5-Fold 224px & 0.860 & 0.817 & 0.860 & 0.865 & \textbf{0.835} & 0.860 & 0.860 & \textbf{0.825} & 0.860 & 0.862 & \textbf{0.908} & \textbf{0.928} & \textbf{0.908} & \textbf{0.835} & 0.860 & 0.810 \\ \bottomrule
-\end{tabular}
-}
-\end{table}
+\input{comum/figuras/fig_roc_es}
+\caption{Curvas ROC fora da dobra das quatro cabeças na ResNet-152 (entrada/saída; probabilidades médias das sementes 42--44; saída é a classe positiva).}
+\label{fig:roc_es}
+\end{figure}
 
-Os resultados empíricos demonstram que, embora a ResNet152 de referência exiba uma acurácia bruta marginalmente superior (0,869 contra 0,860 da TransferKAN) na Tabela~\ref{tab:results_entry_exit}, essa comparação é fundamentalmente assimétrica. A acurácia de 0,869 da referência foi obtida por meio de uma simples divisão \textit{hold-out}, altamente suscetível a vazamento semântico de dados (por exemplo, imagens do mesmo paciente aparecendo tanto no treino quanto no teste). De forma crucial, quando os autores do estudo de 2024~\cite{Lira2025deep} submeteram sua ResNet152 de referência a uma rigorosa validação cruzada k-fold estratificada e agrupada (reportada em seu \textit{boxplot} de análise de estabilidade, reproduzido aqui na Figura~\ref{fig:lira_boxplots}), sua acurácia mediana caiu para cerca de 0,73, com a maior parte das dobras situada entre aproximadamente 0,70 e 0,78 e uma notável dispersão entre as dobras.
+Um diagnóstico gravado na avaliação sugere por que a spline acrescenta pouco. A \texttt{efficient-kan} define as B-splines só numa grade sobre $[-1, 1]$ (um pouco estendida nas bordas); fora dela, cada aresta se reduz ao seu ramo base SiLU, que funciona como uma MLP. Nas imagens de teste, 97--98\% das entradas da primeira camada KAN caem dentro da grade, mas só 46--64\% das entradas da segunda camada (31--39\% na KAN pequena (e)), de modo que boa parte da segunda camada trabalha sem as suas splines.
 
-\figuraBib[htpb]{lira2024/fig4_boxplots}{Análise de estabilidade da ResNet152 de referência ao longo das dobras, para a classificação do tipo de ferimento (a) e para a classificação da Distância Médico-Legal do Disparo (b). A primeira caixa (cinza) de cada painel corresponde à acurácia}{Lira2025deep}{fig:lira_boxplots}{width=0.8\textwidth}
+\textbf{Backbones.} Os backbones pré-treinados vão de 0,839 (ShuffleNetV2 $\times$0.5) a 0,929 (Swin-B). A Swin-B é o melhor modelo do estudo (AUC $0{,}929 \pm 0{,}011$, acurácia 0,884), seguida pela MaxViT-T (0,917) e pela EfficientNetV2-L (0,916). A TransferKAN (0,905) fica junto da RegNetY-16GF (0,906), da DenseNet-169 (0,904) e da ResNet-152 com cabeça linear (0,904), no meio da tabela. As demais redes (VGG-16, MobileNetV2, MNASNet, SqueezeNet, AlexNet e ShuffleNetV2) ficam em 0,891 ou abaixo. Fora as cabeças da ResNet-152, a Swin-B e a MaxViT-T, essas linhas usam uma única semente.
 
-Em forte contraste, o modelo TransferKAN proposto alcançou sua acurácia de 0,860 fora da dobra (\textit{Out-of-Fold}, OOF) sob uma validação cruzada de 5 dobras rigorosamente isolada por caso. Ao comparar os modelos sob o paradigma de avaliação k-fold (0,860 para a TransferKAN vs. uma mediana de $\sim$0,73 para a ResNet152), a margem em favor da TransferKAN é substancial. Essa margem, contudo, deve ser lida com a ressalva registrada na Seção~\ref{sec:threats}: em cada dobra, o ponto de verificação da TransferKAN foi selecionado pela maior acurácia sobre o próprio conjunto de teste da dobra, o que confere às métricas dependentes de limiar---a acurácia entre elas---um viés otimista de magnitude não quantificada. Ainda assim, a diferença observada excede confortavelmente o que se esperaria desse efeito isoladamente, e a métrica sobre a qual se apoia o argumento central deste trabalho, a AUC, é estruturalmente menos sensível a ele. Além disso, a acurácia bruta em si é uma métrica falha em bases de dados altamente desbalanceadas, pois um modelo pode inflar sua pontuação simplesmente prevendo constantemente a classe majoritária (ferimentos de Entrada).
-Em vez disso, o verdadeiro poder discriminativo do modelo TransferKAN é amplamente evidenciado pelas pontuações de Área sob a Curva (AUC). A TransferKAN alcançou uma \textbf{AUC micro de 0,928} extraordinária e uma \textbf{AUC Macro de 0,908}, superando completamente a AUC uniforme de 0,821 da referência. A AUC avalia a capacidade probabilística do modelo de distinguir entre as classes em todos os limiares de classificação. Além disso, a TransferKAN obteve maior Revocação Macro (0,835 vs. 0,821) e maior F1-Score Macro (0,825 vs. 0,824), além de maior Especificidade Macro (0,835 vs. 0,821). Isso confirma nossa hipótese central: substituir o classificador denso MLP tradicional e rígido por uma KAN dinâmica melhora significativamente a capacidade matemática da rede de identificar corretamente as classes minoritárias (ferimentos de Saída) e de lidar com fronteiras visuais não-lineares sem sobreajuste.
-
-Para avaliar de forma abrangente o paradigma das Redes de Kolmogorov-Arnold, também treinamos e testamos três arquiteturas alternativas---PureKAN, PureConvKAN e ResKANet-18---todas treinadas do zero, sem pré-treinamento na ImageNet, e avaliadas sob uma validação \textit{hold-out} estrita e isolada por caso, conforme detalhado na Seção~\ref{sec:ablation_setup}. Como demonstrado na Tabela~\ref{tab:results_entry_exit}, embora esses modelos alternativos mantivessem a separação semântica (prevenindo, assim, o vazamento de dados), seu desempenho geral caiu significativamente, com a PureKAN alcançando uma acurácia de 0,692 e a PureConvKAN, 0,707. A ResKANet-18---uma rede residual cujas próprias convoluções são parametrizadas por splines---teve desempenho melhor (acurácia de 0,822), mas ainda assim ficou aquém da nossa arquitetura TransferKAN proposta.
-
-Cumpre reiterar que essas três referências operam em resolução de entrada menor e sob uma partição \textit{hold-out} única, de sorte que a comparação com a TransferKAN não é isométrica e não permite atribuir a diferença observada exclusivamente à arquitetura. O que a análise sustenta, ainda assim, é uma tendência nítida e monotônica: quanto mais o modelo se afasta de um extrator de características espaciais profundo e pré-treinado, mais o desempenho se degrada---da KAN aplicada diretamente sobre pixels (0,692) à KAN convolucional rasa (0,707), desta à residual convolucional-KAN treinada do zero (0,822) e, por fim, à combinação de \textit{backbone} pré-treinado com cabeça KAN (0,860, sob um protocolo de avaliação mais severo). Essa progressão indica que o classificador KAN, isoladamente, não substitui a extração profunda de características: é o acoplamento entre os dois componentes, e não qualquer um deles em separado, que sustenta o desempenho da TransferKAN.
-
-\section{Classificação da Distância Médico-Legal do Disparo}
+\section{Distância do Disparo: Cabeças e Backbones}
 \label{sec:results_mlsd}
 
-A Tabela~\ref{tab:results_mlsd} apresenta os resultados comparativos para a tarefa multiclasse de classificação de MLSD. Essa tarefa representa um caso extremo de desbalanceamento de classes; a base é fortemente enviesada em direção aos disparos 'À distância' (1.609 imagens), com pouquíssimos exemplos de 'Curta distância' (232) e disparos 'Encostado' (42).
+A Tabela~\ref{tab:protocolo_mlsd} traz a mesma comparação para a tarefa de distância.
 
-\begin{table}[htpb]
+\input{comum/tabelas/tab_protocolo_mlsd}
+
+\textbf{Cabeças.} As AUC são $0{,}785 \pm 0{,}087$ (linear), $0{,}802 \pm 0{,}062$ (MLP-128), $0{,}807 \pm 0{,}055$ (MLP isoparamétrica) e $0{,}798 \pm 0{,}058$ (KAN). A regra pré-registrada dá o desfecho C: contra a melhor MLP, a isoparamétrica, a cabeça KAN tem $\Delta$AUC $= -0{,}011$ ($[-0{,}021; -0{,}003]$) e vence só 1 das 5 dobras. A KAN fica significativamente abaixo \emph{só} dessa MLP: contra a MLP-128 a diferença é de $-0{,}005$ ($[-0{,}012; +0{,}003]$), e contra a cabeça linear, de $+0{,}008$ ($[-0{,}005; +0{,}023]$), os dois intervalos incluindo o zero. As curvas ROC por classe (Figura~\ref{fig:roc_mlsd}) se sobrepõem para curta distância e distância e só se separam para encostado, que tem 42 imagens.
+
+\begin{figure}[!htbp]
 \centering
-\caption{Métricas comparativas de desempenho para a Classificação da Distância Médico-Legal do Disparo (MLSD). Assim como na Tabela~\ref{tab:results_entry_exit}, a coluna \textbf{Variante} registra o protocolo de validação e a resolução de entrada; a comparação entre linhas não é isométrica (Seção~\ref{sec:threats}).}
-\label{tab:results_mlsd}
-\resizebox{\textwidth}{!}{
-\begin{tabular}{@{}lccccccccccccccccc@{}}
-\toprule
-\multirow{2}{*}{\textbf{Arquitetura}} & \multirow{2}{*}{\textbf{Variante}} & \multirow{2}{*}{\textbf{ACC}} & \multicolumn{3}{c}{\textbf{Precisão}} & \multicolumn{3}{c}{\textbf{Revocação}} & \multicolumn{3}{c}{\textbf{F1-Score}} & \multicolumn{3}{c}{\textbf{AUC}} & \multicolumn{3}{c}{\textbf{Especificidade}} \\ \cmidrule(l){4-6} \cmidrule(l){7-9} \cmidrule(l){10-12} \cmidrule(l){13-15} \cmidrule(l){16-18}
- &  &  & M & m & P & M & m & P & M & m & P & M & m & P & M & m & P \\ \midrule
-ResNet [Referência] & Hold-out & \textbf{0.925} & \textbf{0.810} & \textbf{0.925} & \textbf{0.917} & \textbf{0.637} & \textbf{0.925} & \textbf{0.925} & \textbf{0.701} & \textbf{0.925} & \textbf{0.917} & 0.733 & \textbf{0.944} & 0.745 & \textbf{0.830} & \textbf{0.962} & \textbf{0.566} \\
-PureConvKAN [do zero] & Hold-out 128px & 0.803 & 0.268 & 0.803 & 0.645 & 0.333 & 0.803 & 0.803 & 0.297 & 0.803 & 0.716 & 0.536 & 0.888 & 0.509 & 0.667 & 0.902 & 0.197 \\
-PureKAN [do zero] & Hold-out 64px & 0.712 & 0.355 & 0.712 & 0.689 & 0.324 & 0.712 & 0.712 & 0.328 & 0.712 & 0.693 & 0.463 & 0.841 & 0.496 & 0.679 & 0.856 & 0.326 \\
-TransferKAN [Nossa] & 5-Fold 224px & 0.873 & 0.598 & 0.873 & 0.853 & 0.496 & 0.873 & 0.873 & 0.526 & 0.873 & 0.860 & \textbf{0.749} & \textbf{0.944} & \textbf{0.785} & 0.797 & 0.936 & 0.517 \\ \bottomrule
-\end{tabular}
-}
-\end{table}
+\input{comum/figuras/fig_roc_mlsd}
+\caption{Curvas ROC um-contra-o-resto fora da dobra das quatro cabeças na ResNet-152 para a distância do disparo (só entradas; probabilidades médias das sementes 42--44). A legenda traz a AUC um-contra-o-resto de cada cabeça.}
+\label{fig:roc_mlsd}
+\end{figure}
 
-Para a tarefa de MLSD, a abordagem TransferKAN---treinada, nesta tarefa, em fase única de ponta a ponta, sem o congelamento inicial do \textit{backbone} adotado na tarefa Entrada/Saída---reportou uma Acurácia validada por validação cruzada de 0,873, enquanto a ResNet152 de referência reportou uma acurácia bruta superior, de 0,925. No entanto, essa discrepância em acurácia, precisão e revocação deve ser analisada contextualmente sob a ótica dos esquemas de validação. A validação \textit{hold-out} frouxa da referência permite inerentemente o vazamento semântico na classe majoritária, inflando artificialmente métricas que são fortemente influenciadas pelo grande volume de imagens 'À distância'. Ao utilizar uma validação cruzada k-fold estrita baseada em casos, a avaliação da TransferKAN simula um cenário forense do mundo real muito mais severo, porém infinitamente mais realista, no qual o modelo deve classificar pacientes completamente desconhecidos.
+Todas as cabeças têm acurácia balanceada em torno de 0,51--0,52 e F1 macro em torno de 0,48--0,49. A revocação é de cerca de 0,88 para distância e de 0,51--0,53 para curta distância, e de só 0,13--0,17 para encostado. O número do encostado é descritivo: há de 4 a 13 imagens de encostado por dobra de teste. Quando o caso de um ferimento encostado não está no treino, as redes quase nunca o reconhecem. Essa é a principal limitação dos modelos atuais.
 
-Apesar dessa penalidade de avaliação severa e estrita, a TransferKAN alcançou uma \textbf{AUC Macro mais alta (0,749 vs. 0,733)} e uma \textbf{AUC Ponderada mais alta (0,785 vs. 0,745)} em comparação com a referência, mantendo uma AUC micro igual (0,944). Essas métricas probabilísticas integradas são cruciais porque demonstram que a Rede de Kolmogorov-Arnold atua como um discriminador probabilístico excepcionalmente refinado. Mesmo quando classifica erroneamente um disparo 'Encostado' como 'Curta distância' devido à ambiguidade visual, suas distribuições de probabilidade subjacentes são significativamente mais precisas e confiáveis do que as produzidas por um MLP tradicional.
+\textbf{Backbones.} A Swin-B volta a ser a melhor ($0{,}838 \pm 0{,}054$), seguida pela MaxViT-T (0,828) e pela DenseNet-169 (0,821); os dois transformers têm só as sementes 42 e 43 nesta tarefa. Redes mais antigas ou menores, como AlexNet, MobileNetV2 e SqueezeNet, chegam a 0,805--0,806, acima da ResNet-152, enquanto a EfficientNetV2-L (0,744) varia muito entre dobras ($\pm 0{,}133$). A MNASNet colapsou nesta tarefa (acurácia 0,451, prevendo a maioria das entradas como curta distância), o que é uma instabilidade de otimização com esta receita, e não uma propriedade da arquitetura. Com desvios-padrão entre dobras de 0,05--0,13, a maioria das diferenças entre backbones nesta tarefa fica dentro do ruído.
 
-Além disso, ao avaliar as arquiteturas KAN alternativas (PureKAN e PureConvKAN) nesta tarefa de MLSD altamente desbalanceada utilizando validação \textit{hold-out} estrita baseada em casos, seu desempenho mostrou-se inadequado. Como exibido na Tabela~\ref{tab:results_mlsd}, a acurácia da PureKAN caiu para 0,712 e a PureConvKAN alcançou 0,803, com ambos os modelos demonstrando pontuações fracas de AUC Macro (0,463 e 0,536, respectivamente) em comparação com a referência e a TransferKAN. Uma AUC Macro de 0,463 situa-se, na prática, abaixo do acaso, o que revela que a PureKAN não extraiu qualquer sinal útil sobre as classes minoritárias---resultado esperado, dado que a arquitetura recebe pixels achatados em resolução de $64 \times 64$, na qual os vestígios de pólvora que definem a tarefa simplesmente não são mais discerníveis. Ressalvada novamente a diferença de resolução e de protocolo entre essas referências e a TransferKAN, o declínio acentuado indica que as camadas KAN sozinhas, ou camadas KAN combinadas com extratores convolucionais rasos, têm grande dificuldade com o desbalanceamento extremo de classes e com as sutis distinções visuais das distâncias de disparo. Isso reforça a conclusão de que a extração de características espaciais profunda e robusta do \textit{backbone} ResNet é indispensável e de que a TransferKAN une essa extração profunda ao mapeamento probabilístico das Redes de Kolmogorov-Arnold.
+\section{Comparação com os Números Publicados por Lira et al.}
+\label{sec:res_lira}
 
-\section{Resumo dos Achados}
+As Tabelas~\ref{tab:lira_es} e~\ref{tab:lira_dist} põem os números das Tabelas~4 e~5 de Lira et al.\ ao lado dos mesmos backbones no protocolo único. Os dois lados diferem em três pontos ao mesmo tempo (a partição, a inicialização e a definição da AUC), então as tabelas comparam pacotes de avaliação, e não modelos; só a AUC das classes, AUC$_c$, é calculada do mesmo jeito nos dois lados.
+
+\input{comum/tabelas/tab_lira_es}
+
+Em entrada/saída, a ResNet-152 de Lira et al.\ tem acurácia de 0,869, F1 macro de 0,824 e AUC$_c$ de 0,821. O mesmo backbone com cabeça linear no protocolo único obtém 0,846, 0,805 e 0,814 (AUC das probabilidades 0,904). A TransferKAN, com 0,846, 0,806 e 0,816, fica acima de onze das doze linhas publicadas, mas \emph{abaixo} da ResNet-152 deles em acurácia e em AUC$_c$. Para as outras arquiteturas, o protocolo único dá números bem maiores que os publicados (Swin-B: acurácia de 0,728 para 0,884; AUC$_c$ de 0,591 para 0,850), embora a sua partição seja a mais rigorosa. Isso é coerente com o fato de que, no código público, só as ResNets partem dos pesos do ImageNet; mas este trabalho não treinou do zero, então o efeito do pré-treino não é isolado aqui.
+
+\input{comum/tabelas/tab_lira_dist}
+
+Na tarefa de distância, as acurácias publicadas (0,855--0,925 em todas as linhas exceto a SqueezeNet) são maiores que qualquer acurácia do protocolo único, e a TransferKAN (0,813) fica abaixo de onze das doze linhas publicadas. Em AUC$_c$, a TransferKAN (0,664) fica acima de onze das doze linhas e abaixo da ResNet-152 deles (0,733). Vários modelos publicados têm AUC$_c$ perto de 0,5 (SqueezeNet 0,500, ShuffleNetV2 0,512), ou seja, quase não separam as classes, mesmo com acurácia alta, que nesta tarefa é dominada pela classe distância.
+
+Essas comparações sustentam uma afirmação mais estreita que a da versão anterior deste trabalho. No protocolo único, os backbones pré-treinados igualam ou superam a TransferKAN. As diferenças em relação aos números de Lira et al.\ vêm da partição, do pré-treino e da receita, e não da cabeça KAN. Só o efeito da partição foi isolado com a mesma receita (Seção~\ref{sec:res_leak}).
+
+\section{A TransferKAN e os Transformers}
+\label{sec:res_transformers}
+
+Como os dois transformers foram os melhores backbones, a TransferKAN foi comparada diretamente com eles, nas mesmas imagens (Tabela~\ref{tab:transformers}).
+
+\input{comum/tabelas/tab_transformers}
+
+Em entrada/saída, a TransferKAN fica abaixo da Swin-B ($\Delta$AUC $= -0{,}023$, $[-0{,}035; -0{,}011]$) e da MaxViT-T ($-0{,}010$, $[-0{,}020; -0{,}001]$), e perde nas cinco dobras contra as duas. Na distância, fica abaixo da Swin-B ($-0{,}033$, $[-0{,}064; -0{,}0004]$, 1 de 5 dobras). Contra a MaxViT-T a diferença é parecida ($-0{,}030$), mas o intervalo inclui o zero. A afirmação de que a TransferKAN supera os baselines transformer, portanto, não se sustenta; o contrário vale para a Swin-B nas duas tarefas.
+
+\section{Cabeças Wav-KAN}
+\label{sec:res_wavkan}
+
+As Tabelas~\ref{tab:wavkan_es} e~\ref{tab:wavkan_mlsd} mostram as cabeças Wav-KAN ao lado das cabeças (a)--(d), a Tabela~\ref{tab:contrastes_wavkan} traz os contrastes pré-registrados e a Figura~\ref{fig:auc_parametros}, a AUC em função do número de parâmetros da cabeça.
+
+\input{comum/tabelas/tab_wavkan_es}
+
+\begin{figure}[!htbp]
+\centering
+\input{comum/figuras/fig_auc_parametros}
+\caption{AUC (média $\pm$ dp entre dobras) em função do número de parâmetros da cabeça (escala log) para as cabeças linear e MLP, a KAN spline e as cabeças Wav-KAN. W3 e W4 têm o número de parâmetros da W1 e aparecem deslocadas na horizontal só para não se sobreporem; W3--W5 usam uma única semente.}
+\label{fig:auc_parametros}
+\end{figure}
+
+\textbf{Entrada/saída.} Todas as cabeças, spline ou wavelet, ficam na mesma faixa de AUC (0,901--0,908). O primeiro contraste primário, W2 contra a MLP do mesmo tamanho (b), é \emph{inconclusivo}: a diferença de AUC é pequena e cabe na margem ($-0{,}001$, $[-0{,}004; +0{,}002]$), mas a diferença de F1 ($-0{,}012$, $[-0{,}023; -0{,}003]$) tem o limite inferior além de $-0{,}02$, então a não inferioridade não é demonstrada; a inferioridade também não, e a W2 não vence nenhuma dobra. W1 e W5 são não inferiores à MLP isoparamétrica (c) e à KAN spline (d) (a W5, com uma única semente), e a W2 não chega à não inferioridade contra (d) pelo mesmo motivo do F1. As cabeças com wavelets ordenam as imagens tão bem quanto as MLPs (mesma AUC), mas, no limiar padrão de 0,5, têm cerca de um ponto a menos de acurácia e de F1 (0,834--0,835 contra 0,846), com revocação macro um pouco maior. Isso indica um deslocamento do limiar de decisão ou da calibração, e não uma perda de separação. Entre as rodadas de sensibilidade, com uma semente, a cabeça derivada de gaussiana (W3) tem a maior AUC da tabela (0,908), mas F1 e acurácia menores, e a cabeça Morlet (W4) tem o menor F1 ($\Delta$F1 contra a W1 $= -0{,}023$, $[-0{,}035; -0{,}012]$).
+
+\input{comum/tabelas/tab_wavkan_dist}
+
+\textbf{Distância do disparo.} Aqui as cabeças com wavelets perdem com clareza: AUC de $0{,}711 \pm 0{,}116$ (W1) e $0{,}715 \pm 0{,}113$ (W2), contra 0,785--0,807 das outras cabeças. Todos os contrastes dão inferior: a W2 contra a MLP (b) tem $\Delta$AUC $= -0{,}071$ ($[-0{,}098; -0{,}043]$) e perde nas cinco dobras, e os demais contrastes vão de $-0{,}066$ a $-0{,}086$. A variação entre dobras dobra (dp de 0,11--0,12 contra cerca de 0,06) e a acurácia cai para 0,65--0,67.
+
+\input{comum/tabelas/tab_contrastes_wavkan}
+
+\textbf{Custo e forma aprendida.} As cabeças com wavelets não são mais rápidas. A W2 leva o mesmo tempo por dobra que a MLP-128 (8,5 contra 8,3 minutos). Também leva o mesmo tempo que a KAN spline (8,46 contra 8,49 minutos), uma diferença de 0,35\% dentro do ruído entre rodadas, de cerca de 0,1 minuto. A W1 é 3,6\% mais lenta por dobra que a KAN spline e 5,3\% mais lenta que a MLP isoparamétrica, e a W5 é 25--27\% mais lenta. Sozinha, a cabeça W1 leva 8,8 ms para o passo para a frente e para trás de 32 entradas e usa 223 MB de memória, contra 0,73 ms e 0,2 MB da MLP isoparamétrica: cada camada monta um tensor de tamanho lote $\times$ saídas $\times$ entradas. As wavelets também quase não mudaram de forma. No fim das duas fases e nas duas tarefas, a escala média fica entre 0,99 e 1,003 (dp 0,013--0,020) e a translação média fica perto de 0 (dp 0,013--0,025), a partir dos valores iniciais 1 e 0. Na prática, as cabeças aprenderam os pesos de wavelets de forma fixa, e nenhum resultado pode ser atribuído ao ajuste da forma da wavelet.
+
+Em resumo, uma KAN com wavelets não muda o quadro. Em entrada/saída ela empata com as MLPs em AUC e é um pouco pior no limiar padrão; na distância é claramente pior; e não é, na prática, nem menor que uma MLP de mesmo desempenho nem mais rápida.
+
+\section{Uma Rede para as Duas Tarefas}
+\label{sec:res_mt}
+
+A Tabela~\ref{tab:mt_desempenho} compara uma única ResNet-152 multitarefa com o par de redes de tarefa única, a Tabela~\ref{tab:contrastes_mt} traz os contrastes e a Tabela~\ref{tab:mt_custo}, o custo.
+
+\input{comum/tabelas/tab_mt_desempenho}
+
+\textbf{Entrada/saída.} A rede multitarefa é pior, mas dentro da margem pré-registrada. Com cabeças KAN, a AUC vai de $0{,}905 \pm 0{,}013$ para $0{,}894 \pm 0{,}014$ ($\Delta$AUC $= -0{,}011$, $[-0{,}015; -0{,}006]$), e com cabeças MLP, de 0,905 para 0,895 ($-0{,}010$, $[-0{,}014; -0{,}005]$). A rede multitarefa perde nas cinco dobras, então a regra classifica o resultado como pior, enquanto o limite inferior do intervalo fica acima da margem de $-0{,}02$. As duas coisas valem: a perda é pequena e consistente. No limiar padrão a queda é maior: $\Delta$F1 $= -0{,}023$ ($[-0{,}034; -0{,}011]$) com cabeças KAN e $-0{,}022$ ($[-0{,}034; -0{,}010]$) com cabeças MLP, além da margem, e a acurácia cai de 0,846 para 0,820 e 0,823. Em 5 das 30 rodadas multitarefa a acurácia de entrada/saída de uma dobra ficou um pouco abaixo de 0,80 (0,792--0,797), o que reflete essa queda; as perdas continuaram finitas e a AUC dessas dobras foi normal (0,87--0,88).
+
+\textbf{Distância do disparo.} A rede multitarefa é não inferior. Com cabeças KAN a AUC é de $0{,}805 \pm 0{,}065$ contra $0{,}798 \pm 0{,}058$ ($+0{,}007$, $[-0{,}003; +0{,}018]$, 3 de 5 dobras), e com cabeças MLP, de 0,806 contra 0,802 ($+0{,}004$, $[-0{,}006; +0{,}014]$). O F1 macro também não muda. A acurácia da rede multitarefa é maior (0,824 contra 0,813), mas a acurácia balanceada é igual ou menor (0,511 contra 0,515 com cabeças KAN; 0,520 nas duas com cabeças MLP), então a acurácia não deve ser lida como ganho.
+
+\input{comum/tabelas/tab_contrastes_mt}
+
+\textbf{KAN contra MLP dentro da rede multitarefa.} Os dois tipos de cabeça voltam a empatar: $\Delta$AUC $= -0{,}001$ ($[-0{,}003; +0{,}0004]$) em entrada/saída e $-0{,}002$ ($[-0{,}009; +0{,}003]$) na distância. Isso compara tipos de cabeça, não eficiência: as duas cabeças KAN têm 7,87 milhões de parâmetros, contra 0,53 milhão das duas cabeças MLP.
+
+\textbf{Pipeline de quatro classes (secundário, descritivo).} Combinando as duas saídas em saída, encostado, curta e distância, o F1 macro fora da dobra é de 0,485 para a rede multitarefa contra 0,515 para o par com cabeças KAN ($\Delta$F1 $= -0{,}030$, $[-0{,}061; -0{,}004]$), e de 0,492 contra 0,514 com cabeças MLP ($-0{,}022$, $[-0{,}052; +0{,}004]$). A queda vem sobretudo da cabeça de entrada/saída: a rede multitarefa manda mais entradas para ``saída'' (283 entradas a distância previstas como saída, contra 204 no par), o que também aumenta a revocação de saída (0,788 contra 0,756). A revocação de encostado no pipeline vai de 5 para 2 das 42 imagens, poucas demais para qualquer conclusão sobre disparos encostados.
+
+\input{comum/tabelas/tab_mt_custo}
+
+\textbf{Custo.} Uma rede substitui duas. Com cabeças KAN, os parâmetros caem de 124,16 para 66,02 milhões ($-46{,}8\%$), e com cabeças MLP, de 116,81 para 58,67 milhões ($-49{,}8\%$). O treino leva 8,6 em vez de 14,9 minutos por dobra (KAN) e 8,1 em vez de 14,6 (MLP), com desvio-padrão de 0,1--0,15 minuto. Obter as duas saídas leva 1,12 em vez de 2,22 ms por imagem com lote 32 (2,0 vezes mais rápido) e 27,3 em vez de 51,0 ms com lote 1. O pico de memória da inferência com lote 32 cai de 282 para 163 MB, enquanto o pico de memória do treino fica quase igual (3,7 contra 3,6 GB). Essas economias vêm diretamente de fazer um passo para a frente em vez de dois; são uma vantagem de custo de compartilhar o backbone, e não um mérito de uma cabeça específica.
+
+\section{Resumo}
 \label{sec:results_summary}
 
-Em conclusão, a implementação da TransferKAN com validação cruzada k-fold estrita e isolada por caso oferece, para a classificação de imagens forenses de ferimentos por arma de fogo, um protocolo de avaliação mais rigoroso do que o \textit{hold-out} adotado na literatura de referência. Enquanto os MLPs tradicionais perseguem a acurácia bruta superprevendo as classes majoritárias, a arquitetura TransferKAN aproveita suas B-splines adaptáveis para mapear fronteiras de decisão complexas, resultando em ganhos consistentes de Área sob a Curva (AUC) em ambas as tarefas---ganhos que se verificam apesar de a TransferKAN ter sido avaliada sob o protocolo mais severo dos dois. Isso comprova que a TransferKAN é altamente eficaz no gerenciamento das complexidades não-lineares intrínsecas e dos severos desbalanceamentos das imagens reais de cenas de crime. A Figura~\ref{fig:auc_comparison} resume a comparação de AUC entre o modelo TransferKAN proposto e a ResNet152 de referência em ambas as tarefas forenses.
-
-\begin{figure}[htpb]
-\centering
-\begin{tikzpicture}
-\begin{axis}[
-    ybar,
-    width=\textwidth,
-    height=7cm,
-    bar width=8pt,
-    enlarge x limits=0.12,
-    ymin=0.6, ymax=1.0,
-    ylabel={AUC},
-    symbolic x coords={E/S Macro, E/S micro, E/S Pond., MLSD Macro, MLSD micro, MLSD Pond.},
-    xtick=data,
-    x tick label style={rotate=30, anchor=east, font=\small},
-    nodes near coords,
-    nodes near coords style={font=\tiny, /pgf/number format/fixed, /pgf/number format/precision=3},
-    every node near coord/.append style={rotate=90, anchor=west},
-    legend pos=south east,
-    legend style={font=\small},
-    ymajorgrids=true,
-    grid style=dashed,
-]
-\addplot[fill=blue!30] coordinates {
-    (E/S Macro,0.821) (E/S micro,0.821) (E/S Pond.,0.821)
-    (MLSD Macro,0.733) (MLSD micro,0.944) (MLSD Pond.,0.745)
-};
-\addplot[fill=orange!60] coordinates {
-    (E/S Macro,0.908) (E/S micro,0.928) (E/S Pond.,0.908)
-    (MLSD Macro,0.749) (MLSD micro,0.944) (MLSD Pond.,0.785)
-};
-\legend{ResNet152 (referência), TransferKAN (nossa)}
-\end{axis}
-\end{tikzpicture}
-\caption{Comparação das AUC Macro, micro e Ponderada entre a ResNet152 de referência~\cite{Lira2025deep} e o modelo TransferKAN proposto, para a classificação do Tipo de Ferimento (Entrada/Saída, E/S) e da Distância Médico-Legal do Disparo (MLSD).}
-\label{fig:auc_comparison}
-\end{figure}
+Num protocolo sem vazamento de casos, os resultados sustentam as seguintes afirmações, todas ligadas a uma regra pré-registrada:
+\begin{itemize}
+    \item o hold-out do código público de Lira et al.\ infla a AUC em $+0{,}034$ (entrada/saída) e de $+0{,}155$ a $+0{,}158$ (distância), com todo o resto fixo;
+    \item a cabeça KAN da TransferKAN é equivalente às cabeças linear e MLP em entrada/saída (desfecho B) e, na distância, fica abaixo da MLP isoparamétrica, sendo equivalente à MLP-128 e à cabeça linear (desfecho C);
+    \item a melhor arquitetura é a Swin-B, que supera a TransferKAN nas duas tarefas;
+    \item as cabeças Wav-KAN não mudam esse quadro: AUC igual em entrada/saída, claramente pior na distância, e não são mais rápidas;
+    \item uma rede multitarefa custa cerca de metade do par de redes, é não inferior na distância e um pouco pior, de forma consistente, em entrada/saída, dentro da margem.
+\end{itemize}
+As afirmações proibidas pelas regras pré-registradas continuam sem sustentação: que só trocar a cabeça melhora os resultados, que a TransferKAN é um novo estado da arte, que ela supera os baselines transformer e que a cabeça KAN é eficiente em parâmetros.
