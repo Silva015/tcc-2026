@@ -87,5 +87,5 @@ Abra `colab.research.google.com/signup` ou, num notebook, clique em *RAM/Disco �
 Abra uma sessão nova e cole:
 
 ```
-Você é a sessão P4. Execute o plano docs/planos/P4_reescrita_dissertacao.md. Os resultados do P2 e do P3 já estão em resultados/. Comece pelas decisões da seção 1 do plano e me pergunte as que ainda estão em aberto.
+Você é a sessão P4. Execute o plano docs/planos/P4_reescrita_dissertacao.md. Os resultados das três sessões experimentais (P1: protocolo único, cabeças, backbones, MLSD e vazamento; P3: Wav-KAN; P2: multitarefa) já estão em resultados/, e o P2 e o P3 deixaram notas para você em docs/planos/NOTAS_P2_para_P4.md e docs/planos/NOTAS_P3_para_P4.md. Leia tudo o que a seção 0 do plano manda, comece pelas decisões da seção 1 e me pergunte as que ainda estão em aberto antes de escrever.
 ```

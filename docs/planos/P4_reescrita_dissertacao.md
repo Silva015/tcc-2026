@@ -1,16 +1,24 @@
 # Plano P4: reescrever a dissertação (EN e PT) com os resultados do protocolo único
 
-Plano para uma sessão nova. Não treina nada: só reescreve `tcc_dissertation/` (inglês em `tex/`, português em `pt/tex/`) com os números que o P1 já produziu e verificou.
+Plano para uma sessão nova. Não treina nada: só reescreve `tcc_dissertation/` (inglês em `tex/`, português em `pt/tex/`) com os números que as três sessões experimentais já produziram e conferiram:
+- **P1:** protocolo único, ablação da cabeça, 12 backbones, MLSD, vazamento e comparação com Lira (19/10);
+- **P3:** cabeças Wav-KAN (21/10);
+- **P2:** multitarefa (21/10).
 
 ## 0. Antes de começar
 
 **Leia, nesta ordem:**
 1. este plano;
-2. `resultados/frases_dissertacao.md` e `resultados/frase_manuscrito.md` (rascunhos automáticos; veja as ressalvas da seção 4);
-3. `resultados/decisao.json`, `resultados/decisao_mlsd.json`, `resultados/comparacao_transkan_transformers.json`;
-4. as tabelas `resultados/tabela_*.csv` e `.tex` e as figuras `resultados/*.png`;
-5. `docs/planos/P1_protocolo.md`, que registra a regra de decisão definida **antes** dos resultados (14/10, commit `eaf931b`);
+2. **P1:**
+   - `resultados/frases_dissertacao.md` e `resultados/frase_manuscrito.md`, rascunhos automáticos (veja as ressalvas da seção 4);
+   - `resultados/decisao.json`, `resultados/decisao_mlsd.json` e `resultados/comparacao_transkan_transformers.json`;
+   - as tabelas `resultados/tabela_{final,mlsd,vazamento,comparacao_2024_*,mmw_*}.*` e as figuras `resultados/*.png`;
+3. **P3:** `docs/planos/NOTAS_P3_para_P4.md`, com resultados, onde está cada arquivo e 9 cuidados de redação;
+4. **P2:** `docs/planos/NOTAS_P2_para_P4.md`, com resultados, onde está cada arquivo e 14 cuidados de redação;
+5. os planos com as regras definidas **antes** dos resultados: `docs/planos/P1_protocolo.md` (14/10, commit `eaf931b`), `P3_wavkan.md` e `P2_multitarefa.md`, com os ajustes das seções 7–8 de `NOTAS_P1_para_P2_P3.md`;
 6. `auditoria-consistencia.md` (o que estava errado no texto antigo) e `references/2024_paper.txt` (Lira et al.).
+
+As notas do P2 e do P3 valem mais que este plano naquilo que tratam dos resultados deles.
 
 **Como compilar** (a memória do projeto `dissertation-build` também tem isto):
 - só **pdfLaTeX**: XeLaTeX e Tectonic quebram na classe;
@@ -35,15 +43,14 @@ Pergunte antes de escrever. A recomendação vem primeiro em cada item.
 2. **Título e tese:**
    - (rec.) manter "TransferKAN" no título, mas com a tese de uma avaliação sem vazamento (ex.: *"TransferKAN under a leak-free protocol: …"*);
    - ou renomear o trabalho inteiro.
-3. **P2 (multitarefa) e P3 (Wav-KAN): decidido em 19/10.** O usuário roda os dois **antes** do P4, na ordem da seção 9 de `NOTAS_P1_para_P2_P3.md`.
-   - Leia as saídas deles (`resultados/wavkan/`, `resultados/tabela_wavkan.*`, `resultados/multitarefa/`, `resultados/tabela_multitarefa.*`) e as regras de decisão de cada plano.
-   - Cada um vira uma seção curta em Métodos e Resultados.
-   - Se algum não tiver rodado, ele vai para "trabalhos futuros".
+3. **P2 e P3: já rodaram (21/10).** Os dois entram no texto, cada um como uma seção de Métodos e uma de Resultados. O P3 rodou também no MLSD (W1 e W2).
+   - **Recomendado:** P1 como eixo, e P3 e P2 como capítulos de resultado curtos;
+   - **alternativa:** o P2 como contribuição prática à parte, porque é o único resultado com ganho claro de custo.
 4. **Semente 44 da Swin-B e da MaxViT-T no MLSD:**
    - (rec.) reportar com 2 sementes e dizer isso na legenda;
    - ou rodar antes (~2,6 unidades), o que obriga a rodar o 05b de novo e atualizar `resultados/`.
 
-## 2. A nova tese em cinco pontos
+## 2. A nova tese em sete pontos
 
 1. **O hold-out de 2024 vaza casos.** O `iterative_split` do código de Lira estratifica por número do caso em vez de agrupar. Reproduzindo o método (3 partições), 98,7% (E/S) e 98,4% (MLSD) das imagens de teste têm o caso no treino. Com a mesma receita, isso infla a AUC em **+0,034** (E/S) e **+0,155 a +0,158** (MLSD).
 2. **Protocolo único, sem vazamento:**
@@ -56,10 +63,23 @@ Pergunte antes de escrever. A recomendação vem primeiro em cada item.
    - **MLSD:** abaixo da MLP isoparamétrica (desfecho C) e equivalente à MLP-128 e à linear.
 4. **O que explica a diferença para os números de 2024** é a partição, o pré-treino e a receita. A melhor arquitetura no protocolo único é a **Swin-B**, que supera a TransKAN nas duas tarefas.
 5. **"Encostado" quase não é aprendido** quando o caso não aparece no treino (recall 0,13–0,17 na ResNet-152). Essa é a principal limitação.
+6. **(P3) A KAN com wavelets também não ajuda.**
+   - **E/S:** a AUC empata com as MLPs (0,902 com 0,26 M parâmetros na cabeça). Contra a MLP de mesmo orçamento, o resultado é *inconclusivo*: o F1 cai 0,012, com IC além da margem.
+   - **MLSD:** perde claramente (AUC 0,71 contra 0,80; inferior em todos os contrastes).
+   - **Não ficou mais rápida.**
+   - O ajuste de forma das wavelets quase não aconteceu.
+7. **(P2) Uma rede para as duas tarefas custa metade.**
+   - −47% a −50% de parâmetros e inferência 2× mais rápida;
+   - **distância:** não inferior;
+   - **E/S:** perde ~0,01 de AUC em todas as dobras, dentro da margem de 0,02, mas de forma consistente;
+   - a KAN e a MLP empatam também dentro da multitarefa.
 
-A hipótese antiga ("trocar a MLP pela KAN melhora") vira uma **pergunta de pesquisa com resposta negativa**. Não a apague: mostre o teste dela.
+A hipótese antiga ("trocar a MLP pela KAN melhora") vira uma **pergunta de pesquisa com resposta negativa**, testada com duas famílias de KAN (spline e wavelet). Não a apague: mostre o teste dela. A contribuição positiva é metodológica (vazamento e protocolo) e prática (multitarefa a meio custo).
 
 ## 3. Fatos que o texto deve usar (todos verificados)
+
+Esta seção traz os fatos do P1. Os do P3 e do P2 estão nas tabelas "Resultados" das notas deles: use os números de lá, e não os rascunhos dos planos.
+
 
 Média ± desvio-padrão entre as 5 dobras; cada dobra é a média das sementes disponíveis. A AUC vem de probabilidades (OvR macro no MLSD). AUC_c = (recall + especificidade)/2, que é a AUC que Lira calcula a partir de classes; use só para comparar com Lira.
 
@@ -195,6 +215,13 @@ Os números das saídas do 05 e do 05b batem entre si em 401 conferências cruza
 2. **MLSD:** não escreva "abaixo das MLPs". A KAN fica significativamente abaixo só da MLP isoparamétrica; contra a MLP-128 e a linear, os IC incluem zero.
 3. **Vazamento:** use as taxas por tarefa (98,7% e 98,4%; 98,6% só como média) e deixe claro que o "agrupado" dessa tabela é a semente 42.
 
+**P3 e P2.** Siga os "Cuidados para o texto" das duas notas. Os mais importantes:
+- **nunca** escreva que a Wav-KAN treina ou roda mais rápido (a regra deu `true` dentro do ruído; a nota explica por quê);
+- na multitarefa, "mais rápida" vale, mas como custo (um forward no lugar de dois), não como mérito do método;
+- em E/S a multitarefa é "pior, mas dentro da margem": diga as duas coisas;
+- nada de afirmação específica sobre encostado;
+- nada de "eficiência em parâmetros" da KAN.
+
 **O que pode ser afirmado** (`frases_dissertacao.md`, "Pode afirmar?"): as quatro afirmações são `false` nas duas tarefas:
 - só trocar a cabeça melhora;
 - novo estado da arte;
@@ -208,13 +235,13 @@ Escreva primeiro o EN e espelhe no PT, capítulo a capítulo. Commite cada par E
 | Capítulo (EN / PT) | O que fazer |
 |---|---|
 | `abstract.tex` / `resumo.tex` (os dois existem em `tex/` e em `pt/tex/`) | Reescrever com os 5 pontos da seção 2 e 3–4 números: o +0,155 do vazamento, a decisão B/C, o 0,929 da Swin-B |
-| 1 Introduction / Introdução | Objetivos → perguntas de pesquisa (RQ1: o vazamento infla os números de 2024? RQ2: a cabeça KAN melhora sob um protocolo justo? RQ3: como ficam os 12 backbones no mesmo protocolo?). Contribuições reescritas: auditoria e reprodução do split, protocolo único, ablação da cabeça com regra pré-registrada. Remover "pioneering" e "empirical demonstration that TransferKAN…" |
-| 2 Background / Fundamentação | Manter KAN e transfer learning. Acrescentar uma subseção curta sobre vazamento por grupo (validação agrupada) e a diferença entre AUC de probabilidades e AUC de classes |
+| 1 Introduction / Introdução | Objetivos → perguntas de pesquisa (RQ1: o vazamento infla os números de 2024? RQ2: a cabeça KAN melhora sob um protocolo justo? RQ3: como ficam os 12 backbones no mesmo protocolo? RQ4: uma KAN com wavelets muda o quadro? RQ5: uma rede para as duas tarefas substitui o par?). Contribuições reescritas: auditoria e reprodução do split, protocolo único, ablação da cabeça (spline e wavelet) com regras pré-registradas, multitarefa a meio custo. Remover "pioneering" e "empirical demonstration that TransferKAN…" |
+| 2 Background / Fundamentação | Manter KAN e transfer learning. Acrescentar subseções curtas sobre: vazamento por grupo (validação agrupada); a diferença entre AUC de probabilidades e AUC de classes; Wav-KAN (Bozorgasl & Chen); e aprendizado multitarefa (extrator compartilhado e perda com máscara) |
 | 3 Related Work / Trabalhos Relacionados | Lira et al.: descrever o hold-out **pelo código** (`iterative_split` estratifica por caso, ver `auditoria-consistencia.md`), citar `Lira2025deep` como fonte da base e das Tabelas 4 e 5, e citar a k-fold deles (Fig. 4) |
 | 4 Proposed Solution / Solução Proposta | A TransferKAN continua sendo o objeto de estudo, mas sem promessas ("Superior Discrimination…" vira hipótese). Acrescentar o desenho da ablação (a)–(e) com as contagens de parâmetros |
-| 5 Methodology / Metodologia | Reescrever inteiro com a seção 3: dados, dobras, receita, ponte AMP, cabeças, 12 backbones, MLSD (treino só com entradas; teste = dobra inteira), experimento de vazamento, métricas, regra de decisão pré-registrada (data e commit), estatística (bootstrap de casos 2.000; Δ por dobra), sementes 42/43/44, hardware e custo |
-| 6 Results / Resultados | Trocar as tabelas e o gráfico de barras antigos (AUC 0,908/0,928; 0,749/0,944) pelas tabelas e figuras novas. Ordem: (1) vazamento, (2) E/S, (3) MLSD, (4) comparação com Lira, (5) TransKAN × transformers. As tabelas M/m/W (`tabela_mmw_*.tex`) vão para o apêndice. Os modelos exploratórios seguem a decisão 1 |
-| 7 Conclusions / Conclusões | Reescrever: respostas às RQ; limitações (uma base, encostado, 2 sementes para Swin/MaxViT no MLSD, reprodução do método e não da partição exata de Lira, última época sem validação); trabalhos futuros (multitarefa P2, Wav-KAN P3, validação externa) |
+| 5 Methodology / Metodologia | Reescrever inteiro com a seção 3: dados, dobras, receita, ponte AMP, cabeças, 12 backbones, MLSD (treino só com entradas; teste = dobra inteira), experimento de vazamento, métricas, regra de decisão pré-registrada (data e commit), estatística (bootstrap de casos 2.000; Δ por dobra), sementes 42/43/44, hardware e custo. Mais duas subseções: **Wav-KAN** (cabeças W1–W5, contagem de parâmetros, margem de não inferioridade, contrastes primários, `P3_wavkan.md` + NOTAS P1 §8) e **multitarefa** (uma ResNet-152 com duas cabeças, perda com máscara, ST reaproveitadas do P1, pipeline de 4 classes, medida de inferência, `P2_multitarefa.md` + NOTAS P1 §8) |
+| 6 Results / Resultados | Trocar as tabelas e o gráfico de barras antigos (AUC 0,908/0,928; 0,749/0,944) pelas tabelas e figuras novas. Ordem: (1) vazamento, (2) E/S, (3) MLSD, (4) comparação com Lira, (5) TransKAN × transformers, (6) Wav-KAN (`tabela_wavkan.tex`, `tabela_wavkan_mlsd.tex`, `contrastes_wavkan.tex`; a figura `fig_auc_vs_parametros.pdf` só com os rótulos corrigidos, ver nota do P3), (7) multitarefa (`tabela_multitarefa.tex`, que é larga demais: divida em desempenho e custo ou use `\resizebox`; `contrastes_multitarefa.tex`). As tabelas M/m/W (`tabela_mmw_*.tex`) vão para o apêndice. Os modelos exploratórios seguem a decisão 1 |
+| 7 Conclusions / Conclusões | Reescrever: respostas às RQ; limitações (uma base, encostado, 2 sementes para Swin/MaxViT no MLSD, reprodução do método e não da partição exata de Lira, última época sem validação); trabalhos futuros (KAN sobre a Swin-B, mais casos de encostado, validação externa, calibração do limiar, ponderação por incerteza na multitarefa) |
 | `Published_Articles.tex`, `Anexo1.tex` | Conferir se citam números antigos do SIBGRAPI. O manuscrito SIBGRAPI em si fica fora deste plano |
 
 **Tabelas e figuras:**
@@ -227,7 +254,7 @@ Escreva primeiro o EN e espelhe no PT, capítulo a capítulo. Commite cada par E
 1. As duas versões compilam com pdfLaTeX, sem `??` e sem citação indefinida (confira o `.log`).
 2. Nenhum número antigo no texto. Este comando deve dar zero linhas, tirando o apêndice exploratório se for mantido:
    `grep -rnE "0[.,]860|0[.,]873|0[.,]749|0[.,]908|0[.,]928|0[.,]893|0[.,]924|SMOTE|best epoch|melhor época" tcc_dissertation/tex tcc_dissertation/pt/tex`
-3. Cada número citado no texto confere com `resultados/*.csv` e `*.json`. Faça um script que extraia os números do `.tex` e compare.
+3. Cada número citado no texto confere com `resultados/*.csv` e `*.json`, incluindo os do P3 (`decisao_wavkan.json`, `tabela_wavkan*.csv`, `contrastes_wavkan.csv`) e do P2 (`decisao_multitarefa.json`, `tabela_multitarefa.csv`, `contrastes_multitarefa.csv`, `pipeline_multitarefa.csv`). Faça um script que extraia os números do `.tex` e compare.
 4. As frases da seção 4 estão corrigidas.
 5. EN e PT têm as mesmas seções, tabelas e números.
 
