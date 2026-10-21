@@ -56,6 +56,7 @@ O que você faz em cada notebook, em ordem. Todos estão na pasta `Colab Noteboo
 
 - **`O teste rápido ainda não passou…`:** você abriu a aba B antes do passo 2 terminar. Termine o passo 2 e depois rode a aba B de novo.
 - **`Perda não finita … avise a sessão P2`:** a fila parou sozinha e anotou o problema. Não rode de novo; me avise.
+- **`a retomada não reproduziu o treino (diferença acima do ruído da GPU)`** no teste rápido: copie as três linhas `ruído da GPU`, `retomada` e `limites` que aparecem logo acima e me mande. Não rode a aba B.
 - **`… não é o publicado`:** um arquivo do Drive foi trocado. Não rode nada; me avise.
 - **`GPU … não é ('L4',)`:** o Colab te deu outra placa, provavelmente porque o saldo acabou. Espere ou confira o saldo. Não ligue `PERMITIR_RESERVA`.
 - **Uma aba caiu:** abra o mesmo arquivo de novo, escolha **L4** e clique em **Executar tudo** (com `TESTE_RAPIDO = False`). A outra aba continua normalmente.
@@ -89,4 +90,5 @@ O que você faz em cada notebook, em ordem. Todos estão na pasta `Colab Noteboo
   - 09 (abas A e B) e 10 de ponta a ponta num Drive falso, com GPU e backbone simulados e as dobras reais: a aba B recusa rodar antes do teste da A, as duas abas rodam ao mesmo tempo sem pegar a mesma unidade, e o 10 roda com as ST do P1 simuladas e com predições sintéticas de efeito controlado (MT igual, melhor e pior que a ST). As tabelas `.tex` compilam com pdfLaTeX.
   - O 10 lê `case_id` dos `pred_teste.csv` como texto (`dtype={"case_id": str}`); lido como número, `2014.0100` vira `2014.01`.
   - Não foi testado: o desempenho real na L4 e a montagem do Drive.
-- **Drive (`tcc-final`, 21/10/2026):** `multitarefa.py` (id `1jBf8gI0ZaQUAekCVscWlBVbgUvmfWmOc`), `09_multitarefa_entrada_saida_distancia.ipynb` (`1e0JqjKTeihspHWJdqKdhQRtk3VUgXZ2_`), `09_multitarefa_abaB.ipynb` (`1ugny8r6Abqnt9Ql5i87dqvX_PgpHrcTD`) e `10_analise_multitarefa.ipynb` (`1LapBz-Ctd9sPP8aOQmUwhVs0oan446iO`). O plugin, o 09 da aba A e o 10 foram baixados de volta e são idênticos byte a byte aos do repositório; o 09 da aba B confere no tamanho e no cabeçalho e na célula de configuração.
+- **Drive (`tcc-final`, 21/10/2026):** `multitarefa.py` (id `1jBf8gI0ZaQUAekCVscWlBVbgUvmfWmOc`), `09_multitarefa_entrada_saida_distancia.ipynb` (`1gHCodsL40ylEmdc3QMhS34s_xzbD_nXD`), `09_multitarefa_abaB.ipynb` (`1lHIAkFbpKZ-CexMrDYLwvm9l-_v8NV5c`) e `10_analise_multitarefa.ipynb` (`1LapBz-Ctd9sPP8aOQmUwhVs0oan446iO`). Os quatro foram baixados de volta e são idênticos byte a byte aos do repositório (os dois 09 são os do commit cc01303).
+  - As versões anteriores dos 09 continuam na pasta, renomeadas: `09_multitarefa_entrada_saida_distancia_ANTIGO_teste_21-10.ipynb` (`1e0JqjKTeihspHWJdqKdhQRtk3VUgXZ2_`, com a saída do 1º teste rápido na L4) e `09_multitarefa_abaB_ANTIGO_21-10.ipynb` (`1ugny8r6Abqnt9Ql5i87dqvX_PgpHrcTD`). Não use.
