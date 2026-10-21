@@ -1,0 +1,26 @@
+{
+  "ok": true,
+  "quando": "2026-10-21T18:38:39+00:00",
+  "plugin_sha256": "b9841e0f8c0192bf67df96f318e384659a96659c5eda08737dae740f612c1814",
+  "protocolo_sha256": "b7cd9baca53edd96c855cca10914fc258efa8ddfd0937cc0d3e9572de5ef9e13",
+  "gpu": "NVIDIA L4",
+  "precisao": "amp",
+  "retomada": {
+    "max_dif_perda": 0.0003020167350770153,
+    "max_dif_prob": 0.004570740000000018,
+    "ruido_gpu": {
+      "n": [
+        4,
+        4
+      ],
+      "f1": 0.0,
+      "perda": 0.0005246996879579857,
+      "prob": 0.003002160000000087
+    },
+    "limites": {
+      "f1": 1e-05,
+      "perda": 0.0015740990638739571,
+      "prob": 0.009006480000000261
+    }
+  }
+}

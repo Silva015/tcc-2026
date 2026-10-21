@@ -1,0 +1,17 @@
+\begin{table*}[t]
+\centering
+\caption{Multitask vs.\ single-task under the single protocol (ResNet-152, grouped stratified 5-fold by case, same two-phase recipe, last epoch). Single-task: two ResNet-152 trained separately, one per task (P1 heads (d) and (b)). Multitask: one ResNet-152 with one head per task, trained jointly with $L = L_{\mathrm{E/S}} + L_{\mathrm{dist}}$ (exits masked out of $L_{\mathrm{dist}}$). Mean $\pm$ s.d.\ across folds (each fold averaged over the training seeds); AUC from predicted probabilities (distance: one-vs-rest macro, entries only); 4-class F1: macro F1 of the exit/contact/close/distant pipeline. Training: minutes per fold on an NVIDIA~L4 ($15\,t_{F1}+45\,t_{F2}$; single-task = sum of the two networks). Inference: ms per image to obtain both outputs (NVIDIA~L4). Seeds: st\_kan: 42,43,44; mt\_kan: 42,43,44; st\_mlp: 42,43,44; mt\_mlp: 42,43,44.}
+\label{tab:multitarefa}
+\scriptsize
+\setlength{\tabcolsep}{3pt}
+\begin{tabular}{lcrcccccrrr}
+\hline
+System & Nets & Params (M) & E/S AUC & E/S F1 & Dist.\ AUC & Dist.\ F1 & 4-class F1 & Min/fold & ms/img (b=1) & ms/img (b=32) \\
+\hline
+Two single-task KAN heads (d) & 2 & 124.16 & $0.905 \pm 0.013$ & $0.806 \pm 0.013$ & $0.798 \pm 0.058$ & $0.477 \pm 0.045$ & $0.500 \pm 0.035$ & 14.9 & 51.03 & 2.22 \\
+One multitask KAN heads & 1 & 66.02 & $0.894 \pm 0.014$ & $0.784 \pm 0.022$ & $0.805 \pm 0.065$ & $0.482 \pm 0.058$ & $0.491 \pm 0.045$ & 8.6 & 27.31 & 1.12 \\
+Two single-task MLP-128 heads (b) & 2 & 116.81 & $0.905 \pm 0.014$ & $0.806 \pm 0.015$ & $0.802 \pm 0.062$ & $0.482 \pm 0.050$ & $0.506 \pm 0.037$ & 14.6 & 48.48 & 2.22 \\
+One multitask MLP-128 heads & 1 & 58.67 & $0.895 \pm 0.014$ & $0.787 \pm 0.017$ & $0.806 \pm 0.071$ & $0.492 \pm 0.063$ & $0.499 \pm 0.045$ & 8.1 & 24.31 & 1.11 \\
+\hline
+\end{tabular}
+\end{table*}

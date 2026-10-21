@@ -1,0 +1,107 @@
+[
+  {
+    "experimento": "multitarefa",
+    "config": "mt_mlp",
+    "semente": 42,
+    "dobra": 0,
+    "coluna_dobra": "fold"
+  },
+  {
+    "experimento": "multitarefa",
+    "config": "mt_mlp",
+    "semente": 42,
+    "dobra": 1,
+    "coluna_dobra": "fold"
+  },
+  {
+    "experimento": "multitarefa",
+    "config": "mt_mlp",
+    "semente": 42,
+    "dobra": 2,
+    "coluna_dobra": "fold"
+  },
+  {
+    "experimento": "multitarefa",
+    "config": "mt_mlp",
+    "semente": 42,
+    "dobra": 3,
+    "coluna_dobra": "fold"
+  },
+  {
+    "experimento": "multitarefa",
+    "config": "mt_mlp",
+    "semente": 42,
+    "dobra": 4,
+    "coluna_dobra": "fold"
+  },
+  {
+    "experimento": "multitarefa",
+    "config": "mt_mlp",
+    "semente": 43,
+    "dobra": 0,
+    "coluna_dobra": "fold"
+  },
+  {
+    "experimento": "multitarefa",
+    "config": "mt_mlp",
+    "semente": 43,
+    "dobra": 1,
+    "coluna_dobra": "fold"
+  },
+  {
+    "experimento": "multitarefa",
+    "config": "mt_mlp",
+    "semente": 43,
+    "dobra": 2,
+    "coluna_dobra": "fold"
+  },
+  {
+    "experimento": "multitarefa",
+    "config": "mt_mlp",
+    "semente": 43,
+    "dobra": 3,
+    "coluna_dobra": "fold"
+  },
+  {
+    "experimento": "multitarefa",
+    "config": "mt_mlp",
+    "semente": 43,
+    "dobra": 4,
+    "coluna_dobra": "fold"
+  },
+  {
+    "experimento": "multitarefa",
+    "config": "mt_mlp",
+    "semente": 44,
+    "dobra": 0,
+    "coluna_dobra": "fold"
+  },
+  {
+    "experimento": "multitarefa",
+    "config": "mt_mlp",
+    "semente": 44,
+    "dobra": 1,
+    "coluna_dobra": "fold"
+  },
+  {
+    "experimento": "multitarefa",
+    "config": "mt_mlp",
+    "semente": 44,
+    "dobra": 2,
+    "coluna_dobra": "fold"
+  },
+  {
+    "experimento": "multitarefa",
+    "config": "mt_mlp",
+    "semente": 44,
+    "dobra": 3,
+    "coluna_dobra": "fold"
+  },
+  {
+    "experimento": "multitarefa",
+    "config": "mt_mlp",
+    "semente": 44,
+    "dobra": 4,
+    "coluna_dobra": "fold"
+  }
+]

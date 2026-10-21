@@ -1,0 +1,684 @@
+{
+  "margem_ni": -0.02,
+  "n_boot": 2000,
+  "desfecho_mt_vs_st": {
+    "es__kan": "pior",
+    "es__mlp": "pior",
+    "dist__kan": "nao_inferior",
+    "dist__mlp": "nao_inferior"
+  },
+  "contrastes": {
+    "es__mt_kan_vs_st_kan": {
+      "tarefa": "es",
+      "a": "mt_kan",
+      "b": "st_kan",
+      "sementes": [
+        42,
+        43,
+        44
+      ],
+      "delta_auc_oof": -0.01072107245548648,
+      "ic95_auc": [
+        -0.01544013280248011,
+        -0.005992118793776455
+      ],
+      "delta_f1_oof": -0.02253667404361981,
+      "ic95_f1": [
+        -0.0342862845239259,
+        -0.011270458806349644
+      ],
+      "n_boot_validos": 2000,
+      "delta_auc_dobras": {
+        "0": -0.0095,
+        "1": -0.0108,
+        "2": -0.0134,
+        "3": -0.0094,
+        "4": -0.0106
+      },
+      "delta_f1_dobras": {
+        "0": 0.0021,
+        "1": -0.018,
+        "2": -0.0409,
+        "3": -0.0299,
+        "4": -0.024
+      },
+      "media_delta_auc_dobras": -0.01073386125240312,
+      "dp_delta_auc_dobras": 0.0016129902368416011,
+      "dobras_a_vence": 0,
+      "dobras_a_nao_perde": 0,
+      "n_dobras": 5,
+      "superior": false,
+      "inferior": true,
+      "dentro_da_margem": true,
+      "desfecho": "pior",
+      "papel": "primário"
+    },
+    "es__mt_mlp_vs_st_mlp": {
+      "tarefa": "es",
+      "a": "mt_mlp",
+      "b": "st_mlp",
+      "sementes": [
+        42,
+        43,
+        44
+      ],
+      "delta_auc_oof": -0.009536261775886512,
+      "ic95_auc": [
+        -0.01405101982145763,
+        -0.005054774783825416
+      ],
+      "delta_f1_oof": -0.022055305330493935,
+      "ic95_f1": [
+        -0.03422982074386942,
+        -0.01007718520815514
+      ],
+      "n_boot_validos": 2000,
+      "delta_auc_dobras": {
+        "0": -0.0095,
+        "1": -0.0046,
+        "2": -0.0139,
+        "3": -0.0074,
+        "4": -0.0129
+      },
+      "delta_f1_dobras": {
+        "0": -0.0055,
+        "1": -0.0179,
+        "2": -0.0358,
+        "3": -0.0141,
+        "4": -0.0191
+      },
+      "media_delta_auc_dobras": -0.009651760788981889,
+      "dp_delta_auc_dobras": 0.0038547625468795584,
+      "dobras_a_vence": 0,
+      "dobras_a_nao_perde": 0,
+      "n_dobras": 5,
+      "superior": false,
+      "inferior": true,
+      "dentro_da_margem": true,
+      "desfecho": "pior",
+      "papel": "primário"
+    },
+    "es__mt_kan_vs_mt_mlp": {
+      "tarefa": "es",
+      "a": "mt_kan",
+      "b": "mt_mlp",
+      "sementes": [
+        42,
+        43,
+        44
+      ],
+      "delta_auc_oof": -0.0012924487907728377,
+      "ic95_auc": [
+        -0.0029380225071711703,
+        0.000389591940033132
+      ],
+      "delta_f1_oof": -0.0019427104687432806,
+      "ic95_f1": [
+        -0.007684194504732423,
+        0.003380788171680384
+      ],
+      "n_boot_validos": 2000,
+      "delta_auc_dobras": {
+        "0": 0.0003,
+        "1": -0.007,
+        "2": -0.0007,
+        "3": -0.0007,
+        "4": 0.0024
+      },
+      "delta_f1_dobras": {
+        "0": 0.0033,
+        "1": -0.0027,
+        "2": -0.0045,
+        "3": -0.012,
+        "4": -0.0011
+      },
+      "media_delta_auc_dobras": -0.0011480690786153768,
+      "dp_delta_auc_dobras": 0.003510811040974794,
+      "dobras_a_vence": 2,
+      "dobras_a_nao_perde": 2,
+      "n_dobras": 5,
+      "superior": false,
+      "inferior": false,
+      "dentro_da_margem": true,
+      "desfecho": "nao_inferior",
+      "papel": "secundário"
+    },
+    "es__st_kan_vs_st_mlp": {
+      "tarefa": "es",
+      "a": "st_kan",
+      "b": "st_mlp",
+      "sementes": [
+        42,
+        43,
+        44
+      ],
+      "delta_auc_oof": -0.0001076381111728697,
+      "ic95_auc": [
+        -0.0014577605665180905,
+        0.0011443079649490649
+      ],
+      "delta_f1_oof": -0.0014613417556174069,
+      "ic95_f1": [
+        -0.006331231378229671,
+        0.003176278264898746
+      ],
+      "n_boot_validos": 2000,
+      "delta_auc_dobras": {
+        "0": 0.0003,
+        "1": -0.0008,
+        "2": -0.0012,
+        "3": 0.0013,
+        "4": 0.0001
+      },
+      "delta_f1_dobras": {
+        "0": -0.0043,
+        "1": -0.0027,
+        "2": 0.0007,
+        "3": 0.0038,
+        "4": 0.0038
+      },
+      "media_delta_auc_dobras": -6.596861519414521e-05,
+      "dp_delta_auc_dobras": 0.0010063573841474476,
+      "dobras_a_vence": 3,
+      "dobras_a_nao_perde": 3,
+      "n_dobras": 5,
+      "superior": false,
+      "inferior": false,
+      "dentro_da_margem": true,
+      "desfecho": "nao_inferior",
+      "papel": "descritivo"
+    },
+    "dist__mt_kan_vs_st_kan": {
+      "tarefa": "dist",
+      "a": "mt_kan",
+      "b": "st_kan",
+      "sementes": [
+        42,
+        43,
+        44
+      ],
+      "delta_auc_oof": 0.007289891466248699,
+      "ic95_auc": [
+        -0.003047841419197847,
+        0.01760151263310879
+      ],
+      "delta_f1_oof": -0.0015625265031897762,
+      "ic95_f1": [
+        -0.02895846401217279,
+        0.026958784994715136
+      ],
+      "n_boot_validos": 2000,
+      "delta_auc_dobras": {
+        "0": 0.0227,
+        "1": 0.0169,
+        "2": 0.0057,
+        "3": -0.0066,
+        "4": -0.0037
+      },
+      "delta_f1_dobras": {
+        "0": 0.0247,
+        "1": -0.0261,
+        "2": 0.0182,
+        "3": 0.0061,
+        "4": 0.0038
+      },
+      "media_delta_auc_dobras": 0.006983097806513361,
+      "dp_delta_auc_dobras": 0.012701872424575931,
+      "dobras_a_vence": 3,
+      "dobras_a_nao_perde": 3,
+      "n_dobras": 5,
+      "superior": false,
+      "inferior": false,
+      "dentro_da_margem": true,
+      "desfecho": "nao_inferior",
+      "papel": "primário"
+    },
+    "dist__mt_mlp_vs_st_mlp": {
+      "tarefa": "dist",
+      "a": "mt_mlp",
+      "b": "st_mlp",
+      "sementes": [
+        42,
+        43,
+        44
+      ],
+      "delta_auc_oof": 0.004261369588377195,
+      "ic95_auc": [
+        -0.006449707133293095,
+        0.014353362863319109
+      ],
+      "delta_f1_oof": 0.007297644252950319,
+      "ic95_f1": [
+        -0.021292497955876535,
+        0.035046785693482026
+      ],
+      "n_boot_validos": 2000,
+      "delta_auc_dobras": {
+        "0": 0.0205,
+        "1": 0.0175,
+        "2": 0.0035,
+        "3": -0.0127,
+        "4": -0.0069
+      },
+      "delta_f1_dobras": {
+        "0": 0.0155,
+        "1": -0.0123,
+        "2": 0.0297,
+        "3": 0.0027,
+        "4": 0.0148
+      },
+      "media_delta_auc_dobras": 0.004373828016816961,
+      "dp_delta_auc_dobras": 0.014589693631967748,
+      "dobras_a_vence": 3,
+      "dobras_a_nao_perde": 3,
+      "n_dobras": 5,
+      "superior": false,
+      "inferior": false,
+      "dentro_da_margem": true,
+      "desfecho": "nao_inferior",
+      "papel": "primário"
+    },
+    "dist__mt_kan_vs_mt_mlp": {
+      "tarefa": "dist",
+      "a": "mt_kan",
+      "b": "mt_mlp",
+      "sementes": [
+        42,
+        43,
+        44
+      ],
+      "delta_auc_oof": -0.0021689545059642157,
+      "ic95_auc": [
+        -0.00854175617841923,
+        0.003329091335936932
+      ],
+      "delta_f1_oof": -0.007510998707152494,
+      "ic95_f1": [
+        -0.014480646011373905,
+        -0.0012661155634002155
+      ],
+      "n_boot_validos": 2000,
+      "delta_auc_dobras": {
+        "0": 0.0027,
+        "1": -0.0062,
+        "2": -0.0081,
+        "3": -0.0091,
+        "4": 0.0145
+      },
+      "delta_f1_dobras": {
+        "0": 0.0019,
+        "1": -0.0113,
+        "2": -0.0302,
+        "3": -0.0076,
+        "4": -0.0011
+      },
+      "media_delta_auc_dobras": -0.0012408946488894125,
+      "dp_delta_auc_dobras": 0.009948028694708025,
+      "dobras_a_vence": 2,
+      "dobras_a_nao_perde": 2,
+      "n_dobras": 5,
+      "superior": false,
+      "inferior": false,
+      "dentro_da_margem": true,
+      "desfecho": "nao_inferior",
+      "papel": "secundário"
+    },
+    "dist__st_kan_vs_st_mlp": {
+      "tarefa": "dist",
+      "a": "st_kan",
+      "b": "st_mlp",
+      "sementes": [
+        42,
+        43,
+        44
+      ],
+      "delta_auc_oof": -0.00519747638383572,
+      "ic95_auc": [
+        -0.011830378272667192,
+        0.002573344795176201
+      ],
+      "delta_f1_oof": 0.0013491720489876013,
+      "ic95_f1": [
+        -0.007032474225185853,
+        0.009725123757616317
+      ],
+      "n_boot_validos": 2000,
+      "delta_auc_dobras": {
+        "0": 0.0005,
+        "1": -0.0056,
+        "2": -0.0103,
+        "3": -0.0151,
+        "4": 0.0113
+      },
+      "delta_f1_dobras": {
+        "0": -0.0072,
+        "1": 0.0025,
+        "2": -0.0187,
+        "3": -0.0111,
+        "4": 0.0099
+      },
+      "media_delta_auc_dobras": -0.0038501644385858123,
+      "dp_delta_auc_dobras": 0.01025081357946043,
+      "dobras_a_vence": 2,
+      "dobras_a_nao_perde": 2,
+      "n_dobras": 5,
+      "superior": false,
+      "inferior": false,
+      "dentro_da_margem": true,
+      "desfecho": "nao_inferior",
+      "papel": "descritivo"
+    }
+  },
+  "pipeline": {
+    "pipeline__mt_kan_vs_st_kan": {
+      "a": "mt_kan",
+      "b": "st_kan",
+      "sementes": [
+        42,
+        43,
+        44
+      ],
+      "delta_f1_oof": -0.030274499008466182,
+      "ic95_f1": [
+        -0.06090484981865181,
+        -0.0036737476006090427
+      ],
+      "n_boot_validos": 2000,
+      "delta_f1_dobras": {
+        "0": 0.0177,
+        "1": -0.0131,
+        "2": -0.031,
+        "3": -0.0108,
+        "4": -0.0087
+      },
+      "dobras_a_vence": 1,
+      "n_dobras": 5
+    },
+    "pipeline__mt_mlp_vs_st_mlp": {
+      "a": "mt_mlp",
+      "b": "st_mlp",
+      "sementes": [
+        42,
+        43,
+        44
+      ],
+      "delta_f1_oof": -0.022345359457409675,
+      "ic95_f1": [
+        -0.05193239359915326,
+        0.0035587131482940466
+      ],
+      "n_boot_validos": 2000,
+      "delta_f1_dobras": {
+        "0": 0.0269,
+        "1": -0.0129,
+        "2": -0.0439,
+        "3": -0.0039,
+        "4": 0.0011
+      },
+      "dobras_a_vence": 2,
+      "n_dobras": 5
+    },
+    "pipeline__mt_kan_vs_mt_mlp": {
+      "a": "mt_kan",
+      "b": "mt_mlp",
+      "sementes": [
+        42,
+        43,
+        44
+      ],
+      "delta_f1_oof": -0.007016628971413252,
+      "ic95_f1": [
+        -0.01288227126235517,
+        -0.0015914311141216632
+      ],
+      "n_boot_validos": 2000,
+      "delta_f1_dobras": {
+        "0": -0.0117,
+        "1": -0.0115,
+        "2": -0.0068,
+        "3": -0.0123,
+        "4": -0.0016
+      },
+      "dobras_a_vence": 0,
+      "n_dobras": 5
+    }
+  },
+  "custo": {
+    "st_kan": {
+      "redes": 2,
+      "params_total": 124161536,
+      "params_cabecas": 7873920,
+      "treinaveis_fase1": 7873920,
+      "treinaveis_fase2": 124161536,
+      "min_por_dobra": 14.947971111111112,
+      "min_por_dobra_dp": 0.15202487741107343,
+      "mem_pico_treino_gb": 3.626,
+      "inf_ms_img_lote1": 51.03461318969727,
+      "inf_ms_img_lote32": 2.2235571217536925
+    },
+    "mt_kan": {
+      "redes": 1,
+      "params_total": 66017728,
+      "params_cabecas": 7873920,
+      "treinaveis_fase1": 7873920,
+      "treinaveis_fase2": 66017728,
+      "min_por_dobra": 8.583595555555554,
+      "min_por_dobra_dp": 0.10664632943524395,
+      "mem_pico_treino_gb": 3.719,
+      "inf_ms_img_lote1": 27.312822036743164,
+      "inf_ms_img_lote32": 1.1171945542097093,
+      "reducao_params_pct": -46.829162938190464,
+      "treino_mais_rapido_alem_do_ruido": true,
+      "inferencia_mais_rapida_lote1": true,
+      "par_st_sobre_mt_lote1": 1.8685221586052827,
+      "inferencia_mais_rapida_lote32": true,
+      "par_st_sobre_mt_lote32": 1.990304296932965
+    },
+    "st_mlp": {
+      "redes": 2,
+      "params_total": 116812805,
+      "params_cabecas": 525189,
+      "treinaveis_fase1": 525189,
+      "treinaveis_fase2": 116812805,
+      "min_por_dobra": 14.581977777777778,
+      "min_por_dobra_dp": 0.13580647173294183,
+      "mem_pico_treino_gb": 3.526,
+      "inf_ms_img_lote1": 48.484034633636476,
+      "inf_ms_img_lote32": 2.2237671995162964
+    },
+    "mt_mlp": {
+      "redes": 1,
+      "params_total": 58668997,
+      "params_cabecas": 525189,
+      "treinaveis_fase1": 525189,
+      "treinaveis_fase2": 58668997,
+      "min_por_dobra": 8.128131111111111,
+      "min_por_dobra_dp": 0.09825029986356497,
+      "mem_pico_treino_gb": 3.53,
+      "inf_ms_img_lote1": 24.310445318222047,
+      "inf_ms_img_lote32": 1.1101752018928528,
+      "reducao_params_pct": -49.7752005869562,
+      "treino_mais_rapido_alem_do_ruido": true,
+      "inferencia_mais_rapida_lote1": true,
+      "par_st_sobre_mt_lote1": 1.9943704855663407,
+      "inferencia_mais_rapida_lote32": true,
+      "par_st_sobre_mt_lote32": 2.0030777085677696
+    }
+  },
+  "benchmark_inferencia": {
+    "gpu": "NVIDIA L4",
+    "precisao": "amp_fp16",
+    "tabela": [
+      {
+        "tipo": "kan",
+        "lote": 1,
+        "mt_ms_img": 27.312822036743164,
+        "mt_dp_ms_img": 0.9275207543546417,
+        "par_st_ms_img": 51.03461318969727,
+        "par_st_dp_ms_img": 2.051597545098965,
+        "par_st_sobre_mt": 1.8685221586052827,
+        "mt_mais_rapida_alem_do_ruido": true,
+        "mt_mem_pico_mb": 127.6015625,
+        "par_st_mem_pico_mb": 239.21337890625,
+        "mt_parametros": 66017728,
+        "par_st_parametros": 124161536
+      },
+      {
+        "tipo": "kan",
+        "lote": 32,
+        "mt_ms_img": 1.1171945542097093,
+        "mt_dp_ms_img": 0.011175049149329094,
+        "par_st_ms_img": 2.2235571217536925,
+        "par_st_dp_ms_img": 0.014291223560117325,
+        "par_st_sobre_mt": 1.990304296932965,
+        "mt_mais_rapida_alem_do_ruido": true,
+        "mt_mem_pico_mb": 162.67431640625,
+        "par_st_mem_pico_mb": 281.66162109375,
+        "mt_parametros": 66017728,
+        "par_st_parametros": 124161536
+      },
+      {
+        "tipo": "mlp",
+        "lote": 1,
+        "mt_ms_img": 24.310445318222047,
+        "mt_dp_ms_img": 1.2581733383015512,
+        "par_st_ms_img": 48.484034633636476,
+        "par_st_dp_ms_img": 0.9621088649510514,
+        "par_st_sobre_mt": 1.9943704855663407,
+        "mt_mais_rapida_alem_do_ruido": true,
+        "mt_mem_pico_mb": 122.31884765625,
+        "par_st_mem_pico_mb": 235.30615234375,
+        "mt_parametros": 58668997,
+        "par_st_parametros": 116812805
+      },
+      {
+        "tipo": "mlp",
+        "lote": 32,
+        "mt_ms_img": 1.1101752018928528,
+        "mt_dp_ms_img": 0.013192136438138085,
+        "par_st_ms_img": 2.2237671995162964,
+        "par_st_dp_ms_img": 0.016356366137415135,
+        "par_st_sobre_mt": 2.0030777085677696,
+        "mt_mais_rapida_alem_do_ruido": true,
+        "mt_mem_pico_mb": 162.67431640625,
+        "par_st_mem_pico_mb": 287.25537109375,
+        "mt_parametros": 58668997,
+        "par_st_parametros": 116812805
+      }
+    ]
+  },
+  "pode_afirmar": {
+    "mt_non_inferior_to_st": {
+      "es__kan": false,
+      "es__mlp": false,
+      "dist__kan": true,
+      "dist__mlp": true
+    },
+    "mt_better_than_st": {
+      "es__kan": false,
+      "es__mlp": false,
+      "dist__kan": false,
+      "dist__mlp": false
+    },
+    "mt_worse_than_st": {
+      "es__kan": true,
+      "es__mlp": true,
+      "dist__kan": false,
+      "dist__mlp": false
+    },
+    "kan_better_than_mlp_within_mt": {
+      "es": false,
+      "dist": false
+    },
+    "one_network_instead_of_two": true,
+    "mt_faster_inference": {
+      "kan_lote1": true,
+      "kan_lote32": true,
+      "mlp_lote1": true,
+      "mlp_lote32": true
+    },
+    "mt_faster_training": {
+      "kan": true,
+      "mlp": true
+    },
+    "kan_head_parameter_efficiency": false,
+    "claims_about_contact_shots": false,
+    "compare_with_0.908_or_0.893": false,
+    "spline_KAN_is_the_reference_that_works": false
+  },
+  "sementes_por_config": {
+    "es": {
+      "mt_kan": [
+        42,
+        43,
+        44
+      ],
+      "mt_mlp": [
+        42,
+        43,
+        44
+      ],
+      "st_kan": [
+        42,
+        43,
+        44
+      ],
+      "st_mlp": [
+        42,
+        43,
+        44
+      ]
+    },
+    "dist": {
+      "st_kan": [
+        42,
+        43,
+        44
+      ],
+      "st_mlp": [
+        42,
+        43,
+        44
+      ],
+      "mt_kan": [
+        42,
+        43,
+        44
+      ],
+      "mt_mlp": [
+        42,
+        43,
+        44
+      ]
+    }
+  },
+  "avisos": [
+    "acurácia E/S fora de [0,80; 0,89]: mt_kan s42 d3 (0.792), mt_kan s43 d3 (0.797), mt_kan s44 d2 (0.793), mt_kan s44 d3 (0.796), mt_mlp s42 d3 (0.796)"
+  ],
+  "frases_en": [
+    "On entry/exit classification, under an identical protocol, one multitask ResNet-152 with spline-KAN heads (shared backbone, one head per task) underperformed the dedicated single-task network with the same head (AUC 0.894 ± 0.014 vs. 0.905 ± 0.013; ΔAUC = -0.011, 95% CI [-0.015, -0.006]; better in 0/5 folds), although the difference stays within the pre-registered non-inferiority margin of -0.02 (seeds 42, 43, 44).",
+    "On entry/exit classification, under an identical protocol, one multitask ResNet-152 with MLP-128 heads (shared backbone, one head per task) underperformed the dedicated single-task network with the same head (AUC 0.895 ± 0.014 vs. 0.905 ± 0.014; ΔAUC = -0.010, 95% CI [-0.014, -0.005]; better in 0/5 folds), although the difference stays within the pre-registered non-inferiority margin of -0.02 (seeds 42, 43, 44).",
+    "Within the multitask network, on entry/exit classification, spline-KAN heads (7.87 M head parameters) performed on par with MLP-128 heads (0.53 M), within the pre-registered margin (AUC 0.894 ± 0.014 vs. 0.895 ± 0.014; ΔAUC = -0.001, 95% CI [-0.003, +0.0004]; KAN better in 2/5 folds) (seeds 42, 43, 44). This compares head types, not parameter efficiency.",
+    "On shooting-distance classification (entries only), under an identical protocol, one multitask ResNet-152 with spline-KAN heads (shared backbone, one head per task) matched the dedicated single-task network with the same head within the pre-registered non-inferiority margin of -0.02 (AUC 0.805 ± 0.065 vs. 0.798 ± 0.058; ΔAUC = +0.007, 95% CI [-0.003, +0.018]; better in 3/5 folds; ΔF1 = -0.002, 95% CI [-0.029, +0.027]) (seeds 42, 43, 44).",
+    "On shooting-distance classification (entries only), under an identical protocol, one multitask ResNet-152 with MLP-128 heads (shared backbone, one head per task) matched the dedicated single-task network with the same head within the pre-registered non-inferiority margin of -0.02 (AUC 0.806 ± 0.071 vs. 0.802 ± 0.062; ΔAUC = +0.004, 95% CI [-0.006, +0.014]; better in 3/5 folds; ΔF1 = +0.007, 95% CI [-0.021, +0.035]) (seeds 42, 43, 44).",
+    "Within the multitask network, on shooting-distance classification (entries only), spline-KAN heads (7.87 M head parameters) performed on par with MLP-128 heads (0.53 M), within the pre-registered margin (AUC 0.805 ± 0.065 vs. 0.806 ± 0.071; ΔAUC = -0.002, 95% CI [-0.009, +0.003]; KAN better in 2/5 folds) (seeds 42, 43, 44). This compares head types, not parameter efficiency.",
+    "One multitask network with spline-KAN heads replaces two single-task networks: 66.02 M vs. 124.16 M parameters (-46.8%). Both outputs need one forward pass instead of two: 1.12 vs. 2.22 ms per image at batch 32 and 27.31 vs. 51.03 ms at batch 1 on an NVIDIA L4 (2.0× faster at batch 32). Training takes 8.6 min per fold for the multitask network vs. 14.9 min for the two single-task networks together (NVIDIA L4; faster beyond run-to-run noise).",
+    "One multitask network with MLP-128 heads replaces two single-task networks: 58.67 M vs. 116.81 M parameters (-49.8%). Both outputs need one forward pass instead of two: 1.11 vs. 2.22 ms per image at batch 32 and 24.31 vs. 48.48 ms at batch 1 on an NVIDIA L4 (2.0× faster at batch 32). Training takes 8.1 min per fold for the multitask network vs. 14.6 min for the two single-task networks together (NVIDIA L4; faster beyond run-to-run noise).",
+    "Secondary, descriptive: in the 4-class pipeline (exit, contact, close, distant) with spline-KAN heads, macro-F1 on the pooled out-of-fold predictions is 0.485 for the multitask network vs. 0.515 for the single-task pair (ΔF1 = -0.030, 95% CI [-0.061, -0.004]).",
+    "Secondary, descriptive: in the 4-class pipeline (exit, contact, close, distant) with MLP-128 heads, macro-F1 on the pooled out-of-fold predictions is 0.492 for the multitask network vs. 0.514 for the single-task pair (ΔF1 = -0.022, 95% CI [-0.052, +0.004])."
+  ],
+  "frases_pt": [
+    "Em entrada/saída, no mesmo protocolo, uma única ResNet-152 multitarefa com cabeças KAN spline (backbone compartilhado, uma cabeça por tarefa) ficou abaixo da rede de tarefa única dedicada, com a mesma cabeça (AUC 0.894 ± 0.014 contra 0.905 ± 0.013; ΔAUC = -0.011, IC 95 % [-0.015, -0.006]; melhor em 0/5 dobras), embora a diferença fique dentro da margem de não inferioridade pré-registrada de -0.02 (sementes 42, 43, 44).",
+    "Em entrada/saída, no mesmo protocolo, uma única ResNet-152 multitarefa com cabeças MLP-128 (backbone compartilhado, uma cabeça por tarefa) ficou abaixo da rede de tarefa única dedicada, com a mesma cabeça (AUC 0.895 ± 0.014 contra 0.905 ± 0.014; ΔAUC = -0.010, IC 95 % [-0.014, -0.005]; melhor em 0/5 dobras), embora a diferença fique dentro da margem de não inferioridade pré-registrada de -0.02 (sementes 42, 43, 44).",
+    "Dentro da rede multitarefa, em entrada/saída, as cabeças KAN spline (7.87 M parâmetros nas cabeças) empataram com as cabeças MLP-128 (0.53 M), dentro da margem pré-registrada (AUC 0.894 ± 0.014 contra 0.895 ± 0.014; ΔAUC = -0.001, IC 95 % [-0.003, +0.0004]; KAN melhor em 2/5 dobras) (sementes 42, 43, 44). Isso compara tipos de cabeça, não eficiência em parâmetros.",
+    "Em distância do disparo (só entradas), no mesmo protocolo, uma única ResNet-152 multitarefa com cabeças KAN spline (backbone compartilhado, uma cabeça por tarefa) foi não inferior à rede de tarefa única dedicada, com a mesma cabeça, dentro da margem pré-registrada de -0.02 (AUC 0.805 ± 0.065 contra 0.798 ± 0.058; ΔAUC = +0.007, IC 95 % [-0.003, +0.018]; melhor em 3/5 dobras; ΔF1 = -0.002, IC 95 % [-0.029, +0.027]) (sementes 42, 43, 44).",
+    "Em distância do disparo (só entradas), no mesmo protocolo, uma única ResNet-152 multitarefa com cabeças MLP-128 (backbone compartilhado, uma cabeça por tarefa) foi não inferior à rede de tarefa única dedicada, com a mesma cabeça, dentro da margem pré-registrada de -0.02 (AUC 0.806 ± 0.071 contra 0.802 ± 0.062; ΔAUC = +0.004, IC 95 % [-0.006, +0.014]; melhor em 3/5 dobras; ΔF1 = +0.007, IC 95 % [-0.021, +0.035]) (sementes 42, 43, 44).",
+    "Dentro da rede multitarefa, em distância do disparo (só entradas), as cabeças KAN spline (7.87 M parâmetros nas cabeças) empataram com as cabeças MLP-128 (0.53 M), dentro da margem pré-registrada (AUC 0.805 ± 0.065 contra 0.806 ± 0.071; ΔAUC = -0.002, IC 95 % [-0.009, +0.003]; KAN melhor em 2/5 dobras) (sementes 42, 43, 44). Isso compara tipos de cabeça, não eficiência em parâmetros.",
+    "Uma rede multitarefa com cabeças KAN spline substitui duas redes de tarefa única: 66.02 M contra 124.16 M parâmetros (-46.8 %). As duas saídas saem de um forward em vez de dois: 1.12 contra 2.22 ms por imagem com lote 32 e 27.31 contra 51.03 ms com lote 1 na NVIDIA L4 (2.0× mais rápido com lote 32). O treino leva 8.6 min por dobra para a rede multitarefa contra 14.9 min para as duas redes de tarefa única juntas (L4; mais rápido além da variação entre rodadas).",
+    "Uma rede multitarefa com cabeças MLP-128 substitui duas redes de tarefa única: 58.67 M contra 116.81 M parâmetros (-49.8 %). As duas saídas saem de um forward em vez de dois: 1.11 contra 2.22 ms por imagem com lote 32 e 24.31 contra 48.48 ms com lote 1 na NVIDIA L4 (2.0× mais rápido com lote 32). O treino leva 8.1 min por dobra para a rede multitarefa contra 14.6 min para as duas redes de tarefa única juntas (L4; mais rápido além da variação entre rodadas).",
+    "Secundário, descritivo: no pipeline de 4 classes (saída, encostado, curta, distância) com cabeças KAN spline, o F1 macro no OOF é 0.485 para a rede multitarefa contra 0.515 para o par de tarefa única (ΔF1 = -0.030, IC 95 % [-0.061, -0.004]).",
+    "Secundário, descritivo: no pipeline de 4 classes (saída, encostado, curta, distância) com cabeças MLP-128, o F1 macro no OOF é 0.492 para a rede multitarefa contra 0.514 para o par de tarefa única (ΔF1 = -0.022, IC 95 % [-0.052, +0.004])."
+  ],
+  "plugin_sha256": "b9841e0f8c0192bf67df96f318e384659a96659c5eda08737dae740f612c1814",
+  "protocolo_sha256": "b7cd9baca53edd96c855cca10914fc258efa8ddfd0937cc0d3e9572de5ef9e13"
+}

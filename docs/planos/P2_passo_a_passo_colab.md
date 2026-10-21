@@ -65,6 +65,8 @@ O que você faz em cada notebook, em ordem. Todos estão na pasta `Colab Noteboo
 
 ## Notas técnicas para a sessão de análise
 
+- **Estado em 21/10/2026:** tudo rodado na L4 (teste rápido, abas A e B, 15 + 15 unidades) e o `10` no Colab. Os resultados estão em `resultados/` e foram conferidos por um recálculo independente. Resumo e cuidados para o texto: `docs/planos/NOTAS_P2_para_P4.md`.
+
 - **Plugin:** `notebooks/multitarefa.py` v1.0.0, SHA-256 `b9841e0f8c0192bf67df96f318e384659a96659c5eda08737dae740f612c1814`, embutido no 09 (abas A e B) e no 10.
   - Registra só `mt_kan` e `mt_mlp`: ResNet-152 → Dropout 0,5 → {`es`, `dist`}, cabeças nativas `kan` (d) e `mlp128` (b), `pesos_tarefa = {es: 1, dist: 1}`, perda `soma_ponderada`.
   - Parâmetros conferidos com a ResNet-152 de verdade: `mt_kan` 66.017.728 (par ST 124.161.536, −46,8 %); `mt_mlp` 58.668.997 (par ST 116.812.805, −49,8 %).
