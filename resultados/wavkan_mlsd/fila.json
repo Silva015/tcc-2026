@@ -1,0 +1,212 @@
+[
+  {
+    "experimento": "wavkan_mlsd",
+    "config": "mlsd__resnet152__wavkan_mexhat_h128",
+    "semente": 42,
+    "dobra": 0,
+    "coluna_dobra": "fold_dist_d0"
+  },
+  {
+    "experimento": "wavkan_mlsd",
+    "config": "mlsd__resnet152__wavkan_mexhat_h128",
+    "semente": 42,
+    "dobra": 1,
+    "coluna_dobra": "fold_dist_d1"
+  },
+  {
+    "experimento": "wavkan_mlsd",
+    "config": "mlsd__resnet152__wavkan_mexhat_h128",
+    "semente": 42,
+    "dobra": 2,
+    "coluna_dobra": "fold_dist_d2"
+  },
+  {
+    "experimento": "wavkan_mlsd",
+    "config": "mlsd__resnet152__wavkan_mexhat_h128",
+    "semente": 42,
+    "dobra": 3,
+    "coluna_dobra": "fold_dist_d3"
+  },
+  {
+    "experimento": "wavkan_mlsd",
+    "config": "mlsd__resnet152__wavkan_mexhat_h128",
+    "semente": 42,
+    "dobra": 4,
+    "coluna_dobra": "fold_dist_d4"
+  },
+  {
+    "experimento": "wavkan_mlsd",
+    "config": "mlsd__resnet152__wavkan_mexhat_h32",
+    "semente": 42,
+    "dobra": 0,
+    "coluna_dobra": "fold_dist_d0"
+  },
+  {
+    "experimento": "wavkan_mlsd",
+    "config": "mlsd__resnet152__wavkan_mexhat_h32",
+    "semente": 42,
+    "dobra": 1,
+    "coluna_dobra": "fold_dist_d1"
+  },
+  {
+    "experimento": "wavkan_mlsd",
+    "config": "mlsd__resnet152__wavkan_mexhat_h32",
+    "semente": 42,
+    "dobra": 2,
+    "coluna_dobra": "fold_dist_d2"
+  },
+  {
+    "experimento": "wavkan_mlsd",
+    "config": "mlsd__resnet152__wavkan_mexhat_h32",
+    "semente": 42,
+    "dobra": 3,
+    "coluna_dobra": "fold_dist_d3"
+  },
+  {
+    "experimento": "wavkan_mlsd",
+    "config": "mlsd__resnet152__wavkan_mexhat_h32",
+    "semente": 42,
+    "dobra": 4,
+    "coluna_dobra": "fold_dist_d4"
+  },
+  {
+    "experimento": "wavkan_mlsd",
+    "config": "mlsd__resnet152__wavkan_mexhat_h128",
+    "semente": 43,
+    "dobra": 0,
+    "coluna_dobra": "fold_dist_d0"
+  },
+  {
+    "experimento": "wavkan_mlsd",
+    "config": "mlsd__resnet152__wavkan_mexhat_h128",
+    "semente": 43,
+    "dobra": 1,
+    "coluna_dobra": "fold_dist_d1"
+  },
+  {
+    "experimento": "wavkan_mlsd",
+    "config": "mlsd__resnet152__wavkan_mexhat_h128",
+    "semente": 43,
+    "dobra": 2,
+    "coluna_dobra": "fold_dist_d2"
+  },
+  {
+    "experimento": "wavkan_mlsd",
+    "config": "mlsd__resnet152__wavkan_mexhat_h128",
+    "semente": 43,
+    "dobra": 3,
+    "coluna_dobra": "fold_dist_d3"
+  },
+  {
+    "experimento": "wavkan_mlsd",
+    "config": "mlsd__resnet152__wavkan_mexhat_h128",
+    "semente": 43,
+    "dobra": 4,
+    "coluna_dobra": "fold_dist_d4"
+  },
+  {
+    "experimento": "wavkan_mlsd",
+    "config": "mlsd__resnet152__wavkan_mexhat_h32",
+    "semente": 43,
+    "dobra": 0,
+    "coluna_dobra": "fold_dist_d0"
+  },
+  {
+    "experimento": "wavkan_mlsd",
+    "config": "mlsd__resnet152__wavkan_mexhat_h32",
+    "semente": 43,
+    "dobra": 1,
+    "coluna_dobra": "fold_dist_d1"
+  },
+  {
+    "experimento": "wavkan_mlsd",
+    "config": "mlsd__resnet152__wavkan_mexhat_h32",
+    "semente": 43,
+    "dobra": 2,
+    "coluna_dobra": "fold_dist_d2"
+  },
+  {
+    "experimento": "wavkan_mlsd",
+    "config": "mlsd__resnet152__wavkan_mexhat_h32",
+    "semente": 43,
+    "dobra": 3,
+    "coluna_dobra": "fold_dist_d3"
+  },
+  {
+    "experimento": "wavkan_mlsd",
+    "config": "mlsd__resnet152__wavkan_mexhat_h32",
+    "semente": 43,
+    "dobra": 4,
+    "coluna_dobra": "fold_dist_d4"
+  },
+  {
+    "experimento": "wavkan_mlsd",
+    "config": "mlsd__resnet152__wavkan_mexhat_h128",
+    "semente": 44,
+    "dobra": 0,
+    "coluna_dobra": "fold_dist_d0"
+  },
+  {
+    "experimento": "wavkan_mlsd",
+    "config": "mlsd__resnet152__wavkan_mexhat_h128",
+    "semente": 44,
+    "dobra": 1,
+    "coluna_dobra": "fold_dist_d1"
+  },
+  {
+    "experimento": "wavkan_mlsd",
+    "config": "mlsd__resnet152__wavkan_mexhat_h128",
+    "semente": 44,
+    "dobra": 2,
+    "coluna_dobra": "fold_dist_d2"
+  },
+  {
+    "experimento": "wavkan_mlsd",
+    "config": "mlsd__resnet152__wavkan_mexhat_h128",
+    "semente": 44,
+    "dobra": 3,
+    "coluna_dobra": "fold_dist_d3"
+  },
+  {
+    "experimento": "wavkan_mlsd",
+    "config": "mlsd__resnet152__wavkan_mexhat_h128",
+    "semente": 44,
+    "dobra": 4,
+    "coluna_dobra": "fold_dist_d4"
+  },
+  {
+    "experimento": "wavkan_mlsd",
+    "config": "mlsd__resnet152__wavkan_mexhat_h32",
+    "semente": 44,
+    "dobra": 0,
+    "coluna_dobra": "fold_dist_d0"
+  },
+  {
+    "experimento": "wavkan_mlsd",
+    "config": "mlsd__resnet152__wavkan_mexhat_h32",
+    "semente": 44,
+    "dobra": 1,
+    "coluna_dobra": "fold_dist_d1"
+  },
+  {
+    "experimento": "wavkan_mlsd",
+    "config": "mlsd__resnet152__wavkan_mexhat_h32",
+    "semente": 44,
+    "dobra": 2,
+    "coluna_dobra": "fold_dist_d2"
+  },
+  {
+    "experimento": "wavkan_mlsd",
+    "config": "mlsd__resnet152__wavkan_mexhat_h32",
+    "semente": 44,
+    "dobra": 3,
+    "coluna_dobra": "fold_dist_d3"
+  },
+  {
+    "experimento": "wavkan_mlsd",
+    "config": "mlsd__resnet152__wavkan_mexhat_h32",
+    "semente": 44,
+    "dobra": 4,
+    "coluna_dobra": "fold_dist_d4"
+  }
+]

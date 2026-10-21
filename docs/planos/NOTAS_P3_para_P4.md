@@ -1,6 +1,6 @@
 # Notas do P3 (Wav-KAN) para o P4
 
-Resultados das rodadas de 19–20/10/2026 na L4, trazidos do Drive (`tcc-final`) e conferidos.
+Resultados das rodadas de 19–20/10/2026 na L4, trazidos do Drive (`tcc-final`) e conferidos. A MLSD está completa: as dobras 3 e 4 da W2 semente 44 rodaram em 20/10 e o `08` foi rodado de novo, já com a frase corrigida.
 
 ## Onde está cada coisa
 
@@ -15,15 +15,18 @@ Resultados das rodadas de 19–20/10/2026 na L4, trazidos do Drive (`tcc-final`)
 | `resultados/diagnostico_wavkan.csv` | `scale`/`translation` das camadas Wav-KAN no fim de cada fase |
 | `resultados/benchmark_cabecas.json` | Saída do `06`: equivalência com o torch-conv-kan, tempo e memória só da cabeça |
 | `resultados/wavkan/{fila.json,runs.csv,resumo.json,oof.csv}` | Entrada/saída: 45 unidades (cabeça × semente × dobra) e predições fora da dobra |
-| `resultados/wavkan/notebooks_executados/` | `06`, `07` e `08` como rodaram no Colab (sem o nome e o ID do Google nas células) |
+| `resultados/wavkan_mlsd/{fila.json,runs.csv,resumo.json,oof.csv}` | MLSD: 30 unidades (W1 e W2 × 3 sementes × 5 dobras) e predições fora da dobra |
+| `resultados/wavkan/notebooks_executados/` | `06`, `07` e `08` como rodaram no Colab (sem o nome e o ID do Google nas células). O `07` é o da rodada de entrada/saída; o `08` é o da rodada final de 20/10 |
 
-Ficaram só no Drive: as pastas por unidade, os checkpoints e as rodadas da MLSD (`resultados/wavkan_mlsd/`), que ainda não têm `runs.csv`/`oof.csv` porque a W2 semente 44 não terminou.
+Ficaram só no Drive: as pastas por unidade e os checkpoints.
 
 ## Conferências feitas
 
 - Os tamanhos de todos os arquivos batem com os do Drive.
 - `runs.csv` bate com `resumo.json`, e a AUC de cada dobra recalculada a partir do `oof.csv` bate com a do `runs.csv` (diferença máxima de 1e-16).
 - Os contrastes de entrada/saída, recalculados à parte com o mesmo bootstrap pareado (2000 reamostragens, semente 0), batem com o `08` até a 6.ª casa decimal.
+- MLSD: `runs.csv` bate com `resumo.json` e com o `oof.csv` (diferença máxima de 6e-17), e os cinco contrastes, recalculados à parte, batem com o `08` sem diferença nenhuma.
+- `decisao_wavkan.json` e `frases_wavkan.md` da rodada final são idênticos, byte a byte, aos que a célula das frases gera a partir das tabelas. A figura foi conferida por estrutura e por imagem.
 - `06`: a camada e a cabeça são idênticas às do torch-conv-kan @ b412a3b em CPU e CUDA, com diferença 0 na saída e no gradiente.
 - Todas as rodadas usaram a L4, o protocolo SHA b7cd9bac… e o plugin SHA d02f6ca6….
 
@@ -57,16 +60,16 @@ Ficaram só no Drive: as pastas por unidade, os checkpoints e as rodadas da MLSD
 | (c) | 0,807 ± 0,055 | 0,480 | 0,821 | 42–44 |
 | (d) | 0,798 ± 0,058 | 0,477 | 0,813 | 42–44 |
 | W1 | 0,711 ± 0,116 | 0,418 | 0,671 | 42–44 |
-| W2 | 0,713 ± 0,112 | 0,410 | 0,647 | 42, 43 |
+| W2 | 0,715 ± 0,113 | 0,410 | 0,649 | 42–44 |
 
-- **Contraste primário 1 (W2 × b):** *inferior* (C). ΔAUC = −0,076 [−0,103; −0,050]; perde nas 5 dobras.
-- Todos os contrastes da MLSD (W1 × c, W1 × d, W2 × d, W1 × b) dão inferior, com ΔAUC entre −0,072 e −0,086.
+- **Contraste primário 1 (W2 × b):** *inferior* (C). ΔAUC = −0,071 [−0,098; −0,043]; ΔF1 = −0,069 [−0,117; −0,021]; perde nas 5 dobras.
+- Todos os contrastes da MLSD (W1 × c, W1 × d, W2 × d, W1 × b) dão inferior, com ΔAUC entre −0,066 e −0,086.
 
 ## Cuidados para o texto
 
-1. **Frase corrigida.** A frase do `08` para o resultado *inconclusivo* dizia que "o limite inferior do IC fica abaixo da margem", mas citava só o IC do ΔAUC, que está dentro dela. Quem fica abaixo da margem é o ΔF1. O `notebooks/08_analise_wavkan.ipynb` foi corrigido: agora a frase nomeia a métrica e traz o IC dela. `frases_wavkan.md` e `decisao_wavkan.json` foram regerados com o código novo a partir das mesmas saídas, e só a frase W2 × b (EN e PT) mudou. O `08` executado em `notebooks_executados/` mostra a frase antiga, porque é o registro da rodada.
-2. **MLSD W2 sem a semente 44.** A W2 na MLSD tem só as dobras 0–2 da semente 44, então a análise usou as sementes 42 e 43. Para fechar, falta rodar as dobras 3 e 4 (cerca de 15 min de L4) e repetir o `08`. A conclusão (inferior, por ~0,07–0,09 de AUC) dificilmente muda.
-3. **"Mais rápida" não vale.** `pode_afirmar.wavkan_faster.es__W2_vs_d = true` sai da regra (a cabeça sozinha é mais rápida que a KAN spline, 2,95 × 3,30 ms, e a dobra encurtou). Mas a dobra encurtou só 0,35 % (8,46 × 8,49 min, dp ≈ 0,1), o que está dentro do ruído. A própria regra manda dizer "mesmo tempo" quando a diferença cabe no ruído. Não escrever que a Wav-KAN treina mais rápido. A W1 é 3,6 % mais lenta por dobra que a KAN spline e 5,3 % mais lenta que a MLP-iso; a W5 é 25–27 % mais lenta. Só a cabeça, com lote 32, a W1 leva 8,8 ms contra 0,73 ms da MLP-iso e usa 223 MB contra 0,24 MB.
+1. **Frase corrigida.** A frase do `08` para o resultado *inconclusivo* dizia que "o limite inferior do IC fica abaixo da margem", mas citava só o IC do ΔAUC, que está dentro dela. Quem fica abaixo da margem é o ΔF1. O `notebooks/08_analise_wavkan.ipynb` foi corrigido: agora a frase nomeia a métrica e traz o IC dela. `frases_wavkan.md` e `decisao_wavkan.json` foram regerados com o código novo a partir das mesmas saídas, e só a frase W2 × b (EN e PT) mudou. O `08` executado em `notebooks_executados/` é o da rodada final, já com a frase corrigida.
+2. **MLSD W2 completa.** As dobras 3 e 4 da semente 44 rodaram em 20/10 e o `08` foi repetido. Com as três sementes, a conclusão não mudou: W2 × (b) continua *inferior* (ΔAUC −0,071 contra −0,076 com duas sementes).
+3. **"Mais rápida" não vale.** `pode_afirmar.wavkan_faster.es__W2_vs_d = true` sai da regra (a cabeça sozinha é mais rápida que a KAN spline, 2,95 × 3,30 ms, e a dobra encurtou). Mas a dobra encurtou só 0,35 % (8,46 × 8,49 min, dp ≈ 0,1), o que está dentro do ruído. A própria regra manda dizer "mesmo tempo" quando a diferença cabe no ruído. Na rodada final, `dist__W2_vs_d` também saiu `true` pelo mesmo motivo: 6,44 × 6,46 min por dobra, só 0,25 % mais curta. Também não vale. Não escrever que a Wav-KAN treina mais rápido. A W1 é 3,6 % mais lenta por dobra que a KAN spline e 5,3 % mais lenta que a MLP-iso; a W5 é 25–27 % mais lenta. Só a cabeça, com lote 32, a W1 leva 8,8 ms contra 0,73 ms da MLP-iso e usa 223 MB contra 0,24 MB.
 4. **As wavelets quase não mudaram de forma.** Nas duas fases e nas duas tarefas, `scale` termina com média entre 0,99 e 1,003 (dp 0,013–0,020) e `translation` com média ≈ 0 (dp 0,013–0,025); os valores iniciais são 1 e 0. Na prática, a cabeça aprendeu os pesos de uma wavelet de forma fixa. Não atribuir resultado nenhum ao ajuste da forma da wavelet.
 5. **Mesma AUC, F1/acurácia mais baixos.** Em entrada/saída, a Wav-KAN ordena os casos tão bem quanto as MLPs (AUC igual), mas no limiar 0,5 acerta ~1 ponto a menos de acurácia e de F1, com recall macro um pouco maior. Isso é deslocamento do limiar ou calibração, não falta de separação. Se o texto falar em F1, dizer isso.
 6. **MLSD é onde a Wav-KAN perde de verdade.** Além da média mais baixa, a variação entre dobras dobra (dp 0,11–0,12 contra 0,06), e a acurácia cai de ~0,81 para ~0,65.

@@ -484,35 +484,36 @@
       "b": "b",
       "sementes": [
         42,
-        43
+        43,
+        44
       ],
-      "delta_auc_oof": -0.07648948122827814,
+      "delta_auc_oof": -0.07084711172735902,
       "ic95_auc": [
-        -0.10334125465545416,
-        -0.04952008690010892
+        -0.09836458735930097,
+        -0.04289505141143501
       ],
-      "delta_f1_oof": -0.0759209130016188,
+      "delta_f1_oof": -0.06881266265577407,
       "ic95_f1": [
-        -0.11661677129064459,
-        -0.035596124924525276
+        -0.11682457521277,
+        -0.021459113841027028
       ],
       "n_boot_validos": 2000,
       "delta_auc_dobras": {
-        "0": -0.0179,
-        "1": -0.073,
-        "2": -0.0583,
-        "3": -0.1208,
-        "4": -0.1719
+        "0": -0.0177,
+        "1": -0.0708,
+        "2": -0.0564,
+        "3": -0.1142,
+        "4": -0.1754
       },
       "delta_f1_dobras": {
-        "0": -0.1268,
-        "1": -0.0656,
-        "2": -0.0866,
-        "3": -0.068,
-        "4": -0.0408
+        "0": -0.1157,
+        "1": -0.0524,
+        "2": -0.0921,
+        "3": -0.0582,
+        "4": -0.0404
       },
-      "media_delta_auc_dobras": -0.08841145711542622,
-      "dp_delta_auc_dobras": 0.059426379951468725,
+      "media_delta_auc_dobras": -0.08692295413787812,
+      "dp_delta_auc_dobras": 0.060320095411553934,
       "dobras_a_vence": 0,
       "dobras_a_nao_perde": 0,
       "n_dobras": 5,
@@ -615,35 +616,36 @@
       "b": "d",
       "sementes": [
         42,
-        43
+        43,
+        44
       ],
-      "delta_auc_oof": -0.07210161920377756,
+      "delta_auc_oof": -0.0656496353435233,
       "ic95_auc": [
-        -0.10265680644824499,
-        -0.045219811255222064
+        -0.09568108834102405,
+        -0.03769388057468672
       ],
-      "delta_f1_oof": -0.07759256292025768,
+      "delta_f1_oof": -0.07016183470476167,
       "ic95_f1": [
-        -0.12201153443136978,
-        -0.034020892972475854
+        -0.11943263208190609,
+        -0.02245197938340526
       ],
       "n_boot_validos": 2000,
       "delta_auc_dobras": {
-        "0": -0.0219,
-        "1": -0.0648,
-        "2": -0.0506,
-        "3": -0.1041,
-        "4": -0.1939
+        "0": -0.0183,
+        "1": -0.0651,
+        "2": -0.0462,
+        "3": -0.0991,
+        "4": -0.1867
       },
       "delta_f1_dobras": {
-        "0": -0.1129,
-        "1": -0.0629,
-        "2": -0.0522,
-        "3": -0.0531,
-        "4": -0.0489
+        "0": -0.1084,
+        "1": -0.0549,
+        "2": -0.0733,
+        "3": -0.047,
+        "4": -0.0503
       },
-      "media_delta_auc_dobras": -0.0870763803717662,
-      "dp_delta_auc_dobras": 0.06663045716606875,
+      "media_delta_auc_dobras": -0.0830727896992923,
+      "dp_delta_auc_dobras": 0.06496626109865501,
       "dobras_a_vence": 0,
       "dobras_a_nao_perde": 0,
       "n_dobras": 5,
@@ -837,12 +839,12 @@
       ],
       "cabeca_mais_rapida_alem_do_ruido": false,
       "min_por_dobra": [
-        6.470141666666666,
-        0.08983738884888161,
+        6.444236666666667,
+        0.12586103577119015,
         6.309,
         0.08926084790239211
       ],
-      "variacao_dobra_pct": 2.554155439319472,
+      "variacao_dobra_pct": 2.1435515401278638,
       "razao_params_cabeca": 1.0002322942292021
     },
     "dist__W1_vs_c": {
@@ -891,7 +893,7 @@
       "tarefa": "dist",
       "a": "W2",
       "b": "d",
-      "desfecho": "igual",
+      "desfecho": "mais_rapida",
       "cabeca_ms_lote32": [
         2.9521865606307984,
         0.1351113428943226,
@@ -900,12 +902,12 @@
       ],
       "cabeca_mais_rapida_alem_do_ruido": true,
       "min_por_dobra": [
-        6.470141666666666,
-        0.08983738884888161,
+        6.444236666666667,
+        0.12586103577119015,
         6.460327777777778,
         0.10729917577359661
       ],
-      "variacao_dobra_pct": 0.15191007680208646,
+      "variacao_dobra_pct": -0.24907576928930864,
       "razao_params_cabeca": 14.99600149277603
     }
   },
@@ -924,7 +926,7 @@
       "dist__W2_vs_b": false,
       "dist__W1_vs_c": false,
       "dist__W1_vs_d": false,
-      "dist__W2_vs_d": false
+      "dist__W2_vs_d": true
     },
     "compare_with_0.908_or_0.893": false,
     "spline_KAN_is_the_reference_that_works": false
@@ -999,14 +1001,12 @@
       ],
       "W2": [
         42,
-        43
+        43,
+        44
       ]
     }
   },
-  "avisos": [
-    "MLSD (distância) W2: sementes ainda não concluídas [44]",
-    "sementes incompletas (fora da análise): MLSD (distância) W2 s44: dobras [0, 1, 2]"
-  ],
+  "avisos": [],
   "frases_en": [
     "On entry/exit classification, under an identical protocol, a wavelet-KAN head (Mexican hat, 0.26 M parameters) was not shown non-inferior to an MLP head of the same size (0.26 M; AUC 0.902 ± 0.013 vs. 0.905 ± 0.014; ΔAUC = -0.001, 95% CI [-0.004, +0.002]; better in 0/5 folds; ΔF1 = -0.012, 95% CI [-0.023, -0.003]; the lower bound of the ΔF1 CI is below the pre-registered -0.02 margin), although the pre-registered rule for a difference (≥ 4/5 folds and CI excluding zero) was not met either (seeds 42, 43, 44).",
     "On entry/exit classification, a wavelet-KAN head (W1: Mexican hat, 1.05 M parameters) matched a parameter-matched MLP head (3.94 M) within the pre-registered non-inferiority margin (ΔAUC = -0.002, 95% CI [-0.005, +0.002]; ΔF1 = -0.003, 95% CI [-0.014, +0.008]) (seeds 42, 43, 44).",
@@ -1014,13 +1014,13 @@
     "On entry/exit classification, a wavelet-KAN head (W1: Mexican hat, 1.05 M parameters) matched the spline-KAN head (3.94 M) within the pre-registered non-inferiority margin (ΔAUC = -0.001, 95% CI [-0.004, +0.003]; ΔF1 = -0.005, 95% CI [-0.016, +0.005]) (seeds 42, 43, 44).",
     "On entry/exit classification, a wavelet-KAN head (W2: Mexican hat, 0.26 M parameters) did not reach non-inferiority against the spline-KAN head (3.94 M; ΔAUC = -0.001, 95% CI [-0.003, +0.002]; ΔF1 = -0.011, 95% CI [-0.021, -0.002]) (seeds 42, 43, 44).",
     "On entry/exit classification, a wavelet-KAN head (W5: Mexican hat, 3.94 M parameters) matched the spline-KAN head (3.94 M) within the pre-registered non-inferiority margin (ΔAUC = -0.002, 95% CI [-0.007, +0.003]; ΔF1 = -0.008, 95% CI [-0.019, +0.002]) (single training seed).",
-    "On shooting-distance (MLSD) classification, under an identical protocol, a wavelet-KAN head (Mexican hat, 0.26 M parameters) underperformed an MLP head of the same size (0.26 M; AUC 0.713 ± 0.112 vs. 0.802 ± 0.062; ΔAUC = -0.076, 95% CI [-0.103, -0.050]; better in 0/5 folds) (seeds 42, 43).",
+    "On shooting-distance (MLSD) classification, under an identical protocol, a wavelet-KAN head (Mexican hat, 0.26 M parameters) underperformed an MLP head of the same size (0.26 M; AUC 0.715 ± 0.113 vs. 0.802 ± 0.062; ΔAUC = -0.071, 95% CI [-0.098, -0.043]; better in 0/5 folds) (seeds 42, 43, 44).",
     "On shooting-distance (MLSD) classification, a wavelet-KAN head (W1: Mexican hat, 1.05 M parameters) did not reach non-inferiority against a parameter-matched MLP head (3.94 M; ΔAUC = -0.086, 95% CI [-0.120, -0.052]; ΔF1 = -0.070, 95% CI [-0.121, -0.024]) (seeds 42, 43, 44).",
     "On shooting-distance (MLSD) classification, a wavelet-KAN head (W1: Mexican hat, 1.05 M parameters) did not reach non-inferiority against the spline-KAN head (3.94 M; ΔAUC = -0.075, 95% CI [-0.105, -0.044]; ΔF1 = -0.067, 95% CI [-0.113, -0.024]) (seeds 42, 43, 44).",
-    "On shooting-distance (MLSD) classification, a wavelet-KAN head (W2: Mexican hat, 0.26 M parameters) did not reach non-inferiority against the spline-KAN head (3.94 M; ΔAUC = -0.072, 95% CI [-0.103, -0.045]; ΔF1 = -0.078, 95% CI [-0.122, -0.034]) (seeds 42, 43).",
+    "On shooting-distance (MLSD) classification, a wavelet-KAN head (W2: Mexican hat, 0.26 M parameters) did not reach non-inferiority against the spline-KAN head (3.94 M; ΔAUC = -0.066, 95% CI [-0.096, -0.038]; ΔF1 = -0.070, 95% CI [-0.119, -0.022]) (seeds 42, 43, 44).",
     "On entry/exit classification, W2 has the same head-parameter budget as the MLP-128 head at equal wall-clock time (8.5 vs. 8.3 min per fold on an NVIDIA L4); the ResNet-152 backbone dominates the cost.",
     "On entry/exit classification, W1 has 3.7× fewer head parameters than the spline-KAN head but trains 4% slower per fold (8.8 vs. 8.5 min on an NVIDIA L4), because each wavelet layer materialises a batch × output × input tensor.",
-    "On shooting-distance (MLSD) classification, W2 has the same head-parameter budget as the MLP-128 head at equal wall-clock time (6.5 vs. 6.3 min per fold on an NVIDIA L4); the ResNet-152 backbone dominates the cost.",
+    "On shooting-distance (MLSD) classification, W2 has the same head-parameter budget as the MLP-128 head at equal wall-clock time (6.4 vs. 6.3 min per fold on an NVIDIA L4); the ResNet-152 backbone dominates the cost.",
     "On shooting-distance (MLSD) classification, W1 has 3.7× fewer head parameters than the spline-KAN head but trains 4% slower per fold (6.7 vs. 6.5 min on an NVIDIA L4), because each wavelet layer materialises a batch × output × input tensor."
   ],
   "frases_pt": [
@@ -1030,13 +1030,13 @@
     "Em entrada/saída, uma cabeça Wav-KAN (W1: chapéu mexicano, 1.05 M parâmetros) foi não inferior à cabeça KAN spline (3.94 M) dentro da margem pré-registrada (ΔAUC = -0.001, IC 95 % [-0.004, +0.003]; ΔF1 = -0.005, IC 95 % [-0.016, +0.005]) (sementes 42, 43, 44).",
     "Em entrada/saída, uma cabeça Wav-KAN (W2: chapéu mexicano, 0.26 M parâmetros) não atingiu a não inferioridade em relação à cabeça KAN spline (3.94 M; ΔAUC = -0.001, IC 95 % [-0.003, +0.002]; ΔF1 = -0.011, IC 95 % [-0.021, -0.002]) (sementes 42, 43, 44).",
     "Em entrada/saída, uma cabeça Wav-KAN (W5: chapéu mexicano, 3.94 M parâmetros) foi não inferior à cabeça KAN spline (3.94 M) dentro da margem pré-registrada (ΔAUC = -0.002, IC 95 % [-0.007, +0.003]; ΔF1 = -0.008, IC 95 % [-0.019, +0.002]) (uma única semente de treino).",
-    "Em MLSD (distância), no mesmo protocolo, uma cabeça Wav-KAN (chapéu mexicano, 0.26 M parâmetros) ficou abaixo de uma cabeça MLP do mesmo tamanho (0.26 M; AUC 0.713 ± 0.112 contra 0.802 ± 0.062; ΔAUC = -0.076, IC 95 % [-0.103, -0.050]; melhor em 0/5 dobras) (sementes 42, 43).",
+    "Em MLSD (distância), no mesmo protocolo, uma cabeça Wav-KAN (chapéu mexicano, 0.26 M parâmetros) ficou abaixo de uma cabeça MLP do mesmo tamanho (0.26 M; AUC 0.715 ± 0.113 contra 0.802 ± 0.062; ΔAUC = -0.071, IC 95 % [-0.098, -0.043]; melhor em 0/5 dobras) (sementes 42, 43, 44).",
     "Em MLSD (distância), uma cabeça Wav-KAN (W1: chapéu mexicano, 1.05 M parâmetros) não atingiu a não inferioridade em relação a uma cabeça MLP isoparamétrica (3.94 M; ΔAUC = -0.086, IC 95 % [-0.120, -0.052]; ΔF1 = -0.070, IC 95 % [-0.121, -0.024]) (sementes 42, 43, 44).",
     "Em MLSD (distância), uma cabeça Wav-KAN (W1: chapéu mexicano, 1.05 M parâmetros) não atingiu a não inferioridade em relação à cabeça KAN spline (3.94 M; ΔAUC = -0.075, IC 95 % [-0.105, -0.044]; ΔF1 = -0.067, IC 95 % [-0.113, -0.024]) (sementes 42, 43, 44).",
-    "Em MLSD (distância), uma cabeça Wav-KAN (W2: chapéu mexicano, 0.26 M parâmetros) não atingiu a não inferioridade em relação à cabeça KAN spline (3.94 M; ΔAUC = -0.072, IC 95 % [-0.103, -0.045]; ΔF1 = -0.078, IC 95 % [-0.122, -0.034]) (sementes 42, 43).",
+    "Em MLSD (distância), uma cabeça Wav-KAN (W2: chapéu mexicano, 0.26 M parâmetros) não atingiu a não inferioridade em relação à cabeça KAN spline (3.94 M; ΔAUC = -0.066, IC 95 % [-0.096, -0.038]; ΔF1 = -0.070, IC 95 % [-0.119, -0.022]) (sementes 42, 43, 44).",
     "Em entrada/saída, a W2 tem o mesmo orçamento de parâmetros na cabeça que a MLP-128 com o mesmo tempo de treino (8.5 contra 8.3 min por dobra na L4); o backbone ResNet-152 domina o custo.",
     "Em entrada/saída, a W1 tem 3.7× menos parâmetros na cabeça que a KAN spline mas treina 4% mais devagar por dobra (8.8 contra 8.5 min na L4), porque cada camada com wavelets materializa um tensor lote × saída × entrada.",
-    "Em MLSD (distância), a W2 tem o mesmo orçamento de parâmetros na cabeça que a MLP-128 com o mesmo tempo de treino (6.5 contra 6.3 min por dobra na L4); o backbone ResNet-152 domina o custo.",
+    "Em MLSD (distância), a W2 tem o mesmo orçamento de parâmetros na cabeça que a MLP-128 com o mesmo tempo de treino (6.4 contra 6.3 min por dobra na L4); o backbone ResNet-152 domina o custo.",
     "Em MLSD (distância), a W1 tem 3.7× menos parâmetros na cabeça que a KAN spline mas treina 4% mais devagar por dobra (6.7 contra 6.5 min na L4), porque cada camada com wavelets materializa um tensor lote × saída × entrada."
   ],
   "plugin_sha256": "d02f6ca6f41f0530df0f0cc3886382a8c35311ac1ec812c1f65fa74e18d800ed",
