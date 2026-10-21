@@ -1,0 +1,21 @@
+% Gerado por tcc_dissertation/scripts/gerar_tabelas.py a partir de resultados/. Não edite à mão.
+\begin{table}[!htbp]
+\centering
+\caption{\EP{MLSD (entries only; AUC = one-vs-rest macro): wavelet-KAN heads against the heads (a)--(d) on the same ResNet-152 and recipe. Mean $\pm$ s.d.\ across folds (each fold averaged over the S training seeds); F1 is macro; AUC$_{\mathrm{OOF}}$ pools the out-of-fold predictions. Min: training minutes per fold (NVIDIA L4). Head ms: forward + backward of the head alone on a batch of 32 random 2048-d inputs.}{MLSD (só entradas; AUC = macro um-contra-o-resto): cabeças Wav-KAN contra as cabeças (a)--(d), na mesma ResNet-152 e com a mesma receita. Média $\pm$ dp entre dobras (cada dobra é a média das S sementes); F1 macro; a AUC$_{\mathrm{OOF}}$ junta as predições fora da dobra. Min: minutos de treino por dobra (NVIDIA L4). Cabeça ms: forward + backward só da cabeça, num lote de 32 entradas aleatórias de 2048 dimensões.}}
+\label{tab:wavkan_mlsd}
+\footnotesize
+\setlength{\tabcolsep}{3pt}
+\resizebox{\textwidth}{!}{%
+\begin{tabular}{llrcccccrr}
+\toprule
+Id & \EP{Head}{Cabeça} & \EP{Params}{Parâm.} & S & Acc & F1 & AUC & AUC$_{\mathrm{OOF}}$ & Min & \EP{Head ms}{Cabeça ms} \\
+\midrule
+(a) & Linear & 6{,}147 & 3 & $0.815 \pm 0.014$ & $0.488 \pm 0.056$ & $0.785 \pm 0.087$ & 0.797 & 6.3 & 0.48 \\
+(b) & MLP-128 & 262{,}659 & 3 & $0.813 \pm 0.013$ & $0.482 \pm 0.050$ & $0.802 \pm 0.062$ & 0.811 & 6.3 & 0.73 \\
+(c) & MLP-iso & 3{,}937{,}791 & 3 & $0.821 \pm 0.017$ & $0.480 \pm 0.050$ & $0.807 \pm 0.055$ & 0.817 & 6.4 & 0.73 \\
+(d) & \EP{Spline KAN = TransferKAN}{KAN spline = TransferKAN} & 3{,}937{,}920 & 3 & $0.813 \pm 0.017$ & $0.477 \pm 0.045$ & $0.798 \pm 0.058$ & 0.805 & 6.5 & 3.30 \\
+W1 & Wav-KAN, \EP{Mexican hat}{chapéu mexicano}, $h=128 (W1$ & 1{,}050{,}374 & 3 & $0.671 \pm 0.043$ & $0.418 \pm 0.034$ & $0.711 \pm 0.116$ & 0.730 & 6.7 & 8.84 \\
+W2 & Wav-KAN, \EP{Mexican hat}{chapéu mexicano}, $h=32 (W2$ & 262{,}598 & 3 & $0.649 \pm 0.039$ & $0.410 \pm 0.030$ & $0.715 \pm 0.113$ & 0.740 & 6.4 & 2.95 \\
+\bottomrule
+\end{tabular}}
+\end{table}

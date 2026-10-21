@@ -1,0 +1,24 @@
+% Gerado por tcc_dissertation/scripts/gerar_tabelas.py a partir de resultados/. Não edite à mão.
+\begin{table}[!htbp]
+\centering
+\caption{\EP{Entry/exit: wavelet-KAN heads against the heads (a)--(d) on the same ResNet-152 and recipe. Mean $\pm$ s.d.\ across folds (each fold averaged over the S training seeds); F1 is macro; AUC$_{\mathrm{OOF}}$ pools the out-of-fold predictions. Min: training minutes per fold (NVIDIA L4). Head ms: forward + backward of the head alone on a batch of 32 random 2048-d inputs.}{Entrada/saída: cabeças Wav-KAN contra as cabeças (a)--(d), na mesma ResNet-152 e com a mesma receita. Média $\pm$ dp entre dobras (cada dobra é a média das S sementes); F1 macro; a AUC$_{\mathrm{OOF}}$ junta as predições fora da dobra. Min: minutos de treino por dobra (NVIDIA L4). Cabeça ms: forward + backward só da cabeça, num lote de 32 entradas aleatórias de 2048 dimensões.}}
+\label{tab:wavkan_es}
+\footnotesize
+\setlength{\tabcolsep}{3pt}
+\resizebox{\textwidth}{!}{%
+\begin{tabular}{llrcccccrr}
+\toprule
+Id & \EP{Head}{Cabeça} & \EP{Params}{Parâm.} & S & Acc & F1 & AUC & AUC$_{\mathrm{OOF}}$ & Min & \EP{Head ms}{Cabeça ms} \\
+\midrule
+(a) & Linear & 4{,}098 & 3 & $0.846 \pm 0.008$ & $0.805 \pm 0.012$ & $0.904 \pm 0.013$ & 0.905 & 8.2 & 0.48 \\
+(b) & MLP-128 & 262{,}530 & 3 & $0.846 \pm 0.011$ & $0.806 \pm 0.015$ & $0.905 \pm 0.014$ & 0.906 & 8.3 & 0.73 \\
+(c) & MLP-iso & 3{,}935{,}871 & 3 & $0.846 \pm 0.009$ & $0.807 \pm 0.013$ & $0.906 \pm 0.014$ & 0.907 & 8.3 & 0.73 \\
+(d) & \EP{Spline KAN = TransferKAN}{KAN spline = TransferKAN} & 3{,}936{,}000 & 3 & $0.846 \pm 0.010$ & $0.806 \pm 0.013$ & $0.905 \pm 0.013$ & 0.906 & 8.5 & 3.30 \\
+W1 & Wav-KAN, \EP{Mexican hat}{chapéu mexicano}, $h=128 (W1$ & 1{,}049{,}860 & 3 & $0.835 \pm 0.015$ & $0.800 \pm 0.019$ & $0.902 \pm 0.014$ & 0.905 & 8.8 & 8.84 \\
+W2 & Wav-KAN, \EP{Mexican hat}{chapéu mexicano}, $h=32 (W2$ & 262{,}468 & 3 & $0.834 \pm 0.017$ & $0.799 \pm 0.022$ & $0.902 \pm 0.013$ & 0.905 & 8.5 & 2.95 \\
+W3 & Wav-KAN, DoG, $h=128 (W3$ & 1{,}049{,}860 & 1 & $0.823 \pm 0.020$ & $0.793 \pm 0.026$ & $0.908 \pm 0.015$ & 0.907 & 8.7 & 7.60 \\
+W4 & Wav-KAN, Morlet, $h=128 (W4$ & 1{,}049{,}860 & 1 & $0.807 \pm 0.023$ & $0.779 \pm 0.028$ & $0.901 \pm 0.015$ & 0.900 & 8.7 & 8.55 \\
+W5 & Wav-KAN, \EP{Mexican hat}{chapéu mexicano}, $h=480 (W5$ & 3{,}936{,}964 & 1 & $0.834 \pm 0.017$ & $0.799 \pm 0.022$ & $0.903 \pm 0.013$ & 0.902 & 10.6 & 38.36 \\
+\bottomrule
+\end{tabular}}
+\end{table}

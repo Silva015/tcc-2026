@@ -24,6 +24,17 @@
 \usetikzlibrary{positioning,arrows.meta,shapes.geometric,fit,backgrounds,calc}
 \usepackage{pgfplots}
 \pgfplotsset{compat=1.18}
+\usepgfplotslibrary{groupplots}
+% Cores das cabeças (a)-(d) nas figuras
+\definecolor{corA}{HTML}{1F77B4}
+\definecolor{corB}{HTML}{FF7F0E}
+\definecolor{corC}{HTML}{2CA02C}
+\definecolor{corD}{HTML}{D62728}
+% Tabelas e figuras compartilhadas por EN e PT (pasta comum/): \EP{inglês}{português}
+\newcommand{\EP}[2]{#2}
+\pgfplotsset{idioma/.style={/pgf/number format/use comma}}
+% AUC das legendas das curvas ROC (gerado por scripts/preparar_dados_figuras.py)
+\input{img/protocolo/figuras_macros.tex}
 
 \usepackage[acronym]{glossaries}
 \makeglossaries

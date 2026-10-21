@@ -1,0 +1,32 @@
+% Gerado por tcc_dissertation/scripts/gerar_tabelas.py a partir de resultados/. Não edite à mão.
+\begin{table}[!htbp]
+\centering
+\caption{\EP{Entry/exit under the single protocol, in the format of Lira et al.~\cite{Lira2025deep}: M = macro, m = micro, W = weighted. Mean across folds (s.d.\ in \texttt{resultados/tabela\_mmw\_*.csv}); AUC from predicted probabilities. Seeds as in the main tables.}{Entrada/saída no protocolo único, no formato de Lira et al.~\cite{Lira2025deep}: M = macro, m = micro, W = ponderada. Média entre dobras (dp em \texttt{resultados/tabela\_mmw\_*.csv}); AUC das probabilidades previstas. Sementes como nas tabelas principais.}}
+\label{tab:mmw_es}
+\footnotesize
+\setlength{\tabcolsep}{2.5pt}
+\resizebox{\textwidth}{!}{%
+\begin{tabular}{lcccccccccccccccc}
+\toprule
+ & Acc & \multicolumn{3}{c}{\EP{Precision}{Precisão}} & \multicolumn{3}{c}{\EP{Recall}{Revocação}} & \multicolumn{3}{c}{F1} & \multicolumn{3}{c}{AUC} & \multicolumn{3}{c}{\EP{Specificity}{Especificidade}} \\
+\EP{Model}{Modelo} & & M & m & W & M & m & W & M & m & W & M & m & W & M & m & W \\
+\midrule
+ResNet152 + Linear (a) & 0.846 & 0.800 & 0.846 & 0.852 & 0.814 & 0.846 & 0.846 & 0.805 & 0.846 & 0.847 & 0.904 & 0.925 & 0.904 & 0.814 & 0.846 & 0.783 \\
+ResNet152 + MLP-128 (b) & 0.846 & 0.800 & 0.846 & 0.852 & 0.815 & 0.846 & 0.846 & 0.806 & 0.846 & 0.848 & 0.905 & 0.926 & 0.905 & 0.815 & 0.846 & 0.784 \\
+ResNet152 + MLP-iso (c) & 0.846 & 0.801 & 0.846 & 0.853 & 0.817 & 0.846 & 0.846 & 0.807 & 0.846 & 0.848 & 0.906 & 0.926 & 0.906 & 0.817 & 0.846 & 0.789 \\
+ResNet152 + KAN (d) = TransferKAN & 0.846 & 0.800 & 0.846 & 0.852 & 0.816 & 0.846 & 0.846 & 0.806 & 0.846 & 0.848 & 0.905 & 0.925 & 0.905 & 0.816 & 0.846 & 0.786 \\
+ResNet152 + KAN-8 (e) & 0.846 & 0.800 & 0.846 & 0.854 & 0.819 & 0.846 & 0.846 & 0.808 & 0.846 & 0.848 & 0.903 & 0.921 & 0.903 & 0.819 & 0.846 & 0.793 \\
+AlexNet & 0.803 & 0.750 & 0.803 & 0.822 & 0.782 & 0.803 & 0.803 & 0.761 & 0.803 & 0.809 & 0.859 & 0.881 & 0.859 & 0.782 & 0.803 & 0.761 \\
+MobileNetV2 & 0.812 & 0.763 & 0.812 & 0.835 & 0.802 & 0.812 & 0.812 & 0.776 & 0.812 & 0.819 & 0.877 & 0.890 & 0.877 & 0.802 & 0.812 & 0.792 \\
+MNASNet1.3 & 0.837 & 0.829 & 0.837 & 0.835 & 0.725 & 0.837 & 0.837 & 0.753 & 0.837 & 0.822 & 0.872 & 0.911 & 0.872 & 0.725 & 0.837 & 0.613 \\
+ShuffleNetV2 x0.5 & 0.746 & 0.706 & 0.746 & 0.799 & 0.755 & 0.746 & 0.746 & 0.713 & 0.746 & 0.759 & 0.839 & 0.826 & 0.839 & 0.755 & 0.746 & 0.764 \\
+SqueezeNet1.0 & 0.798 & 0.749 & 0.798 & 0.824 & 0.787 & 0.798 & 0.798 & 0.760 & 0.798 & 0.805 & 0.866 & 0.875 & 0.866 & 0.787 & 0.798 & 0.776 \\
+DenseNet169 & 0.858 & 0.814 & 0.858 & 0.863 & 0.830 & 0.858 & 0.858 & 0.821 & 0.858 & 0.860 & 0.904 & 0.924 & 0.904 & 0.830 & 0.858 & 0.801 \\
+MaxViT-T & 0.864 & 0.821 & 0.864 & 0.873 & 0.846 & 0.864 & 0.864 & 0.831 & 0.864 & 0.867 & 0.917 & 0.930 & 0.917 & 0.846 & 0.864 & 0.827 \\
+Swin-B & 0.884 & 0.850 & 0.884 & 0.884 & 0.850 & 0.884 & 0.884 & 0.850 & 0.884 & 0.884 & 0.929 & 0.948 & 0.929 & 0.850 & 0.884 & 0.816 \\
+EfficientNetV2-L & 0.868 & 0.828 & 0.868 & 0.870 & 0.836 & 0.868 & 0.868 & 0.831 & 0.868 & 0.869 & 0.916 & 0.934 & 0.916 & 0.836 & 0.868 & 0.804 \\
+VGG16 & 0.841 & 0.794 & 0.841 & 0.842 & 0.796 & 0.841 & 0.841 & 0.794 & 0.841 & 0.841 & 0.891 & 0.920 & 0.891 & 0.796 & 0.841 & 0.752 \\
+RegNetY-16GF & 0.852 & 0.807 & 0.852 & 0.858 & 0.824 & 0.852 & 0.852 & 0.815 & 0.852 & 0.854 & 0.906 & 0.925 & 0.906 & 0.824 & 0.852 & 0.796 \\
+\bottomrule
+\end{tabular}}
+\end{table}

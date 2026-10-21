@@ -1,0 +1,32 @@
+% Gerado por tcc_dissertation/scripts/gerar_tabelas.py a partir de resultados/. Não edite à mão.
+\begin{table}[!htbp]
+\centering
+\caption{\EP{Pre-registered contrasts of the wavelet-KAN heads ($\Delta$ = W $-$ reference) on the pooled out-of-fold predictions (probabilities averaged over the common seeds); 95\% CI from a paired case-level bootstrap (2,000 resamples). Non-inferiority margin: $-0.02$ on the lower CI bound of both $\Delta$AUC and $\Delta$F1. Superior: higher AUC in at least 4/5 folds and $\Delta$AUC CI above zero. Inferior: higher AUC in at most 1/5 folds and $\Delta$AUC CI below zero. Inconclusive: none of the three. Wins: folds in which W has the higher AUC.}{Contrastes pré-registrados das cabeças Wav-KAN ($\Delta$ = W $-$ referência) nas predições fora da dobra (probabilidades médias das sementes em comum); IC 95\% por bootstrap pareado de casos (2.000 reamostragens). Margem de não inferioridade: $-0{,}02$ no limite inferior do IC do $\Delta$AUC e do $\Delta$F1. Superior: AUC maior em pelo menos 4/5 dobras e IC do $\Delta$AUC acima de zero. Inferior: AUC maior em no máximo 1/5 dobras e IC do $\Delta$AUC abaixo de zero. Inconclusivo: nenhum dos três. Vence: dobras em que W tem a AUC maior.}}
+\label{tab:contrastes_wavkan}
+\footnotesize
+\setlength{\tabcolsep}{3pt}
+\resizebox{\textwidth}{!}{%
+\begin{tabular}{lllcccrl}
+\toprule
+\EP{Task}{Tarefa} & \EP{Contrast}{Contraste} & \EP{Role}{Papel} & \EP{Seeds}{Sementes} & $\Delta$AUC [\EP{95\% CI}{IC 95\%}] & $\Delta$F1 [\EP{95\% CI}{IC 95\%}] & \EP{Wins}{Vence} & \EP{Outcome}{Desfecho} \\
+\midrule
+E/S & W2 $-$ (b) & \EP{primary 1}{primário 1} & 42--44 & $-0.001$ [$-0.004$, $+0.002$] & $-0.012$ [$-0.023$, $-0.003$] & 0/5 & \EP{inconclusive}{inconclusivo} \\
+E/S & W1 $-$ (c) & \EP{primary 2}{primário 2} & 42--44 & $-0.002$ [$-0.005$, $+0.002$] & $-0.003$ [$-0.014$, $+0.008$] & 0/5 & \EP{non-inferior}{não inferior} \\
+E/S & W5 $-$ (c) & \EP{primary 2}{primário 2} & 42 & $-0.003$ [$-0.008$, $+0.002$] & $-0.009$ [$-0.019$, $+0.003$] & 2/5 & \EP{non-inferior}{não inferior} \\
+E/S & W1 $-$ (d) & \EP{secondary}{secundário} & 42--44 & $-0.001$ [$-0.004$, $+0.003$] & $-0.005$ [$-0.016$, $+0.005$] & 1/5 & \EP{non-inferior}{não inferior} \\
+E/S & W2 $-$ (d) & \EP{secondary}{secundário} & 42--44 & $-0.001$ [$-0.003$, $+0.002$] & $-0.011$ [$-0.021$, $-0.002$] & 0/5 & \EP{inconclusive}{inconclusivo} \\
+E/S & W5 $-$ (d) & \EP{secondary}{secundário} & 42 & $-0.002$ [$-0.007$, $+0.003$] & $-0.008$ [$-0.019$, $+0.002$] & 2/5 & \EP{non-inferior}{não inferior} \\
+E/S & W1 $-$ (b) & \EP{descriptive}{descritivo} & 42--44 & $-0.001$ [$-0.004$, $+0.003$] & $-0.007$ [$-0.019$, $+0.004$] & 1/5 & \EP{non-inferior}{não inferior} \\
+E/S & W3 $-$ W1 & \EP{sensitivity}{sensibilidade} & 42 & $+0.002$ [$-0.002$, $+0.006$] & $-0.008$ [$-0.018$, $+0.001$] & 4/5 & \EP{non-inferior}{não inferior} \\
+E/S & W4 $-$ W1 & \EP{sensitivity}{sensibilidade} & 42 & $-0.004$ [$-0.010$, $+0.001$] & $-0.023$ [$-0.035$, $-0.012$] & 1/5 & \EP{inconclusive}{inconclusivo} \\
+E/S & W3 $-$ (d) & \EP{sensitivity}{sensibilidade} & 42 & $+0.003$ [$-0.001$, $+0.007$] & $-0.014$ [$-0.027$, $-0.001$] & 4/5 & \EP{inconclusive}{inconclusivo} \\
+E/S & W4 $-$ (d) & \EP{sensitivity}{sensibilidade} & 42 & $-0.004$ [$-0.009$, $+0.001$] & $-0.028$ [$-0.044$, $-0.014$] & 1/5 & \EP{inconclusive}{inconclusivo} \\
+\midrule
+MLSD & W2 $-$ (b) & \EP{primary 1}{primário 1} & 42--44 & $-0.071$ [$-0.098$, $-0.043$] & $-0.069$ [$-0.117$, $-0.021$] & 0/5 & \EP{inferior}{inferior} \\
+MLSD & W1 $-$ (c) & \EP{primary 2}{primário 2} & 42--44 & $-0.086$ [$-0.120$, $-0.052$] & $-0.070$ [$-0.121$, $-0.024$] & 0/5 & \EP{inferior}{inferior} \\
+MLSD & W1 $-$ (d) & \EP{secondary}{secundário} & 42--44 & $-0.075$ [$-0.105$, $-0.044$] & $-0.067$ [$-0.113$, $-0.024$] & 0/5 & \EP{inferior}{inferior} \\
+MLSD & W2 $-$ (d) & \EP{secondary}{secundário} & 42--44 & $-0.066$ [$-0.096$, $-0.038$] & $-0.070$ [$-0.119$, $-0.022$] & 0/5 & \EP{inferior}{inferior} \\
+MLSD & W1 $-$ (b) & \EP{descriptive}{descritivo} & 42--44 & $-0.080$ [$-0.109$, $-0.050$] & $-0.066$ [$-0.112$, $-0.024$] & 0/5 & \EP{inferior}{inferior} \\
+\bottomrule
+\end{tabular}}
+\end{table}

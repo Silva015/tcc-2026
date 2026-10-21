@@ -1,0 +1,29 @@
+% AUC por dobra (5 dobras agrupadas por caso, semente 42) x AUC por partição no split de Lira et al. (3 partições),
+% mesma receita. Dados: img/protocolo/vaz_*.csv (scripts/preparar_dados_figuras.py).
+\begin{tikzpicture}
+\begin{groupplot}[
+    group style={group size=2 by 1, horizontal sep=16mm},
+    width=0.5\textwidth, height=6.2cm, idioma,
+    xmin=0.45, xmax=2.55, xtick={1,2},
+    xticklabels={{Linear (a)}, {TransferKAN (d)}},
+    ylabel={AUC},
+    ymajorgrids, grid style={gray!25},
+    tick label style={font=\footnotesize}, label style={font=\small}, title style={font=\small},
+    yticklabel style={/pgf/number format/fixed, /pgf/number format/precision=2},
+    legend style={font=\footnotesize, draw=none}, legend columns=2,
+]
+\nextgroupplot[title={\EP{Entry/exit}{Entrada/saída}}, ymin=0.88, ymax=0.95, legend to name=legvazamento]
+\addplot[only marks, mark=*, mark size=1.8pt, color=corA] table[x=x, y=auc, col sep=comma]{img/protocolo/vaz_es_a_agrup.csv};
+\addlegendentry{\EP{case-grouped folds (5 folds)}{dobras agrupadas por caso (5 dobras)}\quad}
+\addplot[only marks, mark=square*, mark size=1.8pt, color=corB] table[x=x, y=auc, col sep=comma]{img/protocolo/vaz_es_a_lira.csv};
+\addlegendentry{\EP{split of Lira et al.\ (3 partitions)}{split de Lira et al.\ (3 partições)}}
+\addplot[only marks, mark=*, mark size=1.8pt, color=corA, forget plot] table[x=x, y=auc, col sep=comma]{img/protocolo/vaz_es_d_agrup.csv};
+\addplot[only marks, mark=square*, mark size=1.8pt, color=corB, forget plot] table[x=x, y=auc, col sep=comma]{img/protocolo/vaz_es_d_lira.csv};
+\nextgroupplot[title={\EP{MLSD (shooting distance)}{MLSD (distância do disparo)}}, ymin=0.60, ymax=0.97]
+\addplot[only marks, mark=*, mark size=1.8pt, color=corA] table[x=x, y=auc, col sep=comma]{img/protocolo/vaz_dist_a_agrup.csv};
+\addplot[only marks, mark=square*, mark size=1.8pt, color=corB] table[x=x, y=auc, col sep=comma]{img/protocolo/vaz_dist_a_lira.csv};
+\addplot[only marks, mark=*, mark size=1.8pt, color=corA] table[x=x, y=auc, col sep=comma]{img/protocolo/vaz_dist_d_agrup.csv};
+\addplot[only marks, mark=square*, mark size=1.8pt, color=corB] table[x=x, y=auc, col sep=comma]{img/protocolo/vaz_dist_d_lira.csv};
+\end{groupplot}
+\node[below=11mm] at ($(group c1r1.south)!0.5!(group c2r1.south)$) {\pgfplotslegendfromname{legvazamento}};
+\end{tikzpicture}

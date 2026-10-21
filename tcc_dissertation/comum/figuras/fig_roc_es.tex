@@ -1,0 +1,24 @@
+% ROC fora da dobra (probabilidades médias das 3 sementes), entrada/saída, cabeças (a)-(d) na ResNet-152.
+% Dados: img/protocolo/roc_es_*.csv; AUC da legenda: img/protocolo/figuras_macros.tex.
+\begin{tikzpicture}
+\begin{axis}[
+    width=0.62\textwidth, height=0.62\textwidth, idioma,
+    xmin=0, xmax=1, ymin=0, ymax=1.01,
+    xlabel={\EP{1 $-$ specificity}{1 $-$ especificidade}},
+    ylabel={\EP{sensitivity (exit)}{sensibilidade (saída)}},
+    grid=major, grid style={gray!20},
+    tick label style={font=\footnotesize}, label style={font=\small},
+    legend pos=south east, legend style={font=\scriptsize, cells={anchor=west}},
+    every axis plot/.append style={line width=0.9pt},
+]
+\addplot[color=corA] table[x=fpr, y=tpr, col sep=comma]{img/protocolo/roc_es_a.csv};
+\addlegendentry{(a) \EP{linear}{linear} (AUC\textsubscript{OOF} \aucRocEsA)}
+\addplot[color=corB] table[x=fpr, y=tpr, col sep=comma]{img/protocolo/roc_es_b.csv};
+\addlegendentry{(b) MLP-128 (AUC\textsubscript{OOF} \aucRocEsB)}
+\addplot[color=corC] table[x=fpr, y=tpr, col sep=comma]{img/protocolo/roc_es_c.csv};
+\addlegendentry{(c) MLP-iso (AUC\textsubscript{OOF} \aucRocEsC)}
+\addplot[color=corD] table[x=fpr, y=tpr, col sep=comma]{img/protocolo/roc_es_d.csv};
+\addlegendentry{(d) KAN = TransferKAN (AUC\textsubscript{OOF} \aucRocEsD)}
+\addplot[black, dotted, thin, forget plot] coordinates {(0,0) (1,1)};
+\end{axis}
+\end{tikzpicture}

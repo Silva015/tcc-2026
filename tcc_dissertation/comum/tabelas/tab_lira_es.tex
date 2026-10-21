@@ -1,0 +1,29 @@
+% Gerado por tcc_dissertation/scripts/gerar_tabelas.py a partir de resultados/. Não edite à mão.
+\begin{table}[!htbp]
+\centering
+\caption{\EP{Entry/exit: numbers published by Lira et al.~\cite{Lira2025deep} (Table~4) next to the same backbones under the single protocol of this work. The two sides differ in three ways at once: the split (image-level hold-out in their public code $\times$ case-grouped 5-fold), the initialisation (mostly trained from scratch in their public code $\times$ ImageNet weights) and the AUC (from predicted classes, AUC$_c$ $\times$ from probabilities, AUC$_p$). Only AUC$_c$ is computed in the same way on both sides; the table compares evaluation packages, not models. M = macro; ours: mean $\pm$ s.d.\ across folds.}{Entrada/saída: números publicados por Lira et al.~\cite{Lira2025deep} (Tabela~4) ao lado dos mesmos backbones no protocolo único deste trabalho. Os dois lados diferem em três pontos ao mesmo tempo: a partição (hold-out por imagem no código público deles $\times$ 5 dobras agrupadas por caso), a inicialização (quase tudo treinado do zero no código público deles $\times$ pesos do ImageNet) e a AUC (das classes previstas, AUC$_c$ $\times$ das probabilidades, AUC$_p$). Só a AUC$_c$ é calculada do mesmo jeito nos dois lados; a tabela compara pacotes de avaliação, não modelos. M = macro; nossos: média $\pm$ dp entre dobras.}}
+\label{tab:lira_es}
+\footnotesize
+\setlength{\tabcolsep}{3pt}
+\resizebox{\textwidth}{!}{%
+\begin{tabular}{lccc|cccc}
+\toprule
+ & \multicolumn{3}{c|}{\EP{Lira et al.\ (published)}{Lira et al.\ (publicado)}} & \multicolumn{4}{c}{\EP{Single protocol (this work)}{Protocolo único (este trabalho)}} \\
+\EP{Model}{Modelo} & Acc & F1$_M$ & AUC$_{c,M}$ & Acc & F1$_M$ & AUC$_{c,M}$ & AUC$_{p,M}$ \\
+\midrule
+ResNet152 & 0.869 & 0.824 & 0.821 & $0.846 \pm 0.008$ & $0.805 \pm 0.012$ & $0.814 \pm 0.012$ & $0.904 \pm 0.013$ \\
+AlexNet & 0.765 & 0.703 & 0.716 & $0.803 \pm 0.036$ & $0.761 \pm 0.047$ & $0.782 \pm 0.045$ & $0.859 \pm 0.040$ \\
+MobileNetV2 & 0.719 & 0.598 & 0.593 & $0.812 \pm 0.024$ & $0.776 \pm 0.029$ & $0.802 \pm 0.027$ & $0.877 \pm 0.025$ \\
+MNASNet1.3 & 0.746 & 0.657 & 0.656 & $0.837 \pm 0.012$ & $0.753 \pm 0.022$ & $0.725 \pm 0.023$ & $0.872 \pm 0.021$ \\
+ShuffleNetV2 x0.5 & 0.730 & 0.619 & 0.614 & $0.746 \pm 0.018$ & $0.713 \pm 0.018$ & $0.755 \pm 0.017$ & $0.839 \pm 0.021$ \\
+SqueezeNet1.0 & 0.750 & 0.429 & 0.500 & $0.798 \pm 0.023$ & $0.760 \pm 0.030$ & $0.787 \pm 0.032$ & $0.866 \pm 0.023$ \\
+DenseNet169 & 0.777 & 0.688 & 0.679 & $0.858 \pm 0.005$ & $0.821 \pm 0.008$ & $0.830 \pm 0.012$ & $0.904 \pm 0.018$ \\
+MaxViT-T & 0.780 & 0.668 & 0.653 & $0.864 \pm 0.015$ & $0.831 \pm 0.021$ & $0.846 \pm 0.020$ & $0.917 \pm 0.009$ \\
+Swin-B & 0.728 & 0.597 & 0.591 & $0.884 \pm 0.011$ & $0.850 \pm 0.015$ & $0.850 \pm 0.016$ & $0.929 \pm 0.011$ \\
+EfficientNetV2-L & 0.782 & 0.654 & 0.638 & $0.868 \pm 0.010$ & $0.831 \pm 0.016$ & $0.836 \pm 0.011$ & $0.916 \pm 0.007$ \\
+VGG16 & 0.782 & 0.694 & 0.685 & $0.841 \pm 0.013$ & $0.794 \pm 0.025$ & $0.796 \pm 0.034$ & $0.891 \pm 0.025$ \\
+RegNetY-16GF & 0.711 & 0.549 & 0.549 & $0.852 \pm 0.015$ & $0.815 \pm 0.020$ & $0.824 \pm 0.021$ & $0.906 \pm 0.011$ \\
+TransferKAN (ResNet152 + KAN) & --- & --- & --- & $0.846 \pm 0.010$ & $0.806 \pm 0.013$ & $0.816 \pm 0.015$ & $0.905 \pm 0.013$ \\
+\bottomrule
+\end{tabular}}
+\end{table}

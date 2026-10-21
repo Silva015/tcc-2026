@@ -1,0 +1,7 @@
+tarefa,cabeca,camada,n_unidades,min,media,max
+es,d,kan0,15,0.973,0.976,0.979
+es,d,kan1,15,0.455,0.545,0.636
+es,e,kan0,5,0.965,0.967,0.969
+es,e,kan1,5,0.267,0.312,0.390
+dist,d,kan0,15,0.970,0.973,0.975
+dist,d,kan1,15,0.451,0.502,0.546

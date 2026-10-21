@@ -1,0 +1,42 @@
+% AUC (média ± dp entre dobras) x parâmetros da cabeça (escala log), entrada/saída e MLSD.
+% Dados: img/protocolo/auc_param_{es,dist}.csv, tirados de resultados/tabela_wavkan*.csv.
+% W3 e W4 têm o mesmo nº de parâmetros da W1; são deslocados na horizontal só para não se sobreporem.
+\pgfplotsset{
+  pontos auc/.style={only marks, mark size=2.2pt,
+      error bars/.cd, y dir=both, y explicit, error bar style={line width=0.6pt}, /pgfplots/.cd},
+  rotulos auc/.style={nodes near coords, point meta=explicit symbolic,
+      visualization depends on={value \thisrow{ancora} \as \ancora},
+      every node near coord/.append style={font=\scriptsize, anchor=\ancora, inner sep=2.5pt, black}},
+}
+\begin{tikzpicture}
+\begin{groupplot}[
+    group style={group size=1 by 2, vertical sep=24mm},
+    width=0.92\textwidth, height=6cm, idioma,
+    xmode=log, xmin=2500, xmax=9e6,
+    xlabel={\EP{head parameters (log scale)}{parâmetros da cabeça (escala log)}},
+    ylabel={\EP{AUC (mean $\pm$ s.d.\ across folds)}{AUC (média $\pm$ dp entre dobras)}},
+    grid=both, grid style={gray!15}, major grid style={gray!25},
+    tick label style={font=\footnotesize}, label style={font=\small}, title style={font=\small},
+    yticklabel style={/pgf/number format/fixed, /pgf/number format/precision=2},
+    legend style={font=\footnotesize, cells={anchor=west}},
+]
+\nextgroupplot[title={\EP{Entry/exit}{Entrada/saída}}, ymin=0.884, ymax=0.926,
+    legend style={at={(0.2,0.97)}, anchor=north west}]
+\addplot[pontos auc, color=gray!80!black, mark=*, rotulos auc]
+  table[x=xplot, y=auc, y error=dp, meta=id, col sep=comma]{img/protocolo/auc_param_es_mlp.csv};
+\addlegendentry{\EP{linear / MLP}{linear / MLP}}
+\addplot[pontos auc, color=corA, mark=square*, rotulos auc]
+  table[x=xplot, y=auc, y error=dp, meta=id, col sep=comma]{img/protocolo/auc_param_es_kan.csv};
+\addlegendentry{\EP{spline KAN}{KAN spline}}
+\addplot[pontos auc, color=corB, mark=triangle*, rotulos auc]
+  table[x=xplot, y=auc, y error=dp, meta=id, col sep=comma]{img/protocolo/auc_param_es_wav.csv};
+\addlegendentry{Wav-KAN}
+\nextgroupplot[title={\EP{MLSD (shooting distance)}{MLSD (distância do disparo)}}, ymin=0.58, ymax=0.90]
+\addplot[pontos auc, color=gray!80!black, mark=*, rotulos auc]
+  table[x=xplot, y=auc, y error=dp, meta=id, col sep=comma]{img/protocolo/auc_param_dist_mlp.csv};
+\addplot[pontos auc, color=corA, mark=square*, rotulos auc]
+  table[x=xplot, y=auc, y error=dp, meta=id, col sep=comma]{img/protocolo/auc_param_dist_kan.csv};
+\addplot[pontos auc, color=corB, mark=triangle*, rotulos auc]
+  table[x=xplot, y=auc, y error=dp, meta=id, col sep=comma]{img/protocolo/auc_param_dist_wav.csv};
+\end{groupplot}
+\end{tikzpicture}

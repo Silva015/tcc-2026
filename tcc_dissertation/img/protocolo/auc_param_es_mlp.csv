@@ -1,0 +1,4 @@
+id,params,xplot,auc,dp,grupo,ancora
+a,4098,4098,0.904,0.013,mlp,west
+b,262530,262530,0.905,0.014,mlp,west
+c,3935871,3935871,0.906,0.014,mlp,south west

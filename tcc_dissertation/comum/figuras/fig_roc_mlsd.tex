@@ -1,0 +1,35 @@
+% ROC um-contra-o-resto fora da dobra (só entradas; probabilidades médias das 3 sementes), MLSD, cabeças (a)-(d).
+% Dados: img/protocolo/roc_dist_*.csv; AUC da legenda: img/protocolo/figuras_macros.tex.
+\begin{tikzpicture}
+\begin{groupplot}[
+    group style={group size=3 by 1, horizontal sep=5mm, yticklabels at=edge left, ylabels at=edge left},
+    width=0.39\textwidth, height=0.39\textwidth, idioma,
+    xmin=0, xmax=1, ymin=0, ymax=1.01,
+    xlabel={\EP{1 $-$ specificity}{1 $-$ especificidade}},
+    ylabel={\EP{sensitivity}{sensibilidade}},
+    xtick={0,0.5,1}, ytick={0,0.5,1},
+    grid=major, grid style={gray!20},
+    tick label style={font=\scriptsize}, label style={font=\footnotesize}, title style={font=\footnotesize},
+    legend pos=south east, legend style={font=\tiny, cells={anchor=west}, inner sep=1pt},
+    every axis plot/.append style={line width=0.7pt},
+]
+\nextgroupplot[title={\EP{contact vs.\ rest}{encostado $\times$ resto}}]
+\addplot[color=corA] table[x=fpr, y=tpr, col sep=comma]{img/protocolo/roc_dist_enc_a.csv}; \addlegendentry{(a) \aucRocDistEncA}
+\addplot[color=corB] table[x=fpr, y=tpr, col sep=comma]{img/protocolo/roc_dist_enc_b.csv}; \addlegendentry{(b) \aucRocDistEncB}
+\addplot[color=corC] table[x=fpr, y=tpr, col sep=comma]{img/protocolo/roc_dist_enc_c.csv}; \addlegendentry{(c) \aucRocDistEncC}
+\addplot[color=corD] table[x=fpr, y=tpr, col sep=comma]{img/protocolo/roc_dist_enc_d.csv}; \addlegendentry{(d) \aucRocDistEncD}
+\addplot[black, dotted, thin, forget plot] coordinates {(0,0) (1,1)};
+\nextgroupplot[title={\EP{close range vs.\ rest}{curta $\times$ resto}}]
+\addplot[color=corA] table[x=fpr, y=tpr, col sep=comma]{img/protocolo/roc_dist_cur_a.csv}; \addlegendentry{(a) \aucRocDistCurA}
+\addplot[color=corB] table[x=fpr, y=tpr, col sep=comma]{img/protocolo/roc_dist_cur_b.csv}; \addlegendentry{(b) \aucRocDistCurB}
+\addplot[color=corC] table[x=fpr, y=tpr, col sep=comma]{img/protocolo/roc_dist_cur_c.csv}; \addlegendentry{(c) \aucRocDistCurC}
+\addplot[color=corD] table[x=fpr, y=tpr, col sep=comma]{img/protocolo/roc_dist_cur_d.csv}; \addlegendentry{(d) \aucRocDistCurD}
+\addplot[black, dotted, thin, forget plot] coordinates {(0,0) (1,1)};
+\nextgroupplot[title={\EP{distant vs.\ rest}{distância $\times$ resto}}]
+\addplot[color=corA] table[x=fpr, y=tpr, col sep=comma]{img/protocolo/roc_dist_dis_a.csv}; \addlegendentry{(a) \aucRocDistDisA}
+\addplot[color=corB] table[x=fpr, y=tpr, col sep=comma]{img/protocolo/roc_dist_dis_b.csv}; \addlegendentry{(b) \aucRocDistDisB}
+\addplot[color=corC] table[x=fpr, y=tpr, col sep=comma]{img/protocolo/roc_dist_dis_c.csv}; \addlegendentry{(c) \aucRocDistDisC}
+\addplot[color=corD] table[x=fpr, y=tpr, col sep=comma]{img/protocolo/roc_dist_dis_d.csv}; \addlegendentry{(d) \aucRocDistDisD}
+\addplot[black, dotted, thin, forget plot] coordinates {(0,0) (1,1)};
+\end{groupplot}
+\end{tikzpicture}

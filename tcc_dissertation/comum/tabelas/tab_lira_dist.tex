@@ -1,0 +1,29 @@
+% Gerado por tcc_dissertation/scripts/gerar_tabelas.py a partir de resultados/. Não edite à mão.
+\begin{table}[!htbp]
+\centering
+\caption{\EP{MLSD (entries only): numbers published by Lira et al.~\cite{Lira2025deep} (Table~5) next to the same backbones under the single protocol of this work. The two sides differ in three ways at once: the split (image-level hold-out in their public code $\times$ case-grouped 5-fold), the initialisation (mostly trained from scratch in their public code $\times$ ImageNet weights) and the AUC (from predicted classes, AUC$_c$ $\times$ from probabilities, AUC$_p$). Only AUC$_c$ is computed in the same way on both sides; the table compares evaluation packages, not models. M = macro; ours: mean $\pm$ s.d.\ across folds. In this task, predicting always ``distant'' already gives an accuracy of 0.854.}{MLSD (só entradas): números publicados por Lira et al.~\cite{Lira2025deep} (Tabela~5) ao lado dos mesmos backbones no protocolo único deste trabalho. Os dois lados diferem em três pontos ao mesmo tempo: a partição (hold-out por imagem no código público deles $\times$ 5 dobras agrupadas por caso), a inicialização (quase tudo treinado do zero no código público deles $\times$ pesos do ImageNet) e a AUC (das classes previstas, AUC$_c$ $\times$ das probabilidades, AUC$_p$). Só a AUC$_c$ é calculada do mesmo jeito nos dois lados; a tabela compara pacotes de avaliação, não modelos. M = macro; nossos: média $\pm$ dp entre dobras. Nesta tarefa, prever sempre ``distância'' já dá acurácia de 0,854.}}
+\label{tab:lira_dist}
+\footnotesize
+\setlength{\tabcolsep}{3pt}
+\resizebox{\textwidth}{!}{%
+\begin{tabular}{lccc|cccc}
+\toprule
+ & \multicolumn{3}{c|}{\EP{Lira et al.\ (published)}{Lira et al.\ (publicado)}} & \multicolumn{4}{c}{\EP{Single protocol (this work)}{Protocolo único (este trabalho)}} \\
+\EP{Model}{Modelo} & Acc & F1$_M$ & AUC$_{c,M}$ & Acc & F1$_M$ & AUC$_{c,M}$ & AUC$_{p,M}$ \\
+\midrule
+ResNet152 & 0.925 & 0.701 & 0.733 & $0.815 \pm 0.014$ & $0.488 \pm 0.056$ & $0.670 \pm 0.047$ & $0.785 \pm 0.087$ \\
+AlexNet & 0.889 & 0.395 & 0.541 & $0.780 \pm 0.033$ & $0.498 \pm 0.084$ & $0.694 \pm 0.064$ & $0.806 \pm 0.079$ \\
+MobileNetV2 & 0.886 & 0.361 & 0.531 & $0.778 \pm 0.025$ & $0.464 \pm 0.042$ & $0.660 \pm 0.043$ & $0.806 \pm 0.056$ \\
+MNASNet1.3 & 0.869 & 0.378 & 0.533 & $0.451 \pm 0.078$ & $0.294 \pm 0.047$ & $0.610 \pm 0.037$ & $0.710 \pm 0.095$ \\
+ShuffleNetV2 x0.5 & 0.855 & 0.346 & 0.512 & $0.854 \pm 0.016$ & $0.474 \pm 0.088$ & $0.627 \pm 0.044$ & $0.776 \pm 0.046$ \\
+SqueezeNet1.0 & 0.095 & 0.058 & 0.500 & $0.788 \pm 0.023$ & $0.490 \pm 0.074$ & $0.666 \pm 0.056$ & $0.805 \pm 0.051$ \\
+DenseNet169 & 0.883 & 0.398 & 0.548 & $0.820 \pm 0.034$ & $0.519 \pm 0.120$ & $0.691 \pm 0.092$ & $0.821 \pm 0.070$ \\
+MaxViT-T & 0.880 & 0.549 & 0.607 & $0.810 \pm 0.021$ & $0.511 \pm 0.070$ & $0.691 \pm 0.053$ & $0.828 \pm 0.047$ \\
+Swin-B & 0.861 & 0.339 & 0.517 & $0.825 \pm 0.021$ & $0.505 \pm 0.091$ & $0.684 \pm 0.053$ & $0.838 \pm 0.054$ \\
+EfficientNetV2-L & 0.880 & 0.488 & 0.588 & $0.830 \pm 0.026$ & $0.495 \pm 0.076$ & $0.673 \pm 0.057$ & $0.744 \pm 0.133$ \\
+VGG16 & 0.864 & 0.381 & 0.546 & $0.844 \pm 0.026$ & $0.481 \pm 0.050$ & $0.656 \pm 0.041$ & $0.776 \pm 0.079$ \\
+RegNetY-16GF & 0.875 & 0.357 & 0.523 & $0.826 \pm 0.024$ & $0.496 \pm 0.071$ & $0.678 \pm 0.048$ & $0.773 \pm 0.088$ \\
+TransferKAN (ResNet152 + KAN) & --- & --- & --- & $0.813 \pm 0.017$ & $0.477 \pm 0.045$ & $0.664 \pm 0.041$ & $0.798 \pm 0.058$ \\
+\bottomrule
+\end{tabular}}
+\end{table}

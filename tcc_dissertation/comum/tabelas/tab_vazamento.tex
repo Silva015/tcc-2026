@@ -1,0 +1,30 @@
+% Gerado por tcc_dissertation/scripts/gerar_tabelas.py a partir de resultados/. Não edite à mão.
+\begin{table}[!htbp]
+\centering
+\caption{\EP{Effect of the data split with everything else fixed (ResNet-152, same recipe, seed 42). \emph{Lira et al.}: the image-level hold-out of the public code of Lira et al.\ (iterative stratification on case number and label) reproduced with three partitions; mean $\pm$ s.d.\ over the partitions. \emph{Grouped}: the five case-grouped folds of this work; mean $\pm$ s.d.\ over folds. Leak: share of test images whose case also has images in training. $\Delta$ = Lira $-$ grouped.}{Efeito da partição com todo o resto fixo (ResNet-152, mesma receita, semente 42). \emph{Lira et al.}: o hold-out por imagem do código público de Lira et al.\ (estratificação iterativa sobre o número do caso e o rótulo) reproduzido em três partições; média $\pm$ dp entre as partições. \emph{Agrupada}: as cinco dobras agrupadas por caso deste trabalho; média $\pm$ dp entre dobras. Vaz.: fração das imagens de teste cujo caso também tem imagens no treino. $\Delta$ = Lira $-$ agrupada.}}
+\label{tab:vazamento}
+\footnotesize
+\setlength{\tabcolsep}{3pt}
+\resizebox{\textwidth}{!}{%
+\begin{tabular}{lllrcccc}
+\toprule
+\EP{Task}{Tarefa} & \EP{Head}{Cabeça} & \EP{Split}{Partição} & \EP{Leak}{Vaz.} & Acc & F1$_M$ & \EP{Bal.\ acc}{Acc bal.} & AUC \\
+\midrule
+\EP{Entry/exit}{Entrada/saída} & Linear (a) & \EP{Lira et al.}{Lira et al.} & 98.7\% & $0.876 \pm 0.005$ & $0.838 \pm 0.007$ & $0.852 \pm 0.010$ & $0.940 \pm 0.003$ \\
+ & & \EP{Grouped}{Agrupada} & 0\% & $0.848 \pm 0.010$ & $0.809 \pm 0.013$ & $0.820 \pm 0.011$ & $0.906 \pm 0.013$ \\
+ & & $\Delta$ & & $+0.028$ & $+0.029$ & $+0.033$ & $+0.034$ \\
+\midrule
+\EP{Entry/exit}{Entrada/saída} & KAN (d) = TransferKAN & \EP{Lira et al.}{Lira et al.} & 98.7\% & $0.881 \pm 0.006$ & $0.844 \pm 0.006$ & $0.859 \pm 0.003$ & $0.940 \pm 0.003$ \\
+ & & \EP{Grouped}{Agrupada} & 0\% & $0.846 \pm 0.008$ & $0.807 \pm 0.011$ & $0.818 \pm 0.013$ & $0.906 \pm 0.011$ \\
+ & & $\Delta$ & & $+0.035$ & $+0.037$ & $+0.040$ & $+0.034$ \\
+\midrule
+MLSD & Linear (a) & \EP{Lira et al.}{Lira et al.} & 98.4\% & $0.857 \pm 0.006$ & $0.697 \pm 0.014$ & $0.783 \pm 0.008$ & $0.937 \pm 0.004$ \\
+ & & \EP{Grouped}{Agrupada} & 0\% & $0.817 \pm 0.014$ & $0.486 \pm 0.059$ & $0.521 \pm 0.079$ & $0.779 \pm 0.088$ \\
+ & & $\Delta$ & & $+0.040$ & $+0.211$ & $+0.262$ & $+0.158$ \\
+\midrule
+MLSD & KAN (d) = TransferKAN & \EP{Lira et al.}{Lira et al.} & 98.4\% & $0.863 \pm 0.002$ & $0.691 \pm 0.003$ & $0.788 \pm 0.006$ & $0.942 \pm 0.003$ \\
+ & & \EP{Grouped}{Agrupada} & 0\% & $0.810 \pm 0.018$ & $0.466 \pm 0.035$ & $0.500 \pm 0.062$ & $0.788 \pm 0.063$ \\
+ & & $\Delta$ & & $+0.053$ & $+0.225$ & $+0.288$ & $+0.155$ \\
+\bottomrule
+\end{tabular}}
+\end{table}

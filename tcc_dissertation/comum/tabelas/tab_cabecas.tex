@@ -1,0 +1,27 @@
+% Gerado por tcc_dissertation/scripts/gerar_tabelas.py a partir de resultados/. Não edite à mão.
+\begin{table}[!htbp]
+\centering
+\caption{\EP{Classification heads compared on the same ResNet-152 backbone (58,143,808 parameters) and the same recipe. $K$ = number of classes (2 for entry/exit, 3 for MLSD). Parameters of the head only; seeds used in each task.}{Cabeças de classificação comparadas sobre o mesmo backbone ResNet-152 (58.143.808 parâmetros) e a mesma receita. $K$ = número de classes (2 em entrada/saída, 3 na MLSD). Parâmetros só da cabeça; sementes usadas em cada tarefa.}}
+\label{tab:cabecas}
+\footnotesize
+\setlength{\tabcolsep}{3pt}
+\resizebox{\textwidth}{!}{%
+\begin{tabular}{lllrrccl}
+\toprule
+ & & & \multicolumn{2}{c}{\EP{Head parameters}{Parâmetros da cabeça}} & \multicolumn{2}{c}{\EP{Seeds}{Sementes}} & \\
+\cmidrule(lr){4-5}\cmidrule(lr){6-7}
+Id & \EP{Head}{Cabeça} & \EP{Structure}{Estrutura} & E/S & MLSD & E/S & MLSD & \EP{Role}{Papel} \\
+\midrule
+(a) & Linear & Linear$(2048, K)$ & 4{,}098 & 6{,}147 & 42--44 & 42--44 & \EP{reference}{referência} \\
+(b) & MLP-128 & $[2048, 128, K]$, ReLU & 262{,}530 & 262{,}659 & 42--44 & 42--44 & \EP{reference}{referência} \\
+(c) & \EP{MLP, matched to (d)}{MLP isoparamétrica} & $[2048, 1919, K]$, ReLU & 3{,}935{,}871 & 3{,}937{,}791 & 42--44 & 42--44 & \EP{same budget as (d)}{mesmo orçamento de (d)} \\
+(d) & \EP{Spline KAN = TransferKAN}{KAN spline = TransferKAN} & $[2048, 128, K]$, $G=10$, $k=3$ & 3{,}936{,}000 & 3{,}937{,}920 & 42--44 & 42--44 & \EP{object of study}{objeto de estudo} \\
+(e) & KAN-8 & $[2048, 8, 2]$, $G=10$, $k=3$ & 246{,}000 & --- & 42 & --- & \EP{sensitivity}{sensibilidade} \\
+W1 & \EP{Wav-KAN, Mexican hat}{Wav-KAN, chapéu mexicano} & $[2048, 128, K]$ & 1{,}049{,}860 & 1{,}050{,}374 & 42--44 & 42--44 & \EP{topology of (d)}{topologia de (d)} \\
+W2 & \EP{Wav-KAN, Mexican hat}{Wav-KAN, chapéu mexicano} & $[2048, 32, K]$ & 262{,}468 & 262{,}598 & 42--44 & 42--44 & \EP{same budget as (b)}{mesmo orçamento de (b)} \\
+W3 & Wav-KAN, DoG & $[2048, 128, 2]$ & 1{,}049{,}860 & --- & 42 & --- & \EP{sensitivity}{sensibilidade} \\
+W4 & Wav-KAN, Morlet & $[2048, 128, 2]$ & 1{,}049{,}860 & --- & 42 & --- & \EP{sensitivity}{sensibilidade} \\
+W5 & \EP{Wav-KAN, Mexican hat}{Wav-KAN, chapéu mexicano} & $[2048, 480, 2]$ & 3{,}936{,}964 & --- & 42 & --- & \EP{same budget as (d)}{mesmo orçamento de (d)} \\
+\bottomrule
+\end{tabular}}
+\end{table}

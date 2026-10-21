@@ -1,0 +1,24 @@
+% Gerado por tcc_dissertation/scripts/gerar_tabelas.py a partir de resultados/. Não edite à mão.
+\begin{table}[!htbp]
+\centering
+\caption{\EP{Exploratory KAN architectures trained from scratch (no ImageNet pre-training) in an earlier phase of this work. They used a single 80/20 hold-out split by case, inputs of 64 or 128 px, batches of 8 and their own recipe, so they are \emph{not} comparable with any number obtained under the single protocol. M = macro, m = micro, W = weighted.}{Arquiteturas KAN exploratórias treinadas do zero (sem pré-treino no ImageNet) numa fase anterior deste trabalho. Usaram um único hold-out 80/20 por caso, entradas de 64 ou 128 px, lotes de 8 e receita própria, portanto \emph{não} são comparáveis com nenhum número obtido no protocolo único. M = macro, m = micro, W = ponderada.}}
+\label{tab:exploratorios}
+\footnotesize
+\setlength{\tabcolsep}{2.5pt}
+\resizebox{\textwidth}{!}{%
+\begin{tabular}{llcccccccccccccccc}
+\toprule
+ & & Acc & \multicolumn{3}{c}{\EP{Precision}{Precisão}} & \multicolumn{3}{c}{\EP{Recall}{Revocação}} & \multicolumn{3}{c}{F1} & \multicolumn{3}{c}{AUC} & \multicolumn{3}{c}{\EP{Specificity}{Especificidade}} \\
+\EP{Model}{Modelo} & \EP{Input}{Entrada} & & M & m & W & M & m & W & M & m & W & M & m & W & M & m & W \\
+\midrule
+\multicolumn{18}{l}{\textit{\EP{Entry/exit}{Entrada/saída}}} \\
+ResKANet-18 & 128 px & 0.822 & 0.767 & 0.822 & 0.820 & 0.762 & 0.822 & 0.822 & 0.765 & 0.822 & 0.821 & 0.839 & 0.885 & 0.839 & 0.762 & 0.822 & 0.703 \\
+PureConvKAN & 128 px & 0.707 & 0.614 & 0.707 & 0.704 & 0.611 & 0.707 & 0.707 & 0.613 & 0.707 & 0.706 & 0.682 & 0.768 & 0.682 & 0.611 & 0.707 & 0.516 \\
+PureKAN & 64 px & 0.692 & 0.614 & 0.692 & 0.692 & 0.614 & 0.692 & 0.692 & 0.614 & 0.692 & 0.692 & 0.684 & 0.733 & 0.684 & 0.614 & 0.692 & 0.536 \\
+\midrule
+\multicolumn{18}{l}{\textit{\EP{MLSD}{MLSD}}} \\
+PureConvKAN & 128 px & 0.803 & 0.268 & 0.803 & 0.645 & 0.333 & 0.803 & 0.803 & 0.297 & 0.803 & 0.716 & 0.536 & 0.888 & 0.509 & 0.667 & 0.902 & 0.197 \\
+PureKAN & 64 px & 0.712 & 0.355 & 0.712 & 0.689 & 0.324 & 0.712 & 0.712 & 0.328 & 0.712 & 0.693 & 0.463 & 0.841 & 0.496 & 0.679 & 0.856 & 0.326 \\
+\bottomrule
+\end{tabular}}
+\end{table}

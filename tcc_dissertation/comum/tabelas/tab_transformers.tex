@@ -1,0 +1,18 @@
+% Gerado por tcc_dissertation/scripts/gerar_tabelas.py a partir de resultados/. Não edite à mão.
+\begin{table}[!htbp]
+\centering
+\caption{\EP{TransferKAN (ResNet-152 + spline KAN, seeds 42--44) against the two transformer backbones with a linear head, under the single protocol. $\Delta$AUC on the pooled out-of-fold predictions (probabilities averaged over the seeds); 95\% CI from a paired case-level bootstrap (2,000 resamples); wins = folds in which TransferKAN has the higher AUC.}{TransferKAN (ResNet-152 + KAN spline, sementes 42--44) contra os dois backbones transformer com cabeça linear, no protocolo único. $\Delta$AUC nas predições fora da dobra (probabilidades médias das sementes); IC 95\% por bootstrap pareado de casos (2.000 reamostragens); vence = dobras em que a TransferKAN tem a AUC maior.}}
+\label{tab:transformers}
+\footnotesize
+\setlength{\tabcolsep}{4pt}
+\begin{tabular}{llcccc}
+\toprule
+\EP{Task}{Tarefa} & \EP{Contrast}{Contraste} & $\Delta$AUC & \EP{95\% CI}{IC 95\%} & \EP{Wins}{Vence} & \EP{Seeds of the transformer}{Sementes do transformer} \\
+\midrule
+\EP{Entry/exit}{Entrada/saída} & TransferKAN $-$ Swin-B & $-0.023$ & [$-0.035$, $-0.011$] & 0/5 & 42--44 \\
+\EP{Entry/exit}{Entrada/saída} & TransferKAN $-$ MaxViT-T & $-0.010$ & [$-0.020$, $-0.001$] & 0/5 & 42--44 \\
+MLSD & TransferKAN $-$ Swin-B & $-0.033$ & [$-0.064$, $-0.0004$] & 1/5 & 42, 43 \\
+MLSD & TransferKAN $-$ MaxViT-T & $-0.030$ & [$-0.059$, $+0.001$] & 1/5 & 42, 43 \\
+\bottomrule
+\end{tabular}
+\end{table}
