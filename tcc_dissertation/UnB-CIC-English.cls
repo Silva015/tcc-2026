@@ -882,7 +882,6 @@
 	\if@qualificacao\else%
 		\@IncluirSecao{dedicatoria}%
 		\@IncluirSecao{agradecimentos}%
-		\@IncluirSecao{disclaimer}%
 
 		% *DO NOT REMOVE*, it is important to acknowledge this CAPES support.
 		This work was carried out with support from the Coordination for the Improvement of Higher Education Personnel - Brazil (CAPES), through access to the Portal of Journals.

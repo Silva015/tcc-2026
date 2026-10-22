@@ -46,7 +46,8 @@ def sinal(x, nd=3):
 
 
 def ic(lo, hi, nd=3):
-    return f"[{sinal(lo, nd)}, {sinal(hi, nd)}]"
+    """Intervalo [lo, hi]; no PT o separador é ';', porque a vírgula já é a decimal."""
+    return f"[{sinal(lo, nd)}{EP(',', ';')} {sinal(hi, nd)}]"
 
 
 def milhar(n):
@@ -222,12 +223,12 @@ def t_protocolo_mlsd():
     tabela("tab_protocolo_mlsd",
            "Medico-legal shooting distance (contact, close range, distant; entry wounds only) under the same protocol as "
            "Table~\\ref{tab:protocolo_es}. Mean $\\pm$ s.d.\\ across folds; S = training seeds (Swin-B and MaxViT-T: "
-           "seeds 42 and 43 only). AUC = one-vs-rest macro AUC from probabilities. Rec.: per-class recall from the pooled "
-           "out-of-fold predictions; contact has 4--13 test images per fold and is descriptive only.",
+           "seeds 42 and 43 only). AUC = one-vs-rest macro AUC from probabilities. Rec.: per-class recall (mean across folds); "
+           "contact has 4--13 test images per fold and is descriptive only.",
            "Distância médico-legal do disparo (encostado, curta, distância; só entradas) no mesmo protocolo da "
            "Tabela~\\ref{tab:protocolo_es}. Média $\\pm$ dp entre dobras; S = sementes de treino (Swin-B e MaxViT-T: "
-           "só as sementes 42 e 43). AUC = AUC macro um-contra-o-resto, das probabilidades. Rev.: revocação por classe; "
-           "encostado tem de 4 a 13 imagens de teste por dobra e é só descritivo.",
+           "só as sementes 42 e 43). AUC = AUC macro um-contra-o-resto, das probabilidades. Rev.: revocação por classe (média entre "
+           "dobras); encostado tem de 4 a 13 imagens de teste por dobra e é só descritivo.",
            "tab:protocolo_mlsd", "lrcccccccr",
            [f"{EP('Model', 'Modelo')} & {EP('Params (M)', 'Parâm. (M)')} & S & Acc & {EP('Bal.\\ acc', 'Acc bal.')} & "
             f"F1$_M$ & AUC & {EP('Rec.\\ cont.', 'Rev.\\ enc.')} & {EP('Rec.\\ close', 'Rev.\\ curta')} & Min \\\\"],
@@ -331,9 +332,19 @@ def t_transformers():
 
 def t_wavkan(tarefa):
     arq = "tabela_wavkan.csv" if tarefa == "es" else "tabela_wavkan_mlsd.csv"
+    # Os minutos das cabeças (a)-(d) vêm das tabelas do protocolo (arredondados uma só vez a partir dos
+    # valores brutos), para bater com as Tabelas 6.2 e 6.3; o tabela_wavkan*.csv já os traz com duas casas
+    # (ex.: 8,35016 -> 8,35 -> 8,3, contra 8,4 na tabela do protocolo).
+    prot = "tabela_final.csv" if tarefa == "es" else "tabela_mlsd.csv"
+    pre = "" if tarefa == "es" else "mlsd__"
+    cfg = {"a": "linear", "b": "mlp128", "c": "mlp_iso", "d": "kan"}
+    min_prot = {}
+    for r in ler(prot):
+        min_prot.setdefault(r["config"], r["treino_min_dobra"])
     linhas = []
     for r in ler(arq):
         i = r["id"]
+        minutos = min_prot[f"{pre}resnet152__{cfg[i]}"] if i in cfg else f"{float(r['min_por_dobra']):.1f}"
         rot = f"({i})" if len(i) == 1 else i
         nome = {"a": "Linear", "b": "MLP-128", "c": "MLP-iso", "d": EP("Spline KAN = TransferKAN", "KAN spline = TransferKAN")}.get(i)
         if nome is None:
@@ -343,7 +354,7 @@ def t_wavkan(tarefa):
             nome = f"Wav-KAN, {onda}, $h={h}$"
         linhas.append(f"{rot} & {nome} & {milhar(r['params_cabeca'])} & {sementes(r['sementes'])} & {pm(r['acc'])} & "
                       f"{pm(r['f1_macro'])} & {pm(r['auc'])} & {float(r['auc_oof']):.3f} & "
-                      f"{float(r['min_por_dobra']):.1f} & {float(r['cabeca_fwd_bwd_ms_lote32']):.2f}")
+                      f"{minutos} & {float(r['cabeca_fwd_bwd_ms_lote32']):.2f}")
     if tarefa == "es":
         en_t, pt_t, rot = "Entry/exit", "Entrada/saída", "tab:wavkan_es"
     else:

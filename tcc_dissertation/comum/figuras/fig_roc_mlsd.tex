@@ -14,22 +14,22 @@
     every axis plot/.append style={line width=0.7pt},
 ]
 \nextgroupplot[title={\EP{contact vs.\ rest}{encostado $\times$ resto}}]
-\addplot[color=corA] table[x=fpr, y=tpr, col sep=comma]{img/protocolo/roc_dist_enc_a.csv}; \addlegendentry{(a) \aucRocDistEncA}
-\addplot[color=corB] table[x=fpr, y=tpr, col sep=comma]{img/protocolo/roc_dist_enc_b.csv}; \addlegendentry{(b) \aucRocDistEncB}
-\addplot[color=corC] table[x=fpr, y=tpr, col sep=comma]{img/protocolo/roc_dist_enc_c.csv}; \addlegendentry{(c) \aucRocDistEncC}
-\addplot[color=corD] table[x=fpr, y=tpr, col sep=comma]{img/protocolo/roc_dist_enc_d.csv}; \addlegendentry{(d) \aucRocDistEncD}
+\addplot[color=corA] table[x=fpr, y=tpr, col sep=comma]{img/protocolo/roc_dist_enc_a.csv}; \addlegendentry{(a) \dec{\aucRocDistEncA}}
+\addplot[color=corB] table[x=fpr, y=tpr, col sep=comma]{img/protocolo/roc_dist_enc_b.csv}; \addlegendentry{(b) \dec{\aucRocDistEncB}}
+\addplot[color=corC] table[x=fpr, y=tpr, col sep=comma]{img/protocolo/roc_dist_enc_c.csv}; \addlegendentry{(c) \dec{\aucRocDistEncC}}
+\addplot[color=corD] table[x=fpr, y=tpr, col sep=comma]{img/protocolo/roc_dist_enc_d.csv}; \addlegendentry{(d) \dec{\aucRocDistEncD}}
 \addplot[black, dotted, thin, forget plot] coordinates {(0,0) (1,1)};
 \nextgroupplot[title={\EP{close range vs.\ rest}{curta $\times$ resto}}]
-\addplot[color=corA] table[x=fpr, y=tpr, col sep=comma]{img/protocolo/roc_dist_cur_a.csv}; \addlegendentry{(a) \aucRocDistCurA}
-\addplot[color=corB] table[x=fpr, y=tpr, col sep=comma]{img/protocolo/roc_dist_cur_b.csv}; \addlegendentry{(b) \aucRocDistCurB}
-\addplot[color=corC] table[x=fpr, y=tpr, col sep=comma]{img/protocolo/roc_dist_cur_c.csv}; \addlegendentry{(c) \aucRocDistCurC}
-\addplot[color=corD] table[x=fpr, y=tpr, col sep=comma]{img/protocolo/roc_dist_cur_d.csv}; \addlegendentry{(d) \aucRocDistCurD}
+\addplot[color=corA] table[x=fpr, y=tpr, col sep=comma]{img/protocolo/roc_dist_cur_a.csv}; \addlegendentry{(a) \dec{\aucRocDistCurA}}
+\addplot[color=corB] table[x=fpr, y=tpr, col sep=comma]{img/protocolo/roc_dist_cur_b.csv}; \addlegendentry{(b) \dec{\aucRocDistCurB}}
+\addplot[color=corC] table[x=fpr, y=tpr, col sep=comma]{img/protocolo/roc_dist_cur_c.csv}; \addlegendentry{(c) \dec{\aucRocDistCurC}}
+\addplot[color=corD] table[x=fpr, y=tpr, col sep=comma]{img/protocolo/roc_dist_cur_d.csv}; \addlegendentry{(d) \dec{\aucRocDistCurD}}
 \addplot[black, dotted, thin, forget plot] coordinates {(0,0) (1,1)};
 \nextgroupplot[title={\EP{distant vs.\ rest}{distância $\times$ resto}}]
-\addplot[color=corA] table[x=fpr, y=tpr, col sep=comma]{img/protocolo/roc_dist_dis_a.csv}; \addlegendentry{(a) \aucRocDistDisA}
-\addplot[color=corB] table[x=fpr, y=tpr, col sep=comma]{img/protocolo/roc_dist_dis_b.csv}; \addlegendentry{(b) \aucRocDistDisB}
-\addplot[color=corC] table[x=fpr, y=tpr, col sep=comma]{img/protocolo/roc_dist_dis_c.csv}; \addlegendentry{(c) \aucRocDistDisC}
-\addplot[color=corD] table[x=fpr, y=tpr, col sep=comma]{img/protocolo/roc_dist_dis_d.csv}; \addlegendentry{(d) \aucRocDistDisD}
+\addplot[color=corA] table[x=fpr, y=tpr, col sep=comma]{img/protocolo/roc_dist_dis_a.csv}; \addlegendentry{(a) \dec{\aucRocDistDisA}}
+\addplot[color=corB] table[x=fpr, y=tpr, col sep=comma]{img/protocolo/roc_dist_dis_b.csv}; \addlegendentry{(b) \dec{\aucRocDistDisB}}
+\addplot[color=corC] table[x=fpr, y=tpr, col sep=comma]{img/protocolo/roc_dist_dis_c.csv}; \addlegendentry{(c) \dec{\aucRocDistDisC}}
+\addplot[color=corD] table[x=fpr, y=tpr, col sep=comma]{img/protocolo/roc_dist_dis_d.csv}; \addlegendentry{(d) \dec{\aucRocDistDisD}}
 \addplot[black, dotted, thin, forget plot] coordinates {(0,0) (1,1)};
 \end{groupplot}
 \end{tikzpicture}

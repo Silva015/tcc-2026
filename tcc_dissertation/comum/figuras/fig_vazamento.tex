@@ -1,4 +1,4 @@
-% AUC por dobra (5 dobras agrupadas por caso, semente 42) x AUC por partição no split de Lira et al. (3 partições),
+% AUC por dobra (5 dobras agrupadas por caso, semente 42) x AUC por partição no hold-out de Lira et al. (3 partições),
 % mesma receita. Dados: img/protocolo/vaz_*.csv (scripts/preparar_dados_figuras.py).
 \begin{tikzpicture}
 \begin{groupplot}[
@@ -16,7 +16,7 @@
 \addplot[only marks, mark=*, mark size=1.8pt, color=corA] table[x=x, y=auc, col sep=comma]{img/protocolo/vaz_es_a_agrup.csv};
 \addlegendentry{\EP{case-grouped folds (5 folds)}{dobras agrupadas por caso (5 dobras)}\quad}
 \addplot[only marks, mark=square*, mark size=1.8pt, color=corB] table[x=x, y=auc, col sep=comma]{img/protocolo/vaz_es_a_lira.csv};
-\addlegendentry{\EP{split of Lira et al.\ (3 partitions)}{split de Lira et al.\ (3 partições)}}
+\addlegendentry{\EP{hold-out of Lira et al.\ (3 partitions)}{hold-out de Lira et al.\ (3 partições)}}
 \addplot[only marks, mark=*, mark size=1.8pt, color=corA, forget plot] table[x=x, y=auc, col sep=comma]{img/protocolo/vaz_es_d_agrup.csv};
 \addplot[only marks, mark=square*, mark size=1.8pt, color=corB, forget plot] table[x=x, y=auc, col sep=comma]{img/protocolo/vaz_es_d_lira.csv};
 \nextgroupplot[title={\EP{MLSD (shooting distance)}{MLSD (distância do disparo)}}, ymin=0.60, ymax=0.97]

@@ -12,13 +12,13 @@
     every axis plot/.append style={line width=0.9pt},
 ]
 \addplot[color=corA] table[x=fpr, y=tpr, col sep=comma]{img/protocolo/roc_es_a.csv};
-\addlegendentry{(a) \EP{linear}{linear} (AUC\textsubscript{OOF} \aucRocEsA)}
+\addlegendentry{(a) \EP{linear}{linear} (AUC\textsubscript{OOF} \dec{\aucRocEsA})}
 \addplot[color=corB] table[x=fpr, y=tpr, col sep=comma]{img/protocolo/roc_es_b.csv};
-\addlegendentry{(b) MLP-128 (AUC\textsubscript{OOF} \aucRocEsB)}
+\addlegendentry{(b) MLP-128 (AUC\textsubscript{OOF} \dec{\aucRocEsB})}
 \addplot[color=corC] table[x=fpr, y=tpr, col sep=comma]{img/protocolo/roc_es_c.csv};
-\addlegendentry{(c) MLP-iso (AUC\textsubscript{OOF} \aucRocEsC)}
+\addlegendentry{(c) MLP-iso (AUC\textsubscript{OOF} \dec{\aucRocEsC})}
 \addplot[color=corD] table[x=fpr, y=tpr, col sep=comma]{img/protocolo/roc_es_d.csv};
-\addlegendentry{(d) KAN = TransferKAN (AUC\textsubscript{OOF} \aucRocEsD)}
+\addlegendentry{(d) KAN = TransferKAN (AUC\textsubscript{OOF} \dec{\aucRocEsD})}
 \addplot[black, dotted, thin, forget plot] coordinates {(0,0) (1,1)};
 \end{axis}
 \end{tikzpicture}
