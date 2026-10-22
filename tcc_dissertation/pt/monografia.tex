@@ -37,6 +37,10 @@
 \input{img/protocolo/figuras_macros.tex}
 % Folga para não estourar a margem com palavras em \texttt e números entre $...$
 \setlength{\emergencystretch}{2em}
+% Sem folha de aprovação até haver banca e data de defesa. A classe exige três nomes na banca;
+% os campos ficam vazios (não são impressos) até a banca ser definida.
+\renewcommand{\folhaaprovacao}{}
+\makeatletter\def\@nomedois{}\def\@filidois{}\def\@nometres{}\def\@filitres{}\makeatother
 % Decimais das tabelas comuns: ponto no EN, vírgula no PT
 \usepackage{xstring}
 \newcommand{\dec}[1]{\StrSubstitute{#1}{.}{{,}}}
@@ -90,10 +94,8 @@
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \orientador{\prof \dr Pedro Garcia Freitas}{CIC/UnB}%
 \coordenador[a]{\prof \dr Marcelo Grandi Mandelli}{Universidade de Brasília}%
-\diamesano{01}{Dezembro}{2025}%
-
-\membrobanca{\prof \dr Membro 1}{ENE/UnB}%
-\membrobanca{\prof \dr Membro 2}{ENE/UnB}%
+% Só o ano da capa: a data da defesa e a banca ainda não foram definidas.
+\diamesano{}{}{2026}%
 
 \autor{Arthur Silva}{Carneiro}%
 
