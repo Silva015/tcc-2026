@@ -5,26 +5,27 @@
 \label{tab:vazamento}
 \footnotesize
 \setlength{\tabcolsep}{3pt}
-\resizebox{\textwidth}{!}{%
+\begin{adjustbox}{max width=\textwidth}
 \begin{tabular}{lllrcccc}
 \toprule
 \EP{Task}{Tarefa} & \EP{Head}{Cabeça} & \EP{Split}{Partição} & \EP{Leak}{Vaz.} & Acc & F1$_M$ & \EP{Bal.\ acc}{Acc bal.} & AUC \\
 \midrule
-\EP{Entry/exit}{Entrada/saída} & Linear (a) & \EP{Lira et al.}{Lira et al.} & 98.7\% & $0.876 \pm 0.005$ & $0.838 \pm 0.007$ & $0.852 \pm 0.010$ & $0.940 \pm 0.003$ \\
- & & \EP{Grouped}{Agrupada} & 0\% & $0.848 \pm 0.010$ & $0.809 \pm 0.013$ & $0.820 \pm 0.011$ & $0.906 \pm 0.013$ \\
- & & $\Delta$ & & $+0.028$ & $+0.029$ & $+0.033$ & $+0.034$ \\
+\EP{Entry/exit}{Entrada/saída} & Linear (a) & \EP{Lira et al.}{Lira et al.} & \dec{98.7}\% & $\dec{0.876} \pm \dec{0.005}$ & $\dec{0.838} \pm \dec{0.007}$ & $\dec{0.852} \pm \dec{0.010}$ & $\dec{0.940} \pm \dec{0.003}$ \\
+ & & \EP{Grouped}{Agrupada} & 0\% & $\dec{0.848} \pm \dec{0.010}$ & $\dec{0.809} \pm \dec{0.013}$ & $\dec{0.820} \pm \dec{0.011}$ & $\dec{0.906} \pm \dec{0.013}$ \\
+ & & $\Delta$ & & $+\dec{0.028}$ & $+\dec{0.029}$ & $+\dec{0.033}$ & $+\dec{0.034}$ \\
 \midrule
-\EP{Entry/exit}{Entrada/saída} & KAN (d) = TransferKAN & \EP{Lira et al.}{Lira et al.} & 98.7\% & $0.881 \pm 0.006$ & $0.844 \pm 0.006$ & $0.859 \pm 0.003$ & $0.940 \pm 0.003$ \\
- & & \EP{Grouped}{Agrupada} & 0\% & $0.846 \pm 0.008$ & $0.807 \pm 0.011$ & $0.818 \pm 0.013$ & $0.906 \pm 0.011$ \\
- & & $\Delta$ & & $+0.035$ & $+0.037$ & $+0.040$ & $+0.034$ \\
+\EP{Entry/exit}{Entrada/saída} & KAN (d) = TransferKAN & \EP{Lira et al.}{Lira et al.} & \dec{98.7}\% & $\dec{0.881} \pm \dec{0.006}$ & $\dec{0.844} \pm \dec{0.006}$ & $\dec{0.859} \pm \dec{0.003}$ & $\dec{0.940} \pm \dec{0.003}$ \\
+ & & \EP{Grouped}{Agrupada} & 0\% & $\dec{0.846} \pm \dec{0.008}$ & $\dec{0.807} \pm \dec{0.011}$ & $\dec{0.818} \pm \dec{0.013}$ & $\dec{0.906} \pm \dec{0.011}$ \\
+ & & $\Delta$ & & $+\dec{0.035}$ & $+\dec{0.037}$ & $+\dec{0.040}$ & $+\dec{0.034}$ \\
 \midrule
-MLSD & Linear (a) & \EP{Lira et al.}{Lira et al.} & 98.4\% & $0.857 \pm 0.006$ & $0.697 \pm 0.014$ & $0.783 \pm 0.008$ & $0.937 \pm 0.004$ \\
- & & \EP{Grouped}{Agrupada} & 0\% & $0.817 \pm 0.014$ & $0.486 \pm 0.059$ & $0.521 \pm 0.079$ & $0.779 \pm 0.088$ \\
- & & $\Delta$ & & $+0.040$ & $+0.211$ & $+0.262$ & $+0.158$ \\
+MLSD & Linear (a) & \EP{Lira et al.}{Lira et al.} & \dec{98.4}\% & $\dec{0.857} \pm \dec{0.006}$ & $\dec{0.697} \pm \dec{0.014}$ & $\dec{0.783} \pm \dec{0.008}$ & $\dec{0.937} \pm \dec{0.004}$ \\
+ & & \EP{Grouped}{Agrupada} & 0\% & $\dec{0.817} \pm \dec{0.014}$ & $\dec{0.486} \pm \dec{0.059}$ & $\dec{0.521} \pm \dec{0.079}$ & $\dec{0.779} \pm \dec{0.088}$ \\
+ & & $\Delta$ & & $+\dec{0.040}$ & $+\dec{0.211}$ & $+\dec{0.262}$ & $+\dec{0.158}$ \\
 \midrule
-MLSD & KAN (d) = TransferKAN & \EP{Lira et al.}{Lira et al.} & 98.4\% & $0.863 \pm 0.002$ & $0.691 \pm 0.003$ & $0.788 \pm 0.006$ & $0.942 \pm 0.003$ \\
- & & \EP{Grouped}{Agrupada} & 0\% & $0.810 \pm 0.018$ & $0.466 \pm 0.035$ & $0.500 \pm 0.062$ & $0.788 \pm 0.063$ \\
- & & $\Delta$ & & $+0.053$ & $+0.225$ & $+0.288$ & $+0.155$ \\
+MLSD & KAN (d) = TransferKAN & \EP{Lira et al.}{Lira et al.} & \dec{98.4}\% & $\dec{0.863} \pm \dec{0.002}$ & $\dec{0.691} \pm \dec{0.003}$ & $\dec{0.788} \pm \dec{0.006}$ & $\dec{0.942} \pm \dec{0.003}$ \\
+ & & \EP{Grouped}{Agrupada} & 0\% & $\dec{0.810} \pm \dec{0.018}$ & $\dec{0.466} \pm \dec{0.035}$ & $\dec{0.500} \pm \dec{0.062}$ & $\dec{0.788} \pm \dec{0.063}$ \\
+ & & $\Delta$ & & $+\dec{0.053}$ & $+\dec{0.225}$ & $+\dec{0.288}$ & $+\dec{0.155}$ \\
 \bottomrule
-\end{tabular}}
+\end{tabular}
+\end{adjustbox}
 \end{table}

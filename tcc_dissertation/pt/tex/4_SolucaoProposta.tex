@@ -27,7 +27,7 @@ A TransferKAN\footnote{O artigo curto derivado deste trabalho para o SIBGRAPI 20
     \node[io] (input) {Imagem\\de entrada\\$224\times224$};
     \node[backbone, right=of input] (resnet) {Backbone\\ResNet-152\\(ImageNet)};
     \node[block, right=of resnet] (drop) {Dropout\\$p=0{,}5$};
-    \node[kan, right=of drop] (kanlayer) {Cabeça\\KAN\\$[2048,128,K]$};
+    \node[kan, right=of drop] (kanlayer) {Cabeça\\KAN\\$[2048, 128, K]$};
     \node[io, right=of kanlayer] (out) {Logits\\das classes\\($K{=}2$ ou $3$)};
 
     \draw[->, thick] (input) -- (resnet);
@@ -42,7 +42,7 @@ A TransferKAN\footnote{O artigo curto derivado deste trabalho para o SIBGRAPI 20
               fit=(kanlayer), label={[font=\scriptsize, orange!70!black]below:Cabeça em estudo}] {};
     \end{scope}
 \end{tikzpicture}
-\caption{A TransferKAN. Uma ResNet-152 pré-treinada no ImageNet extrai um vetor de 2.048 características, que passa por Dropout ($p=0{,}5$) e por uma cabeça KAN de duas camadas $[2048,128,K]$ com grade de tamanho 10 e splines cúbicas ($K=2$ em entrada/saída, $K=3$ na distância do disparo). Na ablação da cabeça, só o bloco laranja muda.}
+\caption{A TransferKAN. Uma ResNet-152 pré-treinada no ImageNet extrai um vetor de 2.048 características, que passa por Dropout ($p=0{,}5$) e por uma cabeça KAN de duas camadas $[2048, 128, K]$ com grade de tamanho 10 e splines cúbicas ($K=2$ em entrada/saída, $K=3$ na distância do disparo). Na ablação da cabeça, só o bloco laranja muda.}
 \label{fig:transferkan_arch}
 \end{figure}
 
@@ -70,6 +70,7 @@ A TransferKAN foi motivada por duas afirmações sobre KANs usadas como cabeças
 
 \begin{figure}[htpb]
 \centering
+\begin{adjustbox}{max width=\textwidth}
 \begin{tikzpicture}[
     >=Stealth,
     node distance=7mm,
@@ -94,6 +95,7 @@ A TransferKAN foi motivada por duas afirmações sobre KANs usadas como cabeças
     \draw[->, thick] (h1) -- (o1);
     \draw[->, thick] (h2) -- (o2);
 \end{tikzpicture}
+\end{adjustbox}
 \caption{A variante multitarefa: uma ResNet-152 e um Dropout compartilhados por duas cabeças do mesmo tipo (KAN ou MLP-128). A perda é $L = L_{\mathrm{E/S}} + L_{\mathrm{dist}}$, com os ferimentos de saída fora do termo de distância.}
 \label{fig:multitarefa_arch}
 \end{figure}

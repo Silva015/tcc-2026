@@ -79,7 +79,7 @@ For each fold and each seed, the following are computed on the test images: accu
 
 Lira et al.\ computed their AUC from predicted classes rather than probabilities~\cite{leguwoi}. For a single threshold the ROC curve has one point, and the macro AUC reduces to the average of recall and specificity; this quantity, called AUC$_c$ here, is computed only to compare with their tables (Section~\ref{sec:auc_background}).
 
-\section{Statistical Analysis and Pre-Registered Decision Rules}
+\section{Statistics and Pre-Registered Decision Rules}
 \label{sec:stats}
 
 Two models are always compared on the same test images. The difference $\Delta$ (first minus second) is computed on the pooled out-of-fold predictions, and its 95\% confidence interval comes from a paired bootstrap over cases~\cite{efron1993bootstrap}: cases are resampled with replacement 2,000 times, which respects the dependence between images of the same case. The difference per fold and the number of folds in which each model wins are also reported.

@@ -79,7 +79,7 @@ Para cada dobra e cada semente, calculam-se nas imagens de teste: acurácia, acu
 
 Lira et al.\ calcularam a AUC a partir das classes previstas, e não das probabilidades~\cite{leguwoi}. Com um único limiar, a curva ROC tem um só ponto, e a AUC macro se reduz à média entre revocação e especificidade; essa grandeza, chamada aqui de AUC$_c$, é calculada só para comparar com as tabelas deles (Seção~\ref{sec:auc_background}).
 
-\section{Análise Estatística e Regras de Decisão Pré-Registradas}
+\section{Estatística e Regras de Decisão Pré-Registradas}
 \label{sec:stats}
 
 Dois modelos são sempre comparados nas mesmas imagens de teste. A diferença $\Delta$ (o primeiro menos o segundo) é calculada nas predições fora da dobra, e o seu intervalo de confiança de 95\% vem de um bootstrap pareado sobre os casos~\cite{efron1993bootstrap}: os casos são reamostrados com reposição 2.000 vezes, o que respeita a dependência entre imagens do mesmo caso. Também são dados a diferença por dobra e o número de dobras em que cada modelo vence.

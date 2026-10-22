@@ -9,6 +9,7 @@ Só usa a biblioteca padrão do Python.
 import csv
 import json
 import os
+import re
 
 RAIZ = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", ".."))
 RES = os.path.join(RAIZ, "resultados")
@@ -62,6 +63,14 @@ def sementes(txt):
     return str(n)
 
 
+def celulas_bilingues(linha):
+    """Nas linhas de dados: decimais viram \\dec{...} (vírgula no PT) e milhares 1{,}049{,}860 viram
+    \\EP{1{,}049{,}860}{1.049.860}. Nomes como MNASNet1.3 ou x0.5 não são tocados."""
+    linha = re.sub(r"(?<![\w{.])(\d+(?:\{,\}\d{3})+)(?![\d.])",
+                   lambda m: f"\\EP{{{m.group(1)}}}{{{m.group(1).replace('{,}', '.')}}}", linha)
+    return re.sub(r"(?<![\w{.,])(\d+\.\d+)", r"\\dec{\1}", linha)
+
+
 def tabela(nome, legenda_en, legenda_pt, rotulo, colunas, cabecalho, linhas, tamanho="\\footnotesize",
            larga=False, nota_en="", nota_pt="", espaco="4pt"):
     corpo = []
@@ -73,16 +82,20 @@ def tabela(nome, legenda_en, legenda_pt, rotulo, colunas, cabecalho, linhas, tam
     corpo.append(tamanho)
     corpo.append(f"\\setlength{{\\tabcolsep}}{{{espaco}}}")
     if larga:
-        corpo.append("\\resizebox{\\textwidth}{!}{%")
+        corpo.append("\\begin{adjustbox}{max width=\\textwidth}")
     corpo.append(f"\\begin{{tabular}}{{{colunas}}}")
     corpo.append("\\toprule")
     corpo += cabecalho
     corpo.append("\\midrule")
     for l in linhas:
         cru = l.endswith("\\\\") or l.startswith(("\\midrule", "\\cmidrule", "\\hline"))
+        if not cru:
+            l = celulas_bilingues(l)
         corpo.append(l if cru else l + " \\\\")
     corpo.append("\\bottomrule")
-    corpo.append("\\end{tabular}" + ("}" if larga else ""))
+    corpo.append("\\end{tabular}")
+    if larga:
+        corpo.append("\\end{adjustbox}")
     if nota_en:
         corpo.append(f"\\par\\smallskip\\parbox{{\\linewidth}}{{\\scriptsize {EP(nota_en, nota_pt)}}}")
     corpo.append("\\end{table}")
@@ -169,29 +182,29 @@ def t_cabecas():
 
 def t_protocolo_es():
     tf = ler("tabela_final.csv")
-    linhas = [secao("Head ablation (ResNet-152 backbone)", "Ablação da cabeça (backbone ResNet-152)", 9)]
+    linhas = [secao("Head ablation (ResNet-152 backbone)", "Ablação da cabeça (backbone ResNet-152)", 7)]
     painel_b = False
     for r in tf:
         if r["painel"] == "B" and not painel_b:
             linhas.append("\\midrule")
-            linhas.append(secao("Backbones (linear head)", "Backbones (cabeça linear)", 9))
+            linhas.append(secao("Backbones (linear head)", "Backbones (cabeça linear)", 7))
             painel_b = True
         linhas.append(f"{nome_modelo(r['modelo'])} & {float(r['params_total_M']):.2f} & {sementes(r['sementes'])} & "
-                      f"{pm(r['acc'])} & {pm(r['prec_macro'])} & {pm(r['rec_macro'])} & {pm(r['f1_macro'])} & "
-                      f"{pm(r['auc'])} & {float(r['treino_min_dobra']):.1f}")
+                      f"{pm(r['acc'])} & {pm(r['f1_macro'])} & {pm(r['auc'])} & {float(r['treino_min_dobra']):.1f}")
     tabela("tab_protocolo_es",
            "Entry/exit classification under the single protocol (case-grouped stratified 5-fold, same two-phase recipe, "
            "last epoch). Mean $\\pm$ s.d.\\ across folds; each fold is the mean over the training seeds (column S). "
-           "Precision, recall and F1 are macro averages; AUC is computed from predicted probabilities. "
+           "F1 is the macro average (macro precision and recall are in Appendix~\\ref{chap:apendice_mmw}); AUC is computed "
+           "from predicted probabilities. "
            "Min: training minutes per fold on an NVIDIA L4.",
            "Classificação entrada/saída no protocolo único (5 dobras estratificadas e agrupadas por caso, mesma receita "
            "de duas fases, última época). Média $\\pm$ dp entre dobras; cada dobra é a média das sementes de treino (coluna S). "
-           "Precisão, revocação e F1 são médias macro; a AUC é calculada das probabilidades previstas. "
+           "F1 é a média macro (precisão e revocação macro estão no Apêndice~\\ref{chap:apendice_mmw}); a AUC é calculada "
+           "das probabilidades previstas. "
            "Min: minutos de treino por dobra numa NVIDIA L4.",
-           "tab:protocolo_es", "lrccccccr",
-           [f"{EP('Model', 'Modelo')} & {EP('Params (M)', 'Parâm. (M)')} & S & Acc & {EP('Prec.', 'Prec.')} & "
-            f"{EP('Rec.', 'Rev.')} & F1 & AUC & Min \\\\"],
-           linhas, larga=True, espaco="3pt")
+           "tab:protocolo_es", "lrccccr",
+           [f"{EP('Model', 'Modelo')} & {EP('Params (M)', 'Parâm. (M)')} & S & Acc & F1 & AUC & Min \\\\"],
+           linhas, larga=True, espaco="4pt")
 
 
 def t_protocolo_mlsd():
@@ -313,7 +326,7 @@ def t_transformers():
            "tab:transformers", "llcccc",
            [f"{EP('Task', 'Tarefa')} & {EP('Contrast', 'Contraste')} & $\\Delta$AUC & {EP('95\\% CI', 'IC 95\\%')} & "
             f"{EP('Wins', 'Vence')} & {EP('Seeds of the transformer', 'Sementes do transformer')} \\\\"],
-           linhas)
+           linhas, larga=True)
 
 
 def t_wavkan(tarefa):
@@ -326,7 +339,7 @@ def t_wavkan(tarefa):
         if nome is None:
             onda = r["modelo"].split("Wav-KAN ")[1].split(",")[0]
             onda = {"mexican hat": EP("Mexican hat", "chapéu mexicano"), "DoG": "DoG", "Morlet": "Morlet"}[onda]
-            h = r["modelo"].split("h=")[1].split(")")[0]
+            h = re.search(r"h=(\d+)", r["modelo"]).group(1)
             nome = f"Wav-KAN, {onda}, $h={h}$"
         linhas.append(f"{rot} & {nome} & {milhar(r['params_cabeca'])} & {sementes(r['sementes'])} & {pm(r['acc'])} & "
                       f"{pm(r['f1_macro'])} & {pm(r['auc'])} & {float(r['auc_oof']):.3f} & "
@@ -518,10 +531,10 @@ def t_mmw(tarefa):
     pt_t = "Entrada/saída" if tarefa == "es" else "MLSD (só entradas)"
     tabela(f"tab_mmw_{tarefa}",
            f"{en_t} under the single protocol, in the format of Lira et al.~\\cite{{Lira2025deep}}: M = macro, m = micro, "
-           "W = weighted. Mean across folds (s.d.\\ in \\texttt{resultados/tabela\\_mmw\\_*.csv}); AUC from predicted "
+           "W = weighted. Mean across folds (the standard deviations are in the result files of the repository); AUC from predicted "
            "probabilities. Seeds as in the main tables.",
            f"{pt_t} no protocolo único, no formato de Lira et al.~\\cite{{Lira2025deep}}: M = macro, m = micro, "
-           "W = ponderada. Média entre dobras (dp em \\texttt{resultados/tabela\\_mmw\\_*.csv}); AUC das probabilidades "
+           "W = ponderada. Média entre dobras (os desvios-padrão estão nos arquivos de resultados do repositório); AUC das probabilidades "
            "previstas. Sementes como nas tabelas principais.",
            f"tab:mmw_{tarefa}", "l" + "c" * 16,
            [f" & Acc & \\multicolumn{{3}}{{c}}{{{EP('Precision', 'Precisão')}}} & \\multicolumn{{3}}{{c}}{{{EP('Recall', 'Revocação')}}} & "

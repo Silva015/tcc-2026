@@ -5,31 +5,32 @@
 \label{tab:protocolo_mlsd}
 \footnotesize
 \setlength{\tabcolsep}{3pt}
-\resizebox{\textwidth}{!}{%
+\begin{adjustbox}{max width=\textwidth}
 \begin{tabular}{lrcccccccr}
 \toprule
 \EP{Model}{Modelo} & \EP{Params (M)}{Parâm. (M)} & S & Acc & \EP{Bal.\ acc}{Acc bal.} & F1$_M$ & AUC & \EP{Rec.\ cont.}{Rev.\ enc.} & \EP{Rec.\ close}{Rev.\ curta} & Min \\
 \midrule
 \multicolumn{10}{l}{\textit{\EP{Head ablation (ResNet-152 backbone)}{Ablação da cabeça (backbone ResNet-152)}}} \\
-ResNet152 + Linear (a) & 58.15 & 3 & $0.815 \pm 0.014$ & $0.524 \pm 0.077$ & $0.488 \pm 0.056$ & $0.785 \pm 0.087$ & 0.17 & 0.53 & 6.3 \\
-ResNet152 + MLP-128 (b) & 58.41 & 3 & $0.813 \pm 0.013$ & $0.520 \pm 0.072$ & $0.482 \pm 0.050$ & $0.802 \pm 0.062$ & 0.16 & 0.53 & 6.3 \\
-ResNet152 + MLP-iso (c) & 62.08 & 3 & $0.821 \pm 0.017$ & $0.510 \pm 0.064$ & $0.480 \pm 0.050$ & $0.807 \pm 0.055$ & 0.13 & 0.51 & 6.4 \\
-ResNet152 + KAN (d) = TransferKAN & 62.08 & 3 & $0.813 \pm 0.017$ & $0.515 \pm 0.069$ & $0.477 \pm 0.045$ & $0.798 \pm 0.058$ & 0.15 & 0.52 & 6.5 \\
+ResNet152 + Linear (a) & \dec{58.15} & 3 & $\dec{0.815} \pm \dec{0.014}$ & $\dec{0.524} \pm \dec{0.077}$ & $\dec{0.488} \pm \dec{0.056}$ & $\dec{0.785} \pm \dec{0.087}$ & \dec{0.17} & \dec{0.53} & \dec{6.3} \\
+ResNet152 + MLP-128 (b) & \dec{58.41} & 3 & $\dec{0.813} \pm \dec{0.013}$ & $\dec{0.520} \pm \dec{0.072}$ & $\dec{0.482} \pm \dec{0.050}$ & $\dec{0.802} \pm \dec{0.062}$ & \dec{0.16} & \dec{0.53} & \dec{6.3} \\
+ResNet152 + MLP-iso (c) & \dec{62.08} & 3 & $\dec{0.821} \pm \dec{0.017}$ & $\dec{0.510} \pm \dec{0.064}$ & $\dec{0.480} \pm \dec{0.050}$ & $\dec{0.807} \pm \dec{0.055}$ & \dec{0.13} & \dec{0.51} & \dec{6.4} \\
+ResNet152 + KAN (d) = TransferKAN & \dec{62.08} & 3 & $\dec{0.813} \pm \dec{0.017}$ & $\dec{0.515} \pm \dec{0.069}$ & $\dec{0.477} \pm \dec{0.045}$ & $\dec{0.798} \pm \dec{0.058}$ & \dec{0.15} & \dec{0.52} & \dec{6.5} \\
 \midrule
 \multicolumn{10}{l}{\textit{\EP{Backbones (linear head)}{Backbones (cabeça linear)}}} \\
-ResNet152 & 58.15 & 3 & $0.815 \pm 0.014$ & $0.524 \pm 0.077$ & $0.488 \pm 0.056$ & $0.785 \pm 0.087$ & 0.17 & 0.53 & 6.3 \\
-AlexNet & 57.02 & 1 & $0.780 \pm 0.033$ & $0.561 \pm 0.105$ & $0.498 \pm 0.084$ & $0.806 \pm 0.079$ & 0.26 & 0.59 & 2.5 \\
-MobileNetV2 & 2.23 & 1 & $0.778 \pm 0.025$ & $0.513 \pm 0.074$ & $0.464 \pm 0.042$ & $0.806 \pm 0.056$ & 0.20 & 0.50 & 3.1 \\
-MNASNet1.3 & 5.01 & 1 & $0.451 \pm 0.078$ & $0.455 \pm 0.051$ & $0.294 \pm 0.047$ & $0.710 \pm 0.095$ & 0.10 & 0.86 & 3.1 \\
-ShuffleNetV2 x0.5 & 0.34 & 1 & $0.854 \pm 0.016$ & $0.474 \pm 0.079$ & $0.474 \pm 0.088$ & $0.776 \pm 0.046$ & 0.10 & 0.38 & 3.1 \\
-SqueezeNet1.0 & 0.74 & 1 & $0.788 \pm 0.023$ & $0.525 \pm 0.090$ & $0.490 \pm 0.074$ & $0.805 \pm 0.051$ & 0.20 & 0.53 & 2.6 \\
-DenseNet169 & 12.49 & 1 & $0.820 \pm 0.034$ & $0.556 \pm 0.136$ & $0.519 \pm 0.120$ & $0.821 \pm 0.070$ & 0.24 & 0.55 & 6.6 \\
-MaxViT-T & 30.41 & 2 & $0.810 \pm 0.021$ & $0.555 \pm 0.086$ & $0.511 \pm 0.070$ & $0.828 \pm 0.047$ & 0.23 & 0.58 & 9.4 \\
-Swin-B & 86.75 & 2 & $0.825 \pm 0.021$ & $0.540 \pm 0.087$ & $0.505 \pm 0.091$ & $0.838 \pm 0.054$ & 0.18 & 0.55 & 11.4 \\
-EfficientNetV2-L & 117.24 & 1 & $0.830 \pm 0.026$ & $0.529 \pm 0.084$ & $0.495 \pm 0.076$ & $0.744 \pm 0.133$ & 0.15 & 0.55 & 11.6 \\
-VGG16 & 134.27 & 1 & $0.844 \pm 0.026$ & $0.510 \pm 0.067$ & $0.481 \pm 0.050$ & $0.776 \pm 0.079$ & 0.10 & 0.51 & 6.6 \\
-RegNetY-16GF & 80.57 & 1 & $0.826 \pm 0.024$ & $0.531 \pm 0.080$ & $0.496 \pm 0.071$ & $0.773 \pm 0.088$ & 0.13 & 0.58 & 9.1 \\
-ResNet152 + KAN (d) = TransferKAN & 62.08 & 3 & $0.813 \pm 0.017$ & $0.515 \pm 0.069$ & $0.477 \pm 0.045$ & $0.798 \pm 0.058$ & 0.15 & 0.52 & 6.5 \\
+ResNet152 & \dec{58.15} & 3 & $\dec{0.815} \pm \dec{0.014}$ & $\dec{0.524} \pm \dec{0.077}$ & $\dec{0.488} \pm \dec{0.056}$ & $\dec{0.785} \pm \dec{0.087}$ & \dec{0.17} & \dec{0.53} & \dec{6.3} \\
+AlexNet & \dec{57.02} & 1 & $\dec{0.780} \pm \dec{0.033}$ & $\dec{0.561} \pm \dec{0.105}$ & $\dec{0.498} \pm \dec{0.084}$ & $\dec{0.806} \pm \dec{0.079}$ & \dec{0.26} & \dec{0.59} & \dec{2.5} \\
+MobileNetV2 & \dec{2.23} & 1 & $\dec{0.778} \pm \dec{0.025}$ & $\dec{0.513} \pm \dec{0.074}$ & $\dec{0.464} \pm \dec{0.042}$ & $\dec{0.806} \pm \dec{0.056}$ & \dec{0.20} & \dec{0.50} & \dec{3.1} \\
+MNASNet1.3 & \dec{5.01} & 1 & $\dec{0.451} \pm \dec{0.078}$ & $\dec{0.455} \pm \dec{0.051}$ & $\dec{0.294} \pm \dec{0.047}$ & $\dec{0.710} \pm \dec{0.095}$ & \dec{0.10} & \dec{0.86} & \dec{3.1} \\
+ShuffleNetV2 x0.5 & \dec{0.34} & 1 & $\dec{0.854} \pm \dec{0.016}$ & $\dec{0.474} \pm \dec{0.079}$ & $\dec{0.474} \pm \dec{0.088}$ & $\dec{0.776} \pm \dec{0.046}$ & \dec{0.10} & \dec{0.38} & \dec{3.1} \\
+SqueezeNet1.0 & \dec{0.74} & 1 & $\dec{0.788} \pm \dec{0.023}$ & $\dec{0.525} \pm \dec{0.090}$ & $\dec{0.490} \pm \dec{0.074}$ & $\dec{0.805} \pm \dec{0.051}$ & \dec{0.20} & \dec{0.53} & \dec{2.6} \\
+DenseNet169 & \dec{12.49} & 1 & $\dec{0.820} \pm \dec{0.034}$ & $\dec{0.556} \pm \dec{0.136}$ & $\dec{0.519} \pm \dec{0.120}$ & $\dec{0.821} \pm \dec{0.070}$ & \dec{0.24} & \dec{0.55} & \dec{6.6} \\
+MaxViT-T & \dec{30.41} & 2 & $\dec{0.810} \pm \dec{0.021}$ & $\dec{0.555} \pm \dec{0.086}$ & $\dec{0.511} \pm \dec{0.070}$ & $\dec{0.828} \pm \dec{0.047}$ & \dec{0.23} & \dec{0.58} & \dec{9.4} \\
+Swin-B & \dec{86.75} & 2 & $\dec{0.825} \pm \dec{0.021}$ & $\dec{0.540} \pm \dec{0.087}$ & $\dec{0.505} \pm \dec{0.091}$ & $\dec{0.838} \pm \dec{0.054}$ & \dec{0.18} & \dec{0.55} & \dec{11.4} \\
+EfficientNetV2-L & \dec{117.24} & 1 & $\dec{0.830} \pm \dec{0.026}$ & $\dec{0.529} \pm \dec{0.084}$ & $\dec{0.495} \pm \dec{0.076}$ & $\dec{0.744} \pm \dec{0.133}$ & \dec{0.15} & \dec{0.55} & \dec{11.6} \\
+VGG16 & \dec{134.27} & 1 & $\dec{0.844} \pm \dec{0.026}$ & $\dec{0.510} \pm \dec{0.067}$ & $\dec{0.481} \pm \dec{0.050}$ & $\dec{0.776} \pm \dec{0.079}$ & \dec{0.10} & \dec{0.51} & \dec{6.6} \\
+RegNetY-16GF & \dec{80.57} & 1 & $\dec{0.826} \pm \dec{0.024}$ & $\dec{0.531} \pm \dec{0.080}$ & $\dec{0.496} \pm \dec{0.071}$ & $\dec{0.773} \pm \dec{0.088}$ & \dec{0.13} & \dec{0.58} & \dec{9.1} \\
+ResNet152 + KAN (d) = TransferKAN & \dec{62.08} & 3 & $\dec{0.813} \pm \dec{0.017}$ & $\dec{0.515} \pm \dec{0.069}$ & $\dec{0.477} \pm \dec{0.045}$ & $\dec{0.798} \pm \dec{0.058}$ & \dec{0.15} & \dec{0.52} & \dec{6.5} \\
 \bottomrule
-\end{tabular}}
+\end{tabular}
+\end{adjustbox}
 \end{table}

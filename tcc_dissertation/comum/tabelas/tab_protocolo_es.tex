@@ -1,36 +1,37 @@
 % Gerado por tcc_dissertation/scripts/gerar_tabelas.py a partir de resultados/. Não edite à mão.
 \begin{table}[!htbp]
 \centering
-\caption{\EP{Entry/exit classification under the single protocol (case-grouped stratified 5-fold, same two-phase recipe, last epoch). Mean $\pm$ s.d.\ across folds; each fold is the mean over the training seeds (column S). Precision, recall and F1 are macro averages; AUC is computed from predicted probabilities. Min: training minutes per fold on an NVIDIA L4.}{Classificação entrada/saída no protocolo único (5 dobras estratificadas e agrupadas por caso, mesma receita de duas fases, última época). Média $\pm$ dp entre dobras; cada dobra é a média das sementes de treino (coluna S). Precisão, revocação e F1 são médias macro; a AUC é calculada das probabilidades previstas. Min: minutos de treino por dobra numa NVIDIA L4.}}
+\caption{\EP{Entry/exit classification under the single protocol (case-grouped stratified 5-fold, same two-phase recipe, last epoch). Mean $\pm$ s.d.\ across folds; each fold is the mean over the training seeds (column S). F1 is the macro average (macro precision and recall are in Appendix~\ref{chap:apendice_mmw}); AUC is computed from predicted probabilities. Min: training minutes per fold on an NVIDIA L4.}{Classificação entrada/saída no protocolo único (5 dobras estratificadas e agrupadas por caso, mesma receita de duas fases, última época). Média $\pm$ dp entre dobras; cada dobra é a média das sementes de treino (coluna S). F1 é a média macro (precisão e revocação macro estão no Apêndice~\ref{chap:apendice_mmw}); a AUC é calculada das probabilidades previstas. Min: minutos de treino por dobra numa NVIDIA L4.}}
 \label{tab:protocolo_es}
 \footnotesize
-\setlength{\tabcolsep}{3pt}
-\resizebox{\textwidth}{!}{%
-\begin{tabular}{lrccccccr}
+\setlength{\tabcolsep}{4pt}
+\begin{adjustbox}{max width=\textwidth}
+\begin{tabular}{lrccccr}
 \toprule
-\EP{Model}{Modelo} & \EP{Params (M)}{Parâm. (M)} & S & Acc & \EP{Prec.}{Prec.} & \EP{Rec.}{Rev.} & F1 & AUC & Min \\
+\EP{Model}{Modelo} & \EP{Params (M)}{Parâm. (M)} & S & Acc & F1 & AUC & Min \\
 \midrule
-\multicolumn{9}{l}{\textit{\EP{Head ablation (ResNet-152 backbone)}{Ablação da cabeça (backbone ResNet-152)}}} \\
-ResNet152 + Linear (a) & 58.15 & 3 & $0.846 \pm 0.008$ & $0.800 \pm 0.019$ & $0.814 \pm 0.012$ & $0.805 \pm 0.012$ & $0.904 \pm 0.013$ & 8.2 \\
-ResNet152 + MLP-128 (b) & 58.41 & 3 & $0.846 \pm 0.011$ & $0.800 \pm 0.020$ & $0.815 \pm 0.015$ & $0.806 \pm 0.015$ & $0.905 \pm 0.014$ & 8.3 \\
-ResNet152 + MLP-iso (c) & 62.08 & 3 & $0.846 \pm 0.009$ & $0.801 \pm 0.019$ & $0.817 \pm 0.012$ & $0.807 \pm 0.013$ & $0.906 \pm 0.014$ & 8.4 \\
-ResNet152 + KAN (d) = TransferKAN & 62.08 & 3 & $0.846 \pm 0.010$ & $0.800 \pm 0.018$ & $0.816 \pm 0.015$ & $0.806 \pm 0.013$ & $0.905 \pm 0.013$ & 8.5 \\
-ResNet152 + KAN-8 (e) & 58.39 & 1 & $0.846 \pm 0.012$ & $0.800 \pm 0.018$ & $0.819 \pm 0.013$ & $0.808 \pm 0.014$ & $0.903 \pm 0.014$ & 8.4 \\
+\multicolumn{7}{l}{\textit{\EP{Head ablation (ResNet-152 backbone)}{Ablação da cabeça (backbone ResNet-152)}}} \\
+ResNet152 + Linear (a) & \dec{58.15} & 3 & $\dec{0.846} \pm \dec{0.008}$ & $\dec{0.805} \pm \dec{0.012}$ & $\dec{0.904} \pm \dec{0.013}$ & \dec{8.2} \\
+ResNet152 + MLP-128 (b) & \dec{58.41} & 3 & $\dec{0.846} \pm \dec{0.011}$ & $\dec{0.806} \pm \dec{0.015}$ & $\dec{0.905} \pm \dec{0.014}$ & \dec{8.3} \\
+ResNet152 + MLP-iso (c) & \dec{62.08} & 3 & $\dec{0.846} \pm \dec{0.009}$ & $\dec{0.807} \pm \dec{0.013}$ & $\dec{0.906} \pm \dec{0.014}$ & \dec{8.4} \\
+ResNet152 + KAN (d) = TransferKAN & \dec{62.08} & 3 & $\dec{0.846} \pm \dec{0.010}$ & $\dec{0.806} \pm \dec{0.013}$ & $\dec{0.905} \pm \dec{0.013}$ & \dec{8.5} \\
+ResNet152 + KAN-8 (e) & \dec{58.39} & 1 & $\dec{0.846} \pm \dec{0.012}$ & $\dec{0.808} \pm \dec{0.014}$ & $\dec{0.903} \pm \dec{0.014}$ & \dec{8.4} \\
 \midrule
-\multicolumn{9}{l}{\textit{\EP{Backbones (linear head)}{Backbones (cabeça linear)}}} \\
-ResNet152 & 58.15 & 3 & $0.846 \pm 0.008$ & $0.800 \pm 0.019$ & $0.814 \pm 0.012$ & $0.805 \pm 0.012$ & $0.904 \pm 0.013$ & 8.2 \\
-AlexNet & 57.01 & 1 & $0.803 \pm 0.036$ & $0.750 \pm 0.047$ & $0.782 \pm 0.045$ & $0.761 \pm 0.047$ & $0.859 \pm 0.040$ & 3.2 \\
-MobileNetV2 & 2.23 & 1 & $0.812 \pm 0.024$ & $0.763 \pm 0.029$ & $0.802 \pm 0.027$ & $0.776 \pm 0.029$ & $0.877 \pm 0.025$ & 3.9 \\
-MNASNet1.3 & 5.00 & 1 & $0.837 \pm 0.012$ & $0.829 \pm 0.022$ & $0.725 \pm 0.023$ & $0.753 \pm 0.022$ & $0.872 \pm 0.021$ & 3.9 \\
-ShuffleNetV2 x0.5 & 0.34 & 1 & $0.746 \pm 0.018$ & $0.706 \pm 0.014$ & $0.755 \pm 0.017$ & $0.713 \pm 0.018$ & $0.839 \pm 0.021$ & 3.8 \\
-SqueezeNet1.0 & 0.74 & 1 & $0.798 \pm 0.023$ & $0.749 \pm 0.031$ & $0.787 \pm 0.032$ & $0.760 \pm 0.030$ & $0.866 \pm 0.023$ & 3.2 \\
-DenseNet169 & 12.49 & 1 & $0.858 \pm 0.005$ & $0.814 \pm 0.010$ & $0.830 \pm 0.012$ & $0.821 \pm 0.008$ & $0.904 \pm 0.018$ & 8.4 \\
-MaxViT-T & 30.41 & 3 & $0.864 \pm 0.015$ & $0.821 \pm 0.025$ & $0.846 \pm 0.020$ & $0.831 \pm 0.021$ & $0.917 \pm 0.009$ & 12.4 \\
-Swin-B & 86.75 & 3 & $0.884 \pm 0.011$ & $0.850 \pm 0.017$ & $0.850 \pm 0.016$ & $0.850 \pm 0.015$ & $0.929 \pm 0.011$ & 15.4 \\
-EfficientNetV2-L & 117.24 & 1 & $0.868 \pm 0.010$ & $0.828 \pm 0.021$ & $0.836 \pm 0.011$ & $0.831 \pm 0.016$ & $0.916 \pm 0.007$ & 15.2 \\
-VGG16 & 134.27 & 1 & $0.841 \pm 0.013$ & $0.794 \pm 0.019$ & $0.796 \pm 0.034$ & $0.794 \pm 0.025$ & $0.891 \pm 0.025$ & 8.6 \\
-RegNetY-16GF & 80.57 & 1 & $0.852 \pm 0.015$ & $0.807 \pm 0.021$ & $0.824 \pm 0.021$ & $0.815 \pm 0.020$ & $0.906 \pm 0.011$ & 12.1 \\
-ResNet152 + KAN (d) = TransferKAN & 62.08 & 3 & $0.846 \pm 0.010$ & $0.800 \pm 0.018$ & $0.816 \pm 0.015$ & $0.806 \pm 0.013$ & $0.905 \pm 0.013$ & 8.5 \\
+\multicolumn{7}{l}{\textit{\EP{Backbones (linear head)}{Backbones (cabeça linear)}}} \\
+ResNet152 & \dec{58.15} & 3 & $\dec{0.846} \pm \dec{0.008}$ & $\dec{0.805} \pm \dec{0.012}$ & $\dec{0.904} \pm \dec{0.013}$ & \dec{8.2} \\
+AlexNet & \dec{57.01} & 1 & $\dec{0.803} \pm \dec{0.036}$ & $\dec{0.761} \pm \dec{0.047}$ & $\dec{0.859} \pm \dec{0.040}$ & \dec{3.2} \\
+MobileNetV2 & \dec{2.23} & 1 & $\dec{0.812} \pm \dec{0.024}$ & $\dec{0.776} \pm \dec{0.029}$ & $\dec{0.877} \pm \dec{0.025}$ & \dec{3.9} \\
+MNASNet1.3 & \dec{5.00} & 1 & $\dec{0.837} \pm \dec{0.012}$ & $\dec{0.753} \pm \dec{0.022}$ & $\dec{0.872} \pm \dec{0.021}$ & \dec{3.9} \\
+ShuffleNetV2 x0.5 & \dec{0.34} & 1 & $\dec{0.746} \pm \dec{0.018}$ & $\dec{0.713} \pm \dec{0.018}$ & $\dec{0.839} \pm \dec{0.021}$ & \dec{3.8} \\
+SqueezeNet1.0 & \dec{0.74} & 1 & $\dec{0.798} \pm \dec{0.023}$ & $\dec{0.760} \pm \dec{0.030}$ & $\dec{0.866} \pm \dec{0.023}$ & \dec{3.2} \\
+DenseNet169 & \dec{12.49} & 1 & $\dec{0.858} \pm \dec{0.005}$ & $\dec{0.821} \pm \dec{0.008}$ & $\dec{0.904} \pm \dec{0.018}$ & \dec{8.4} \\
+MaxViT-T & \dec{30.41} & 3 & $\dec{0.864} \pm \dec{0.015}$ & $\dec{0.831} \pm \dec{0.021}$ & $\dec{0.917} \pm \dec{0.009}$ & \dec{12.4} \\
+Swin-B & \dec{86.75} & 3 & $\dec{0.884} \pm \dec{0.011}$ & $\dec{0.850} \pm \dec{0.015}$ & $\dec{0.929} \pm \dec{0.011}$ & \dec{15.4} \\
+EfficientNetV2-L & \dec{117.24} & 1 & $\dec{0.868} \pm \dec{0.010}$ & $\dec{0.831} \pm \dec{0.016}$ & $\dec{0.916} \pm \dec{0.007}$ & \dec{15.2} \\
+VGG16 & \dec{134.27} & 1 & $\dec{0.841} \pm \dec{0.013}$ & $\dec{0.794} \pm \dec{0.025}$ & $\dec{0.891} \pm \dec{0.025}$ & \dec{8.6} \\
+RegNetY-16GF & \dec{80.57} & 1 & $\dec{0.852} \pm \dec{0.015}$ & $\dec{0.815} \pm \dec{0.020}$ & $\dec{0.906} \pm \dec{0.011}$ & \dec{12.1} \\
+ResNet152 + KAN (d) = TransferKAN & \dec{62.08} & 3 & $\dec{0.846} \pm \dec{0.010}$ & $\dec{0.806} \pm \dec{0.013}$ & $\dec{0.905} \pm \dec{0.013}$ & \dec{8.5} \\
 \bottomrule
-\end{tabular}}
+\end{tabular}
+\end{adjustbox}
 \end{table}

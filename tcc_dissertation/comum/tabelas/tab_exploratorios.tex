@@ -5,20 +5,21 @@
 \label{tab:exploratorios}
 \footnotesize
 \setlength{\tabcolsep}{2.5pt}
-\resizebox{\textwidth}{!}{%
+\begin{adjustbox}{max width=\textwidth}
 \begin{tabular}{llcccccccccccccccc}
 \toprule
  & & Acc & \multicolumn{3}{c}{\EP{Precision}{Precisão}} & \multicolumn{3}{c}{\EP{Recall}{Revocação}} & \multicolumn{3}{c}{F1} & \multicolumn{3}{c}{AUC} & \multicolumn{3}{c}{\EP{Specificity}{Especificidade}} \\
 \EP{Model}{Modelo} & \EP{Input}{Entrada} & & M & m & W & M & m & W & M & m & W & M & m & W & M & m & W \\
 \midrule
 \multicolumn{18}{l}{\textit{\EP{Entry/exit}{Entrada/saída}}} \\
-ResKANet-18 & 128 px & 0.822 & 0.767 & 0.822 & 0.820 & 0.762 & 0.822 & 0.822 & 0.765 & 0.822 & 0.821 & 0.839 & 0.885 & 0.839 & 0.762 & 0.822 & 0.703 \\
-PureConvKAN & 128 px & 0.707 & 0.614 & 0.707 & 0.704 & 0.611 & 0.707 & 0.707 & 0.613 & 0.707 & 0.706 & 0.682 & 0.768 & 0.682 & 0.611 & 0.707 & 0.516 \\
-PureKAN & 64 px & 0.692 & 0.614 & 0.692 & 0.692 & 0.614 & 0.692 & 0.692 & 0.614 & 0.692 & 0.692 & 0.684 & 0.733 & 0.684 & 0.614 & 0.692 & 0.536 \\
+ResKANet-18 & 128 px & \dec{0.822} & \dec{0.767} & \dec{0.822} & \dec{0.820} & \dec{0.762} & \dec{0.822} & \dec{0.822} & \dec{0.765} & \dec{0.822} & \dec{0.821} & \dec{0.839} & \dec{0.885} & \dec{0.839} & \dec{0.762} & \dec{0.822} & \dec{0.703} \\
+PureConvKAN & 128 px & \dec{0.707} & \dec{0.614} & \dec{0.707} & \dec{0.704} & \dec{0.611} & \dec{0.707} & \dec{0.707} & \dec{0.613} & \dec{0.707} & \dec{0.706} & \dec{0.682} & \dec{0.768} & \dec{0.682} & \dec{0.611} & \dec{0.707} & \dec{0.516} \\
+PureKAN & 64 px & \dec{0.692} & \dec{0.614} & \dec{0.692} & \dec{0.692} & \dec{0.614} & \dec{0.692} & \dec{0.692} & \dec{0.614} & \dec{0.692} & \dec{0.692} & \dec{0.684} & \dec{0.733} & \dec{0.684} & \dec{0.614} & \dec{0.692} & \dec{0.536} \\
 \midrule
 \multicolumn{18}{l}{\textit{\EP{MLSD}{MLSD}}} \\
-PureConvKAN & 128 px & 0.803 & 0.268 & 0.803 & 0.645 & 0.333 & 0.803 & 0.803 & 0.297 & 0.803 & 0.716 & 0.536 & 0.888 & 0.509 & 0.667 & 0.902 & 0.197 \\
-PureKAN & 64 px & 0.712 & 0.355 & 0.712 & 0.689 & 0.324 & 0.712 & 0.712 & 0.328 & 0.712 & 0.693 & 0.463 & 0.841 & 0.496 & 0.679 & 0.856 & 0.326 \\
+PureConvKAN & 128 px & \dec{0.803} & \dec{0.268} & \dec{0.803} & \dec{0.645} & \dec{0.333} & \dec{0.803} & \dec{0.803} & \dec{0.297} & \dec{0.803} & \dec{0.716} & \dec{0.536} & \dec{0.888} & \dec{0.509} & \dec{0.667} & \dec{0.902} & \dec{0.197} \\
+PureKAN & 64 px & \dec{0.712} & \dec{0.355} & \dec{0.712} & \dec{0.689} & \dec{0.324} & \dec{0.712} & \dec{0.712} & \dec{0.328} & \dec{0.712} & \dec{0.693} & \dec{0.463} & \dec{0.841} & \dec{0.496} & \dec{0.679} & \dec{0.856} & \dec{0.326} \\
 \bottomrule
-\end{tabular}}
+\end{tabular}
+\end{adjustbox}
 \end{table}

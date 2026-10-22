@@ -5,17 +5,18 @@
 \label{tab:wavkan_mlsd}
 \footnotesize
 \setlength{\tabcolsep}{3pt}
-\resizebox{\textwidth}{!}{%
+\begin{adjustbox}{max width=\textwidth}
 \begin{tabular}{llrcccccrr}
 \toprule
 Id & \EP{Head}{Cabeça} & \EP{Params}{Parâm.} & S & Acc & F1 & AUC & AUC$_{\mathrm{OOF}}$ & Min & \EP{Head ms}{Cabeça ms} \\
 \midrule
-(a) & Linear & 6{,}147 & 3 & $0.815 \pm 0.014$ & $0.488 \pm 0.056$ & $0.785 \pm 0.087$ & 0.797 & 6.3 & 0.48 \\
-(b) & MLP-128 & 262{,}659 & 3 & $0.813 \pm 0.013$ & $0.482 \pm 0.050$ & $0.802 \pm 0.062$ & 0.811 & 6.3 & 0.73 \\
-(c) & MLP-iso & 3{,}937{,}791 & 3 & $0.821 \pm 0.017$ & $0.480 \pm 0.050$ & $0.807 \pm 0.055$ & 0.817 & 6.4 & 0.73 \\
-(d) & \EP{Spline KAN = TransferKAN}{KAN spline = TransferKAN} & 3{,}937{,}920 & 3 & $0.813 \pm 0.017$ & $0.477 \pm 0.045$ & $0.798 \pm 0.058$ & 0.805 & 6.5 & 3.30 \\
-W1 & Wav-KAN, \EP{Mexican hat}{chapéu mexicano}, $h=128 (W1$ & 1{,}050{,}374 & 3 & $0.671 \pm 0.043$ & $0.418 \pm 0.034$ & $0.711 \pm 0.116$ & 0.730 & 6.7 & 8.84 \\
-W2 & Wav-KAN, \EP{Mexican hat}{chapéu mexicano}, $h=32 (W2$ & 262{,}598 & 3 & $0.649 \pm 0.039$ & $0.410 \pm 0.030$ & $0.715 \pm 0.113$ & 0.740 & 6.4 & 2.95 \\
+(a) & Linear & \EP{6{,}147}{6.147} & 3 & $\dec{0.815} \pm \dec{0.014}$ & $\dec{0.488} \pm \dec{0.056}$ & $\dec{0.785} \pm \dec{0.087}$ & \dec{0.797} & \dec{6.3} & \dec{0.48} \\
+(b) & MLP-128 & \EP{262{,}659}{262.659} & 3 & $\dec{0.813} \pm \dec{0.013}$ & $\dec{0.482} \pm \dec{0.050}$ & $\dec{0.802} \pm \dec{0.062}$ & \dec{0.811} & \dec{6.3} & \dec{0.73} \\
+(c) & MLP-iso & \EP{3{,}937{,}791}{3.937.791} & 3 & $\dec{0.821} \pm \dec{0.017}$ & $\dec{0.480} \pm \dec{0.050}$ & $\dec{0.807} \pm \dec{0.055}$ & \dec{0.817} & \dec{6.4} & \dec{0.73} \\
+(d) & \EP{Spline KAN = TransferKAN}{KAN spline = TransferKAN} & \EP{3{,}937{,}920}{3.937.920} & 3 & $\dec{0.813} \pm \dec{0.017}$ & $\dec{0.477} \pm \dec{0.045}$ & $\dec{0.798} \pm \dec{0.058}$ & \dec{0.805} & \dec{6.5} & \dec{3.30} \\
+W1 & Wav-KAN, \EP{Mexican hat}{chapéu mexicano}, $h=128$ & \EP{1{,}050{,}374}{1.050.374} & 3 & $\dec{0.671} \pm \dec{0.043}$ & $\dec{0.418} \pm \dec{0.034}$ & $\dec{0.711} \pm \dec{0.116}$ & \dec{0.730} & \dec{6.7} & \dec{8.84} \\
+W2 & Wav-KAN, \EP{Mexican hat}{chapéu mexicano}, $h=32$ & \EP{262{,}598}{262.598} & 3 & $\dec{0.649} \pm \dec{0.039}$ & $\dec{0.410} \pm \dec{0.030}$ & $\dec{0.715} \pm \dec{0.113}$ & \dec{0.740} & \dec{6.4} & \dec{2.95} \\
 \bottomrule
-\end{tabular}}
+\end{tabular}
+\end{adjustbox}
 \end{table}

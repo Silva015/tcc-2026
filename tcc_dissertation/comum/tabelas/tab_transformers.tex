@@ -5,14 +5,16 @@
 \label{tab:transformers}
 \footnotesize
 \setlength{\tabcolsep}{4pt}
+\begin{adjustbox}{max width=\textwidth}
 \begin{tabular}{llcccc}
 \toprule
 \EP{Task}{Tarefa} & \EP{Contrast}{Contraste} & $\Delta$AUC & \EP{95\% CI}{IC 95\%} & \EP{Wins}{Vence} & \EP{Seeds of the transformer}{Sementes do transformer} \\
 \midrule
-\EP{Entry/exit}{Entrada/saída} & TransferKAN $-$ Swin-B & $-0.023$ & [$-0.035$, $-0.011$] & 0/5 & 42--44 \\
-\EP{Entry/exit}{Entrada/saída} & TransferKAN $-$ MaxViT-T & $-0.010$ & [$-0.020$, $-0.001$] & 0/5 & 42--44 \\
-MLSD & TransferKAN $-$ Swin-B & $-0.033$ & [$-0.064$, $-0.0004$] & 1/5 & 42, 43 \\
-MLSD & TransferKAN $-$ MaxViT-T & $-0.030$ & [$-0.059$, $+0.001$] & 1/5 & 42, 43 \\
+\EP{Entry/exit}{Entrada/saída} & TransferKAN $-$ Swin-B & $-\dec{0.023}$ & [$-\dec{0.035}$, $-\dec{0.011}$] & 0/5 & 42--44 \\
+\EP{Entry/exit}{Entrada/saída} & TransferKAN $-$ MaxViT-T & $-\dec{0.010}$ & [$-\dec{0.020}$, $-\dec{0.001}$] & 0/5 & 42--44 \\
+MLSD & TransferKAN $-$ Swin-B & $-\dec{0.033}$ & [$-\dec{0.064}$, $-\dec{0.0004}$] & 1/5 & 42, 43 \\
+MLSD & TransferKAN $-$ MaxViT-T & $-\dec{0.030}$ & [$-\dec{0.059}$, $+\dec{0.001}$] & 1/5 & 42, 43 \\
 \bottomrule
 \end{tabular}
+\end{adjustbox}
 \end{table}

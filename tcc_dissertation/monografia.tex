@@ -36,6 +36,11 @@
 \pgfplotsset{idioma/.style={}}
 % AUC das legendas das curvas ROC (gerado por scripts/preparar_dados_figuras.py)
 \input{img/protocolo/figuras_macros.tex}
+% Folga para não estourar a margem com palavras em \texttt e números entre $...$
+\setlength{\emergencystretch}{2em}
+% Decimais das tabelas comuns: ponto no EN, vírgula no PT
+\usepackage{xstring}
+\newcommand{\dec}[1]{#1}
 \usepackage[acronym]{glossaries}
 \makeglossaries
 

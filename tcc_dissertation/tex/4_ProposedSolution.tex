@@ -27,7 +27,7 @@ TransferKAN\footnote{The short paper derived from this work for SIBGRAPI 2026 ca
     \node[io] (input) {Input\\image\\$224\times224$};
     \node[backbone, right=of input] (resnet) {ResNet-152\\backbone\\(ImageNet)};
     \node[block, right=of resnet] (drop) {Dropout\\$p=0.5$};
-    \node[kan, right=of drop] (kanlayer) {KAN\\head\\$[2048,128,K]$};
+    \node[kan, right=of drop] (kanlayer) {KAN\\head\\$[2048, 128, K]$};
     \node[io, right=of kanlayer] (out) {Class\\logits\\($K{=}2$ or $3$)};
 
     \draw[->, thick] (input) -- (resnet);
@@ -42,7 +42,7 @@ TransferKAN\footnote{The short paper derived from this work for SIBGRAPI 2026 ca
               fit=(kanlayer), label={[font=\scriptsize, orange!70!black]below:Head under study}] {};
     \end{scope}
 \end{tikzpicture}
-\caption{TransferKAN. A ResNet-152 pre-trained on ImageNet extracts a 2,048-dimensional feature vector, which passes through Dropout ($p=0.5$) and a two-layer KAN head $[2048,128,K]$ with grid size 10 and cubic splines ($K=2$ for entry/exit, $K=3$ for the shooting distance). In the head ablation only the orange block changes.}
+\caption{TransferKAN. A ResNet-152 pre-trained on ImageNet extracts a 2,048-dimensional feature vector, which passes through Dropout ($p=0.5$) and a two-layer KAN head $[2048, 128, K]$ with grid size 10 and cubic splines ($K=2$ for entry/exit, $K=3$ for the shooting distance). In the head ablation only the orange block changes.}
 \label{fig:transferkan_arch}
 \end{figure}
 
@@ -70,6 +70,7 @@ TransferKAN was motivated by two claims about KANs used as classification heads.
 
 \begin{figure}[htpb]
 \centering
+\begin{adjustbox}{max width=\textwidth}
 \begin{tikzpicture}[
     >=Stealth,
     node distance=7mm,
@@ -94,6 +95,7 @@ TransferKAN was motivated by two claims about KANs used as classification heads.
     \draw[->, thick] (h1) -- (o1);
     \draw[->, thick] (h2) -- (o2);
 \end{tikzpicture}
+\end{adjustbox}
 \caption{The multitask variant: one ResNet-152 and one Dropout shared by two heads of the same type (KAN or MLP-128). The loss is $L = L_{\mathrm{E/S}} + L_{\mathrm{dist}}$, with exit wounds masked out of the distance term.}
 \label{fig:multitarefa_arch}
 \end{figure}
