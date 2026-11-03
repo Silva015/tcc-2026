@@ -20,23 +20,19 @@ Em conjunto, a hipótese que motivou este trabalho, de que trocar a cabeça MLP 
 \section{Limitações}
 \label{sec:limitations}
 
-\begin{itemize}
-    \item \textbf{Uma única base.} Todas as imagens vêm de uma única polícia de uma única região; não houve validação externa.
-    \item \textbf{Disparos encostados.} Com 42 imagens de 16 casos, só 13--17\% das imagens de encostado são reconhecidas quando o caso não está no treino, e nada específico pode ser afirmado sobre essa classe.
-    \item \textbf{Sementes.} A Swin-B e a MaxViT-T têm duas sementes na tarefa de distância, e a maioria dos outros backbones, a KAN pequena (e) e as cabeças Wav-KAN W3--W5 têm uma única semente.
-    \item \textbf{A partição de Lira et al.} O experimento de vazamento reproduz o método do código público deles, e não a partição exata das tabelas publicadas, que não pode ser recuperada.
-    \item \textbf{Última época sem validação.} Todos os modelos são avaliados na última época, sem uma partição interna de validação. Isso é justo entre os modelos, mas não é otimizado para nenhum deles.
-    \item \textbf{Receita.} A receita do notebook original da TransferKAN foi mantida para todos os modelos, inclusive um ruído gaussiano forte que pode apagar vestígios finos como a tatuagem. Outras receitas podem mudar os números absolutos.
-    \item \textbf{Pré-treino não isolado.} A comparação com a tabela publicada sugere um efeito grande do pré-treino no ImageNet, mas nenhum modelo foi treinado do zero no protocolo único; esse efeito, portanto, não é medido aqui.
-\end{itemize}
+As respostas acima valem dentro de limites impostos pelos dados, pelo desenho experimental e pela comparação com o trabalho anterior. O primeiro e mais importante limite vem dos dados. Todas as imagens vêm de uma única polícia de uma única região, e não foi possível fazer uma validação externa; não se sabe, portanto, como os modelos se comportariam com fotografias feitas por outras equipes, com outros equipamentos e em outras condições. Dentro desta base, a classe encostado é o caso mais restritivo: ela tem só 42 imagens de 16 casos, e só 13--17\% dessas imagens são reconhecidas quando o seu caso não está no treino (Seção~\ref{sec:results_mlsd}). Com tão poucos casos, nada específico pode ser afirmado sobre essa classe.
+
+O desenho experimental impõe outras restrições. Todos os modelos são avaliados na última época, sem uma partição interna de validação. Como a regra é a mesma para todos os modelos, ela é justa entre eles, mas não é otimizada para nenhum. Da mesma forma, a receita do notebook original da TransferKAN foi mantida para todos os modelos, inclusive um ruído gaussiano forte que pode apagar vestígios finos como a tatuagem; ela não favorece nenhum modelo, mas outras receitas podem mudar os números absolutos. O número de sementes também varia entre os experimentos: a Swin-B e a MaxViT-T têm duas sementes na tarefa de distância, e a maioria dos outros backbones, a KAN pequena (e) e as cabeças Wav-KAN W3--W5 têm uma única semente. Os resultados desses modelos carregam, portanto, mais incerteza que os da ablação da cabeça, que usa três sementes (Seção~\ref{sec:threats}).
+
+Por fim, duas limitações dizem respeito à comparação com Lira et al. O experimento de vazamento reproduz o método do código público deles, e não a partição exata por trás das tabelas publicadas, que não pode ser recuperada; ele mede o efeito desse método de partição, e o código usado no artigo pode ter sido diferente. Além disso, a comparação com a tabela publicada sugere um efeito grande do pré-treino no ImageNet, mas nenhum modelo foi treinado do zero no protocolo único; esse efeito é, portanto, sugerido por este trabalho, mas não medido nele (Seção~\ref{sec:res_lira}). A maior parte dessas limitações vale igualmente para todos os modelos e, por isso, não enviesa as comparações feitas no protocolo único; o que elas restringem é o alcance dos números absolutos e das conclusões para além desta base.
 
 \section{Trabalhos Futuros}
 \label{sec:future}
 
-\begin{itemize}
-    \item \textbf{KAN no melhor backbone.} Testar uma cabeça KAN sobre a Swin-B, o melhor backbone, para ver se a ablação da cabeça se mantém com um extrator mais forte.
-    \item \textbf{Mais casos de encostado e dados externos.} Reunir mais casos de encostado e imagens de outras instituições, para que a classe minoritária possa ser aprendida e os modelos validados fora da base original.
-    \item \textbf{Calibração e limiares.} Calibrar as probabilidades e escolher o limiar de decisão numa partição interna de validação; as cabeças Wav-KAN e a rede multitarefa perdem sobretudo no limiar padrão.
-    \item \textbf{Melhor treino multitarefa.} Ponderar as perdas das tarefas, por exemplo pela sua incerteza, para recuperar a pequena perda da rede multitarefa em entrada/saída.
-    \item \textbf{O efeito do pré-treino.} Treinar alguns backbones do zero no protocolo único, para medir o efeito do pré-treino, o fator que a comparação com os números publicados não conseguiu isolar.
-\end{itemize}
+Os resultados e as limitações acima sugerem cinco direções para trabalhos futuros. A primeira decorre diretamente da ablação da cabeça. Como a cabeça KAN não melhorou a ResNet-152, resta saber se esse resultado se mantém com um extrator de características mais forte, o que pode ser testado treinando uma cabeça KAN sobre a Swin-B, o melhor backbone no protocolo único.
+
+A segunda direção trata da principal limitação dos dados. Reunir mais casos de encostado, assim como imagens de outras instituições, permitiria que a classe minoritária fosse aprendida e que os modelos fossem validados fora da base original, de modo que as conclusões deixassem de depender de uma única polícia e de uma única região.
+
+A terceira e a quarta direções dizem respeito às alternativas avaliadas neste trabalho. As cabeças Wav-KAN e a rede multitarefa perdem sobretudo no limiar padrão (Seções~\ref{sec:res_wavkan} e~\ref{sec:res_mt}), o que motiva calibrar as probabilidades e escolher o limiar de decisão numa partição interna de validação. No caso da rede multitarefa, ponderar as perdas das tarefas, por exemplo pela sua incerteza, poderia recuperar a sua pequena perda em entrada/saída e reforçar o seu uso como substituta do par de redes.
+
+A última direção diz respeito ao fator que este trabalho não conseguiu isolar. As diferenças em relação aos números publicados por Lira et al.\ foram atribuídas à partição, ao pré-treino e à receita, mas só o efeito da partição foi medido. Treinar alguns backbones do zero no protocolo único mediria também o efeito do pré-treino e tornaria mais completa a comparação com os resultados anteriores.

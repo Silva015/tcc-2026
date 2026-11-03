@@ -20,23 +20,19 @@ Taken together, the hypothesis that motivated this work, that replacing the MLP 
 \section{Limitations}
 \label{sec:limitations}
 
-\begin{itemize}
-    \item \textbf{One database.} All images come from one police force in one region; there was no external validation.
-    \item \textbf{Contact shots.} With 42 images from 16 cases, only 13--17\% of the contact images are recognised when their case is not in the training set, and nothing specific can be claimed about this class.
-    \item \textbf{Seeds.} Swin-B and MaxViT-T have two seeds in the distance task, and most other backbones, the small KAN (e) and the wavelet heads W3--W5 have a single seed.
-    \item \textbf{The split of Lira et al.} The leakage experiment reproduces the method of their public code, not the exact partition of their published tables, which cannot be recovered.
-    \item \textbf{Last epoch without validation.} Every model is evaluated at the last epoch, without an inner validation split. This is fair across models but not tuned for any of them.
-    \item \textbf{Recipe.} The recipe of the original TransferKAN notebook was kept for every model, including a strong Gaussian noise that may erase fine traces such as stippling. Other recipes might change absolute numbers.
-    \item \textbf{Pre-training not isolated.} The comparison with the published table suggests a large effect of ImageNet pre-training, but no model was trained from scratch under the single protocol, so that effect is not measured here.
-\end{itemize}
+The answers above hold within limits set by the data, by the experimental design and by the comparison with earlier work. The first and most important limit comes from the data. All images come from a single police force in a single region, and no external validation was possible, so it is not known how the models would behave on photographs taken by other teams, with other equipment and under other conditions. Within this database, the contact class is the most restrictive case: it has only 42 images from 16 cases, and only 13--17\% of these images are recognised when their case is not in the training set (Section~\ref{sec:results_mlsd}). With so few cases, nothing specific can be claimed about this class.
+
+The experimental design imposes further restrictions. Every model is evaluated at the last epoch, without an inner validation split. Because the rule is the same for all models, it is fair across them, but it is not tuned for any of them. Likewise, the recipe of the original TransferKAN notebook was kept for every model, including a strong Gaussian noise that may erase fine traces such as stippling; it does not favour any model, but other recipes might change the absolute numbers. The number of seeds also varies between experiments: Swin-B and MaxViT-T have two seeds in the distance task, and most other backbones, the small KAN (e) and the wavelet heads W3--W5 have a single seed. The results of these models therefore carry more uncertainty than those of the head ablation, which uses three seeds (Section~\ref{sec:threats}).
+
+Finally, two limitations concern the comparison with Lira et al. The leakage experiment reproduces the method of their public code, not the exact partition behind their published tables, which cannot be recovered; it measures the effect of that splitting method, and the code used for the article may have differed. In addition, the comparison with the published table suggests a large effect of ImageNet pre-training, but no model was trained from scratch under the single protocol, so that effect is suggested by this work but not measured in it (Section~\ref{sec:res_lira}). Most of these limitations apply equally to every model and therefore do not bias the comparisons made under the single protocol; what they restrict is how far the absolute numbers and the conclusions extend beyond this database.
 
 \section{Future Work}
 \label{sec:future}
 
-\begin{itemize}
-    \item \textbf{KAN on the best backbone.} Test a KAN head on Swin-B, the best backbone, to check whether the head ablation holds on a stronger feature extractor.
-    \item \textbf{More contact cases and external data.} Collect more contact cases and images from other institutions, so that the minority class can be learned and the models validated outside the original database.
-    \item \textbf{Calibration and thresholds.} Calibrate the probabilities and choose the decision threshold on an inner validation split; the wavelet heads and the multitask network lose mainly at the default threshold.
-    \item \textbf{Better multitask training.} Weight the task losses, for example by their uncertainty, to recover the small loss of the multitask network in entry/exit.
-    \item \textbf{The effect of pre-training.} Train some backbones from scratch under the single protocol to measure the effect of pre-training, the factor that the comparison with the published numbers could not isolate.
-\end{itemize}
+The results and the limitations above suggest five directions for future work. The first follows directly from the head ablation. Since the KAN head did not improve the ResNet-152, it remains to be seen whether this result holds on a stronger feature extractor, which can be tested by training a KAN head on Swin-B, the best backbone under the single protocol.
+
+The second direction addresses the main limitation of the data. Collecting more contact cases, as well as images from other institutions, would allow the minority class to be learned and the models to be validated outside the original database, so that the conclusions would no longer depend on a single police force and region.
+
+The third and fourth directions concern the alternatives evaluated in this work. The wavelet heads and the multitask network lose mainly at the default threshold (Sections~\ref{sec:res_wavkan} and~\ref{sec:res_mt}), which motivates calibrating the probabilities and choosing the decision threshold on an inner validation split. For the multitask network in particular, weighting the task losses, for example by their uncertainty, could recover its small loss in entry/exit and strengthen its case as a replacement for the pair of networks.
+
+The last direction concerns the factor that this work could not isolate. The differences from the published numbers of Lira et al.\ were attributed to the split, the pre-training and the recipe, but only the effect of the split was measured. Training some backbones from scratch under the single protocol would measure the effect of pre-training as well, and would make the comparison with the earlier results more complete.
