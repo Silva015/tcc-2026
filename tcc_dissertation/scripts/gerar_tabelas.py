@@ -73,10 +73,10 @@ def celulas_bilingues(linha):
 
 
 def tabela(nome, legenda_en, legenda_pt, rotulo, colunas, cabecalho, linhas, tamanho="\\footnotesize",
-           larga=False, nota_en="", nota_pt="", espaco="4pt"):
+           larga=False, nota_en="", nota_pt="", espaco="4pt", posicao="!htbp"):
     corpo = []
     corpo.append("% Gerado por tcc_dissertation/scripts/gerar_tabelas.py a partir de resultados/. Não edite à mão.")
-    corpo.append("\\begin{table}[!htbp]")
+    corpo.append(f"\\begin{{table}}[{posicao}]")
     corpo.append("\\centering")
     corpo.append(f"\\caption{{{EP(legenda_en, legenda_pt)}}}")
     corpo.append(f"\\label{{{rotulo}}}")
@@ -583,7 +583,7 @@ def t_exploratorios():
            [f" & & Acc & \\multicolumn{{3}}{{c}}{{{EP('Precision', 'Precisão')}}} & \\multicolumn{{3}}{{c}}{{{EP('Recall', 'Revocação')}}} & "
             f"\\multicolumn{{3}}{{c}}{{F1}} & \\multicolumn{{3}}{{c}}{{AUC}} & \\multicolumn{{3}}{{c}}{{{EP('Specificity', 'Especificidade')}}} \\\\",
             f"{EP('Model', 'Modelo')} & {EP('Input', 'Entrada')} & & M & m & W & M & m & W & M & m & W & M & m & W & M & m & W \\\\"],
-           linhas, larga=True, espaco="2.5pt")
+           linhas, larga=True, espaco="2.5pt", posicao="!t")
 
 
 if __name__ == "__main__":
