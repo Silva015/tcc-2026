@@ -48,7 +48,7 @@ import torch
 
 import protocolo_comum as pc
 
-VERSAO = "1.0.0"
+VERSAO = "1.1.0"
 SEMENTE = 0x40  # GunshotDatasetConfig.SEED
 TAG_V01 = "V_0.1"
 PREFIXO_CAMINHO_LIRA = "/home/pedro/databases/tiros/"
@@ -113,6 +113,15 @@ RECEITAS = {
         "epocas": 300,
         "nota": "como B, com a reamostragem que o artigo descreve",
     },
+}
+
+# Diagnóstico (NÃO é candidata a reprodução): igual à B, mas embaralhando os lotes de treino.
+# O skorch não embaralha por padrão e o CSV vem ordenado por classe (pastas), então o código
+# público treina com lotes de uma classe só; esta variante mede quanto isso pesa.
+RECEITAS["B_embaralhada"] = {
+    **RECEITAS["B"], "embaralhar": True,
+    "origem": "master (commit 83d82f1) + iterator_train__shuffle=True (desvio deliberado)",
+    "nota": "diagnóstico: não está no código público",
 }
 
 METRICAS = [
@@ -596,7 +605,11 @@ def treinar_unidade(
     dir_u = caminho_unidade(raiz_resultados, receita + rotulo_extra, particao_nome, tarefa, modelo)
     arq = dir_u / "resultado.json"
     if arq.exists():
-        return json.loads(arq.read_text(encoding="utf-8"))
+        pronto = json.loads(arq.read_text(encoding="utf-8"))
+        if pronto.get("epocas_feitas") == pronto.get("epocas") == epocas:
+            return pronto
+        print(f"  {arq.parent}: resultado incompleto ({pronto.get('epocas_feitas')}/{pronto.get('epocas')} épocas"
+              f", pedido {epocas}); refazendo.")
     dir_ck = None
     if raiz_checkpoints is not None:
         dir_ck = caminho_unidade(raiz_checkpoints, receita + rotulo_extra, particao_nome, tarefa, modelo)
@@ -639,6 +652,7 @@ def treinar_unidade(
             train_split=skorch.dataset.ValidSplit(cv=5, stratified=True),
             device=dispositivo,
             verbose=0,
+            **({"iterator_train__shuffle": True} if cfg_r.get("embaralhar") else {}),
         )
 
     desvios = []
@@ -665,6 +679,15 @@ def treinar_unidade(
             estado["lote"] //= 2
             estado["instantaneos"].clear()
             estado["inicio"] = time.time()
+
+    if len(net.history) < epocas:
+        # o skorch engole KeyboardInterrupt dentro do fit: sem esta checagem, uma execução
+        # interrompida seria gravada como se tivesse terminado
+        if dir_ck is not None and len(net.history) > 0:
+            dict(net.callbacks_)["controle"].gravar(net)
+        raise KeyboardInterrupt(
+            f"{modelo} {tarefa} {particao_nome}: treino interrompido na época {len(net.history)} de {epocas}"
+            + ("; checkpoint gravado, rode de novo para retomar." if dir_ck is not None else "."))
 
     y_pred = net.predict(Xte)
     proba = net.predict_proba(Xte)
