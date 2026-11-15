@@ -48,7 +48,7 @@ import torch
 
 import protocolo_comum as pc
 
-VERSAO = "1.1.0"
+VERSAO = "1.2.0"
 SEMENTE = 0x40  # GunshotDatasetConfig.SEED
 TAG_V01 = "V_0.1"
 PREFIXO_CAMINHO_LIRA = "/home/pedro/databases/tiros/"
@@ -123,6 +123,18 @@ RECEITAS["B_embaralhada"] = {
     "origem": "master (commit 83d82f1) + iterator_train__shuffle=True (desvio deliberado)",
     "nota": "diagnóstico: não está no código público",
 }
+RECEITAS["B_permutada"] = {
+    **RECEITAS["B"], "permutar": True,
+    "origem": "master (commit 83d82f1) + linhas de treino permutadas uma vez (desvio deliberado)",
+    "nota": "diagnóstico: simula um CSV que não esteja ordenado por classe; os lotes continuam "
+            "na mesma ordem em todas as épocas, como no código público",
+}
+RECEITAS["A_embaralhada"] = {
+    **RECEITAS["A"], "embaralhar": True,
+    "origem": "tag V_0.1 (commit 14956dd8) + iterator_train__shuffle=True (desvio deliberado)",
+    "nota": "diagnóstico: não está no código público",
+}
+DIAGNOSTICOS = ("B_embaralhada", "B_permutada", "A_embaralhada")
 
 METRICAS = [
     "acc", "prec_M", "prec_m", "prec_W", "rec_M", "rec_m", "rec_W", "f1_M", "f1_m", "f1_W",
@@ -615,6 +627,9 @@ def treinar_unidade(
         dir_ck = caminho_unidade(raiz_checkpoints, receita + rotulo_extra, particao_nome, tarefa, modelo)
 
     Xtr, ytr, Xte, yte, info = arrays(ctx, tarefa, particao_nome, cfg_r["reamostragem"], limite_imagens)
+    if cfg_r.get("permutar"):  # só nas receitas de diagnóstico
+        ordem = np.random.RandomState(SEMENTE).permutation(len(ytr))
+        Xtr, ytr = Xtr[ordem], ytr[ordem]
     # --- daqui em diante, na ordem de fixed_train_test_validation_split ---
     labels = len(np.unique(np.unique(ytr).tolist() + np.unique(yte).tolist()))
     if cfg_r["pesos_classe"] == "balanced":  # V_0.1
