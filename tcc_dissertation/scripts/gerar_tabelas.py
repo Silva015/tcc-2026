@@ -586,6 +586,116 @@ def t_exploratorios():
            linhas, larga=True, espaco="2.5pt", posicao="!t")
 
 
+# ------------------------------------------------------------------------- reprodução de Lira et al.
+NOMES_REPRO = {
+    "Resnet152": "ResNet152", "Resnet101": "ResNet101", "Resnet50": "ResNet50", "Resnet34": "ResNet34",
+    "Resnet18": "ResNet18", "Alexnet": "AlexNet", "Densenet169": "DenseNet169", "EfficientnetV2L": "EfficientNetV2-L",
+    "MaxVit": "MaxViT-T", "MNASnet13": "MNASNet1.3", "MobileNetV2": "MobileNetV2", "RegnetY16GF": "RegNetY-16GF$^{\\dagger}$",
+    "ShuffleNetV2x05": "ShuffleNetV2 x0.5", "Squeezenet10": "SqueezeNet1.0", "SwinTransformerB": "Swin-B", "VGG16": "VGG16",
+}
+PRE_TREINADAS = ["Resnet152", "Resnet101", "Resnet50", "Resnet34", "Resnet18"]
+
+
+def t_reproducao(tarefa):
+    n = 4 if tarefa == "es" else 5
+    vaz = {r["modelo_leguwoi"]: r for r in ler(f"reproducao_lira/tabela{n}_reproduzida.csv")}
+    agr = {r["modelo_leguwoi"]: r for r in ler(f"reproducao_lira/tabela{n}_sem_vazamento.csv")}
+    pub = {r["modelo_leguwoi"]: r for r in ler("lira2024_tabelas_completas.csv") if r["tarefa"] == tarefa}
+    ordem = PRE_TREINADAS + [m for m in vaz if m not in PRE_TREINADAS]
+    C = ("acc", "f1_M", "auc_M")
+
+    def linha(nome, p, v, a):
+        tres = lambda d: " & ".join(f"{float(d[c]):.3f}" for c in C)
+        return (f"{nome} & {tres(p)} & {tres(v)} & {tres(a)} & {sinal(float(v['acc']) - float(a['acc']))} & "
+                f"{sinal(float(v['f1_M']) - float(a['f1_M']))}")
+
+    def media(mods):
+        m = lambda d: {c: sum(float(d[x][c]) for x in mods) / len(mods) for c in C}
+        return m(pub), m(vaz), m(agr)
+
+    linhas = [linha(NOMES_REPRO[m], pub[m], vaz[m], agr[m]) for m in ordem[:5]]
+    linhas.append("\\midrule")
+    linhas += [linha(NOMES_REPRO[m], pub[m], vaz[m], agr[m]) for m in ordem[5:]]
+    linhas.append("\\midrule")
+    linhas.append(linha(EP("Mean, 5 ResNets", "Média, 5 ResNets"), *media(ordem[:5])))
+    linhas.append(linha(EP("Mean, 16 models", "Média, 16 modelos"), *media(ordem)))
+    if tarefa == "es":
+        en_t, pt_t = "Entry/exit", "Entrada/saída"
+    else:
+        en_t, pt_t = "Shooting distance (entries only)", "Distância do disparo (só entradas)"
+    tabela(f"tab_repro_{tarefa}",
+           f"{en_t}: the training recipe of Lira et al.\\ rerun on two splits. \\emph{{Published}}: Table~{n} of "
+           "Lira et al.~\\cite{Lira2025deep}. \\emph{With leak}: one image-level hold-out of their public code, in which "
+           "cases are shared between training and test. \\emph{Without leak}: one case-grouped hold-out of about the "
+           "same size. Models, augmentations, optimiser, epochs and batch size are the same on both sides; only the split "
+           "changes. The recipe is the public code with the training rows permuted once (Section~\\ref{sec:repro_setup}). "
+           "All metrics are computed from predicted classes, as in the article; M = macro. $\\Delta$ = with leak $-$ "
+           "without leak. One partition per side.",
+           f"{pt_t}: a receita de treino de Lira et al.\\ rodada de novo em duas partições. \\emph{{Publicado}}: Tabela~{n} "
+           "de Lira et al.~\\cite{Lira2025deep}. \\emph{Com vazamento}: um hold-out por imagem do código público deles, em "
+           "que treino e teste compartilham casos. \\emph{Sem vazamento}: um hold-out agrupado por caso, de tamanho "
+           "parecido. Modelos, aumentos de dados, otimizador, épocas e lote são os mesmos nos dois lados; só a partição "
+           "muda. A receita é o código público com as linhas de treino permutadas uma vez "
+           "(Seção~\\ref{sec:repro_setup}). Todas as métricas saem das classes previstas, como no artigo; M = macro. "
+           "$\\Delta$ = com vazamento $-$ sem vazamento. Uma partição de cada lado.",
+           f"tab:repro_{tarefa}", "lccc|ccc|ccc|cc",
+           [f" & \\multicolumn{{3}}{{c|}}{{{EP('Published', 'Publicado')}}} & "
+            f"\\multicolumn{{3}}{{c|}}{{{EP('With leak', 'Com vazamento')}}} & "
+            f"\\multicolumn{{3}}{{c|}}{{{EP('Without leak', 'Sem vazamento')}}} & \\multicolumn{{2}}{{c}}{{$\\Delta$}} \\\\",
+            f"{EP('Model', 'Modelo')} & Acc & F1$_M$ & AUC$_{{c,M}}$ & Acc & F1$_M$ & AUC$_{{c,M}}$ & Acc & F1$_M$ & "
+            "AUC$_{c,M}$ & Acc & F1$_M$ \\\\"],
+           linhas, larga=True, espaco="3pt",
+           nota_en="$^{\\dagger}$ In the public code this row is built with \\texttt{regnet\\_y\\_1\\_6gf}, not with the "
+                   "\\texttt{regnet\\_y\\_16gf} used under the single protocol.",
+           nota_pt="$^{\\dagger}$ No código público esta linha é construída com \\texttt{regnet\\_y\\_1\\_6gf}, e não com a "
+                   "\\texttt{regnet\\_y\\_16gf} usada no protocolo único.")
+
+
+def t_diagnostico():
+    d = js("reproducao_lira/diagnostico_lira.json")
+    res = {r["receita"]: r for r in d["resumo"]}
+    acc152 = {(q["receita"], q["tarefa"]): q["acc"] for q in d["quadro"] if q["modelo"] == "Resnet152"}
+    nomes = [
+        ("B", "B: \\texttt{master}", "yes", "sim"),
+        ("B_smoteenn", "B + SMOTEENN", "yes", "sim"),
+        ("A", "A: tag \\texttt{V\\_0.1}", "yes", "sim"),
+        None,
+        ("B_permutada", EP("B, rows permuted once", "B, linhas permutadas uma vez"), "no", "não"),
+        ("B_embaralhada", EP("B, batches shuffled", "B, lotes embaralhados"), "no", "não"),
+        ("A_embaralhada", EP("A, batches shuffled", "A, lotes embaralhados"), "no", "não"),
+    ]
+    linhas = []
+    for it in nomes:
+        if it is None:
+            linhas.append("\\midrule")
+            continue
+        k, nome, en, pt = it
+        r = res[k]
+        a = lambda t: f"{acc152[(k, t)]:.3f}" if (k, t) in acc152 else "---"
+        linhas.append(f"{nome} & {EP(en, pt)} & {int(r['unidades'])} & {int(r['uma_classe_so'])} & "
+                      f"{r['erro_abs_medio']:.3f} & {a('es')} & {a('dist')}")
+    pub = {r["tarefa"]: r for r in ler("lira2024_tabelas_completas.csv") if r["modelo_leguwoi"] == "Resnet152"}
+    linhas.append("\\midrule")
+    linhas.append(f"{EP('Published', 'Publicado')} & & & & & {float(pub['es']['acc']):.3f} & {float(pub['dist']['acc']):.3f}")
+    tabela("tab_repro_diagnostico",
+           "Calibration of the reproduction on the leaky hold-out. Recipes A and B follow the two versions of the public "
+           "code of Lira et al.; the last three add a deviation that is not in it. \\emph{Units}: trained (model, task) "
+           "pairs among ResNet-152, ResNet-18, AlexNet and VGG-16. \\emph{One class}: units whose test predictions are all "
+           "the same class. \\emph{Error}: mean absolute difference to the published accuracy, macro F1 and macro AUC$_c$. "
+           "Recipe A was run for 1{,}000 epochs and the others for 300.",
+           "Calibração da reprodução no hold-out com vazamento. As receitas A e B seguem as duas versões do código público "
+           "de Lira et al.; as três últimas acrescentam um desvio que não está nele. \\emph{Unidades}: pares (modelo, "
+           "tarefa) treinados, entre ResNet-152, ResNet-18, AlexNet e VGG-16. \\emph{Uma classe}: unidades cujas predições "
+           "de teste são todas da mesma classe. \\emph{Erro}: diferença absoluta média para a acurácia, o F1 macro e a "
+           "AUC$_c$ macro publicados. A receita A rodou por 1.000 épocas e as demais por 300.",
+           "tab:repro_diagnostico", "lcccccc",
+           [f" & {EP('Public', 'Código')} & & {EP('One', 'Uma')} & & "
+            f"\\multicolumn{{2}}{{c}}{{{EP('ResNet-152 accuracy', 'Acurácia da ResNet-152')}}} \\\\",
+            f"{EP('Recipe', 'Receita')} & {EP('code', 'público')} & {EP('Units', 'Unidades')} & {EP('class', 'classe')} & "
+            f"{EP('Error', 'Erro')} & {EP('Entry/exit', 'Entrada/saída')} & {EP('Distance', 'Distância')} \\\\"],
+           linhas)
+
+
 if __name__ == "__main__":
     os.makedirs(SAIDA, exist_ok=True)
     t_dobras()
@@ -604,3 +714,6 @@ if __name__ == "__main__":
     t_mmw("es")
     t_mmw("dist")
     t_exploratorios()
+    t_reproducao("es")
+    t_reproducao("dist")
+    t_diagnostico()

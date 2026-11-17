@@ -511,6 +511,42 @@ def afirmacoes():
         x = [r for r in vl if r["config"] == cfg][0]
         add(C5, "int", int(x["n_treino"]), f"treino split Lira {cfg}")
         add(C5, "int", int(x["n_teste"]), f"teste split Lira {cfg}")
+    # reprodução da receita de Lira et al. (Seções repro_setup e res_repro)
+    rr = js("reproducao_lira/resumo_reproducao.json")["por_tarefa"]
+    dg = js("reproducao_lira/diagnostico_lira.json")
+    er = {r["receita"]: r["erro_abs_medio"] for r in dg["resumo"]}
+    a152 = {(q["receita"], q["tarefa"]): q["acc"] for q in dg["quadro"] if q["modelo"] == "Resnet152"}
+    for k in ("B", "B_permutada", "B_embaralhada"):
+        add(C5, "f3", er[k], f"erro abs médio da receita {k}")
+    add(C5, "f3", a152[("B", "es")], "acc ResNet-152 receita B fiel E/S")
+    add(C5, "f3", a152[("B_permutada", "es")], "acc ResNet-152 B permutada E/S")
+    add(C5, "f3", a152[("B_permutada", "dist")], "acc ResNet-152 B permutada distância")
+    add(C5, "f1", js("reproducao_lira/resumo_reproducao.json")["horas_gpu"], "horas de GPU da reprodução")
+    for t in ("es", "dist"):
+        for lado in ("vazado", "agrupado"):
+            add(C5, "int", rr[t]["n_treino"][lado], f"treino {t} {lado}")
+            add(C5, "int", rr[t]["n_teste"][lado], f"teste {t} {lado}")
+    e, d = rr["es"], rr["dist"]
+    add(C6, "f3", e["erro_abs_medio_vs_publicado"]["acc"], "erro de acurácia E/S vs publicado")
+    add(C6, "f2", e["spearman_acc"], "Spearman E/S")
+    add(C6, "f3", d["sem_squeezenet10"]["erro_abs_medio_vs_publicado"]["acc"], "erro de acurácia distância sem SqueezeNet")
+    add(C6, "f2", d["spearman_acc"], "Spearman distância")
+    for t, x in (("E/S", e), ("dist", d)):
+        add(C6, "f3", x["media_vazado"]["acc"], f"acc média com vazamento {t}")
+        add(C6, "f3", x["media_agrupado"]["acc"], f"acc média sem vazamento {t}")
+        add(C6, "s3", x["queda_media"]["acc"], f"Δ acc média {t}")
+        add(C6, "f3", x["media_vazado"]["f1_M"], f"F1 médio com vazamento {t}")
+        add(C6, "f3", x["media_agrupado"]["f1_M"], f"F1 médio sem vazamento {t}")
+    add(C6, "s3", e["queda_media_resnets"]["acc"], "Δ acc ResNets E/S")
+    add(C6, "s3", e["queda_media_resnets"]["f1_M"], "Δ F1 ResNets E/S")
+    add(C6, "s3", d["queda_media"]["f1_M"], "Δ F1 médio distância")
+    add(C6, "s3", d["queda_media_resnets"]["f1_M"], "Δ F1 ResNets distância")
+    add(C6, "s3", d["queda_media_resnets"]["auc_M"], "Δ AUCc ResNets distância")
+    un = {(r["particao"], r["tarefa"], r["modelo_leguwoi"]): r for r in ler("reproducao_lira/unidades.csv")}
+    for part in ("vazado_p42", "agrupado_d0"):
+        add(C6, "f3", float(un[(part, "es", "Resnet152")]["acc"]), f"acc ResNet-152 E/S {part}")
+        add(C6, "f3", float(un[(part, "dist", "Resnet152")]["f1_M"]), f"F1 ResNet-152 distância {part}")
+        add(C6, "f3", float(un[(part, "dist", "Resnet152")]["auc_M"]), f"AUCc ResNet-152 distância {part}")
     return A
 
 

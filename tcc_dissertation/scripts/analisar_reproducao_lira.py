@@ -56,6 +56,15 @@ for t, n in (("es", 4), ("dist", 5)):
         "uma_classe_so": {"vazado": int(vaz.uma_classe_so.sum()), "agrupado": int(agr.uma_classe_so.sum())},
         "classes_teste": {"vazado": json.loads(vaz.classes_teste.iloc[0]), "agrupado": json.loads(agr.classes_teste.iloc[0])},
     }
+    sem = [m for m in ordem if m != "Squeezenet10"]   # na Tabela 5 o artigo traz acc 0,095 para a SqueezeNet 1.0
+    resumo["por_tarefa"][t]["sem_squeezenet10"] = {
+        "erro_abs_medio_vs_publicado": {c: float((vaz.loc[sem, c] - pub.loc[sem, c]).abs().mean()) for c in ("acc", "f1_M", "auc_M")},
+        "spearman_acc": float(vaz.loc[sem, "acc"].corr(pub.loc[sem, "acc"], method="spearman")),
+    }
+    resumo["por_tarefa"][t]["n_teste"] = {"vazado": int(vaz.n_teste.iloc[0]), "agrupado": int(agr.n_teste.iloc[0])}
+    resumo["por_tarefa"][t]["n_treino"] = {"vazado": int(vaz.n_treino.iloc[0]), "agrupado": int(agr.n_treino.iloc[0])}
+    resumo["por_tarefa"][t]["pior_e_melhor_delta_f1_M"] = [float((vaz.f1_M - agr.f1_M).min()), float((vaz.f1_M - agr.f1_M).max())]
     print(json.dumps(resumo["por_tarefa"][t], indent=1))
 resumo["horas_gpu"] = float(res.treino_min.sum()/60)
+resumo["n_unidades"] = int(len(res))
 json.dump(resumo, open(SA/"resumo_reproducao.json", "w"), indent=1, ensure_ascii=False)

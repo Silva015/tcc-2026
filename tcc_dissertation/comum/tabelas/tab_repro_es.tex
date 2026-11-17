@@ -1,0 +1,38 @@
+% Gerado por tcc_dissertation/scripts/gerar_tabelas.py a partir de resultados/. Não edite à mão.
+\begin{table}[!htbp]
+\centering
+\caption{\EP{Entry/exit: the training recipe of Lira et al.\ rerun on two splits. \emph{Published}: Table~4 of Lira et al.~\cite{Lira2025deep}. \emph{With leak}: one image-level hold-out of their public code, in which cases are shared between training and test. \emph{Without leak}: one case-grouped hold-out of about the same size. Models, augmentations, optimiser, epochs and batch size are the same on both sides; only the split changes. The recipe is the public code with the training rows permuted once (Section~\ref{sec:repro_setup}). All metrics are computed from predicted classes, as in the article; M = macro. $\Delta$ = with leak $-$ without leak. One partition per side.}{Entrada/saída: a receita de treino de Lira et al.\ rodada de novo em duas partições. \emph{Publicado}: Tabela~4 de Lira et al.~\cite{Lira2025deep}. \emph{Com vazamento}: um hold-out por imagem do código público deles, em que treino e teste compartilham casos. \emph{Sem vazamento}: um hold-out agrupado por caso, de tamanho parecido. Modelos, aumentos de dados, otimizador, épocas e lote são os mesmos nos dois lados; só a partição muda. A receita é o código público com as linhas de treino permutadas uma vez (Seção~\ref{sec:repro_setup}). Todas as métricas saem das classes previstas, como no artigo; M = macro. $\Delta$ = com vazamento $-$ sem vazamento. Uma partição de cada lado.}}
+\label{tab:repro_es}
+\footnotesize
+\setlength{\tabcolsep}{3pt}
+\begin{adjustbox}{max width=\textwidth}
+\begin{tabular}{lccc|ccc|ccc|cc}
+\toprule
+ & \multicolumn{3}{c|}{\EP{Published}{Publicado}} & \multicolumn{3}{c|}{\EP{With leak}{Com vazamento}} & \multicolumn{3}{c|}{\EP{Without leak}{Sem vazamento}} & \multicolumn{2}{c}{$\Delta$} \\
+\EP{Model}{Modelo} & Acc & F1$_M$ & AUC$_{c,M}$ & Acc & F1$_M$ & AUC$_{c,M}$ & Acc & F1$_M$ & AUC$_{c,M}$ & Acc & F1$_M$ \\
+\midrule
+ResNet152 & \dec{0.869} & \dec{0.824} & \dec{0.821} & \dec{0.845} & \dec{0.783} & \dec{0.775} & \dec{0.821} & \dec{0.761} & \dec{0.742} & $+\dec{0.023}$ & $+\dec{0.022}$ \\
+ResNet101 & \dec{0.863} & \dec{0.811} & \dec{0.803} & \dec{0.826} & \dec{0.770} & \dec{0.777} & \dec{0.835} & \dec{0.785} & \dec{0.770} & $-\dec{0.009}$ & $-\dec{0.016}$ \\
+ResNet50 & \dec{0.850} & \dec{0.797} & \dec{0.792} & \dec{0.851} & \dec{0.791} & \dec{0.782} & \dec{0.827} & \dec{0.778} & \dec{0.767} & $+\dec{0.024}$ & $+\dec{0.013}$ \\
+ResNet34 & \dec{0.850} & \dec{0.802} & \dec{0.806} & \dec{0.797} & \dec{0.732} & \dec{0.740} & \dec{0.821} & \dec{0.769} & \dec{0.756} & $-\dec{0.025}$ & $-\dec{0.037}$ \\
+ResNet18 & \dec{0.817} & \dec{0.744} & \dec{0.734} & \dec{0.834} & \dec{0.773} & \dec{0.771} & \dec{0.835} & \dec{0.781} & \dec{0.762} & $-\dec{0.001}$ & $-\dec{0.008}$ \\
+\midrule
+AlexNet & \dec{0.765} & \dec{0.703} & \dec{0.716} & \dec{0.753} & \dec{0.668} & \dec{0.670} & \dec{0.710} & \dec{0.625} & \dec{0.620} & $+\dec{0.042}$ & $+\dec{0.042}$ \\
+DenseNet169 & \dec{0.777} & \dec{0.688} & \dec{0.679} & \dec{0.746} & \dec{0.634} & \dec{0.628} & \dec{0.734} & \dec{0.663} & \dec{0.658} & $+\dec{0.012}$ & $-\dec{0.028}$ \\
+EfficientNetV2-L & \dec{0.782} & \dec{0.654} & \dec{0.638} & \dec{0.755} & \dec{0.430} & \dec{0.499} & \dec{0.710} & \dec{0.415} & \dec{0.497} & $+\dec{0.044}$ & $+\dec{0.015}$ \\
+MaxViT-T & \dec{0.780} & \dec{0.668} & \dec{0.653} & \dec{0.776} & \dec{0.693} & \dec{0.691} & \dec{0.730} & \dec{0.649} & \dec{0.642} & $+\dec{0.045}$ & $+\dec{0.043}$ \\
+MNASNet1.3 & \dec{0.746} & \dec{0.657} & \dec{0.656} & \dec{0.750} & \dec{0.429} & \dec{0.496} & \dec{0.714} & \dec{0.417} & \dec{0.500} & $+\dec{0.036}$ & $+\dec{0.012}$ \\
+MobileNetV2 & \dec{0.719} & \dec{0.598} & \dec{0.593} & \dec{0.723} & \dec{0.608} & \dec{0.604} & \dec{0.744} & \dec{0.673} & \dec{0.667} & $-\dec{0.021}$ & $-\dec{0.065}$ \\
+RegNetY-16GF$^{\dagger}$ & \dec{0.711} & \dec{0.549} & \dec{0.549} & \dec{0.709} & \dec{0.571} & \dec{0.568} & \dec{0.677} & \dec{0.563} & \dec{0.561} & $+\dec{0.032}$ & $+\dec{0.008}$ \\
+ShuffleNetV2 x0.5 & \dec{0.730} & \dec{0.619} & \dec{0.614} & \dec{0.709} & \dec{0.577} & \dec{0.574} & \dec{0.667} & \dec{0.567} & \dec{0.565} & $+\dec{0.042}$ & $+\dec{0.010}$ \\
+SqueezeNet1.0 & \dec{0.750} & \dec{0.429} & \dec{0.500} & \dec{0.757} & \dec{0.431} & \dec{0.500} & \dec{0.714} & \dec{0.417} & \dec{0.500} & $+\dec{0.042}$ & $+\dec{0.014}$ \\
+Swin-B & \dec{0.728} & \dec{0.597} & \dec{0.591} & \dec{0.740} & \dec{0.605} & \dec{0.597} & \dec{0.734} & \dec{0.588} & \dec{0.587} & $+\dec{0.006}$ & $+\dec{0.017}$ \\
+VGG16 & \dec{0.782} & \dec{0.694} & \dec{0.685} & \dec{0.767} & \dec{0.681} & \dec{0.679} & \dec{0.784} & \dec{0.722} & \dec{0.713} & $-\dec{0.016}$ & $-\dec{0.041}$ \\
+\midrule
+\EP{Mean, 5 ResNets}{Média, 5 ResNets} & \dec{0.850} & \dec{0.796} & \dec{0.791} & \dec{0.831} & \dec{0.770} & \dec{0.769} & \dec{0.828} & \dec{0.775} & \dec{0.759} & $+\dec{0.002}$ & $-\dec{0.005}$ \\
+\EP{Mean, 16 models}{Média, 16 modelos} & \dec{0.782} & \dec{0.677} & \dec{0.677} & \dec{0.771} & \dec{0.636} & \dec{0.647} & \dec{0.754} & \dec{0.636} & \dec{0.644} & $+\dec{0.017}$ & $+\dec{0.0001}$ \\
+\bottomrule
+\end{tabular}
+\end{adjustbox}
+\par\smallskip\parbox{\linewidth}{\scriptsize \EP{$^{\dagger}$ In the public code this row is built with \texttt{regnet\_y\_1\_6gf}, not with the \texttt{regnet\_y\_16gf} used under the single protocol.}{$^{\dagger}$ No código público esta linha é construída com \texttt{regnet\_y\_1\_6gf}, e não com a \texttt{regnet\_y\_16gf} usada no protocolo único.}}
+\end{table}

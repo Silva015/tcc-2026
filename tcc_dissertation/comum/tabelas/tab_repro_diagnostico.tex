@@ -1,0 +1,24 @@
+% Gerado por tcc_dissertation/scripts/gerar_tabelas.py a partir de resultados/. Não edite à mão.
+\begin{table}[!htbp]
+\centering
+\caption{\EP{Calibration of the reproduction on the leaky hold-out. Recipes A and B follow the two versions of the public code of Lira et al.; the last three add a deviation that is not in it. \emph{Units}: trained (model, task) pairs among ResNet-152, ResNet-18, AlexNet and VGG-16. \emph{One class}: units whose test predictions are all the same class. \emph{Error}: mean absolute difference to the published accuracy, macro F1 and macro AUC$_c$. Recipe A was run for 1{,}000 epochs and the others for 300.}{Calibração da reprodução no hold-out com vazamento. As receitas A e B seguem as duas versões do código público de Lira et al.; as três últimas acrescentam um desvio que não está nele. \emph{Unidades}: pares (modelo, tarefa) treinados, entre ResNet-152, ResNet-18, AlexNet e VGG-16. \emph{Uma classe}: unidades cujas predições de teste são todas da mesma classe. \emph{Erro}: diferença absoluta média para a acurácia, o F1 macro e a AUC$_c$ macro publicados. A receita A rodou por 1.000 épocas e as demais por 300.}}
+\label{tab:repro_diagnostico}
+\footnotesize
+\setlength{\tabcolsep}{4pt}
+\begin{tabular}{lcccccc}
+\toprule
+ & \EP{Public}{Código} & & \EP{One}{Uma} & & \multicolumn{2}{c}{\EP{ResNet-152 accuracy}{Acurácia da ResNet-152}} \\
+\EP{Recipe}{Receita} & \EP{code}{público} & \EP{Units}{Unidades} & \EP{class}{classe} & \EP{Error}{Erro} & \EP{Entry/exit}{Entrada/saída} & \EP{Distance}{Distância} \\
+\midrule
+B: \texttt{master} & \EP{yes}{sim} & 6 & 6 & \dec{0.207} & \dec{0.755} & \dec{0.887} \\
+B + SMOTEENN & \EP{yes}{sim} & 6 & 4 & \dec{0.386} & \dec{0.243} & \dec{0.019} \\
+A: tag \texttt{V\_0.1} & \EP{yes}{sim} & 2 & 1 & \dec{0.372} & \dec{0.243} & --- \\
+\midrule
+\EP{B, rows permuted once}{B, linhas permutadas uma vez} & \EP{no}{não} & 6 & 0 & \dec{0.044} & \dec{0.845} & \dec{0.904} \\
+\EP{B, batches shuffled}{B, lotes embaralhados} & \EP{no}{não} & 6 & 0 & \dec{0.050} & \dec{0.853} & \dec{0.926} \\
+\EP{A, batches shuffled}{A, lotes embaralhados} & \EP{no}{não} & 4 & 0 & \dec{0.117} & --- & --- \\
+\midrule
+\EP{Published}{Publicado} & & & & & \dec{0.869} & \dec{0.925} \\
+\bottomrule
+\end{tabular}
+\end{table}

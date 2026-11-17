@@ -75,7 +75,24 @@ In entry/exit, the ResNet-152 of Lira et al.\ reports accuracy 0.869, macro F1 0
 
 In the distance task, the published accuracies (0.855--0.925 for all rows but SqueezeNet) are higher than any accuracy under the single protocol, and TransferKAN (0.813) is below eleven of the twelve published rows. In AUC$_c$, TransferKAN (0.664) is above eleven of the twelve rows and below their ResNet-152 (0.733). Several published models have AUC$_c$ close to 0.5 (SqueezeNet 0.500, ShuffleNetV2 0.512), that is, they hardly separate the classes even with high accuracy, which in this task is dominated by the distant class.
 
-These comparisons support a narrower statement than the one made in the earlier version of this work. Under the single protocol, TransferKAN is equivalent to the same ResNet-152 with a linear head and below the best pre-trained backbones (Section~\ref{sec:res_transformers}). The differences from the numbers of Lira et al.\ come from the split, the pre-training and the recipe, not from the KAN head. Only the effect of the split was isolated with the same recipe (Section~\ref{sec:res_leak}).
+These comparisons support a narrower statement than the one made in the earlier version of this work. Under the single protocol, TransferKAN is equivalent to the same ResNet-152 with a linear head and below the best pre-trained backbones (Section~\ref{sec:res_transformers}). The differences from the numbers of Lira et al.\ come from the split, the pre-training and the recipe, not from the KAN head. The effect of the split was isolated with the recipe of this work (Section~\ref{sec:res_leak}) and with theirs (Section~\ref{sec:res_repro}).
+
+\section{The Recipe of Lira et al.\ With and Without Leakage}
+\label{sec:res_repro}
+
+The previous sections leave one question open: what happens to the numbers of Lira et al.\ when \emph{their} recipe is evaluated without the leak. Tables~\ref{tab:repro_es} and~\ref{tab:repro_dist} answer it for 16 architectures, with the recipe of Section~\ref{sec:repro_setup} run on a leaky split and on a case-grouped split.
+
+\input{comum/tabelas/tab_repro_es}
+
+\textbf{The reproduction.} On entry/exit, the column with leak tracks the published Table~4. The mean absolute error in accuracy is 0.017, and the ranking of the 16 models by accuracy is almost the same (rank correlation of 0.92). The ResNet-152 reaches 0.845, against 0.869 in the article; the ResNets are at the top and the networks trained from scratch stay close to the majority class, as in the article. On distance, accuracy is also reproduced (error of 0.017, leaving out SqueezeNet 1.0, whose published row, with an accuracy of 0.095, was not reproduced), but the ranking of the models is less well preserved (correlation of 0.53), because almost all accuracies fall in a narrow band around 0.887, the share of the majority class in the test set.
+
+\textbf{Entry/exit.} Without the leak, the recipe of Lira et al.\ barely changes. The mean accuracy of the 16 models goes from 0.771 to 0.754 ($+0.017$ in favour of the leaky split) and the mean macro F1 is the same on both splits (0.636); in 6 of the 16 models macro F1 is even higher without the leak. On the five ResNets the mean difference is $+0.002$ in accuracy and $-0.005$ in macro F1. The ResNet-152, the best row of the article, goes from 0.845 to 0.821.
+
+\input{comum/tabelas/tab_repro_dist}
+
+\textbf{Shooting distance.} Here the leak matters. All 16 models have higher accuracy with the leak, and 15 of the 16 have higher macro F1. Averaged over the 16, accuracy falls from 0.884 to 0.829 ($+0.056$) and macro F1 from 0.495 to 0.400 ($+0.095$). On the ResNets, which are the networks that actually learn the task, mean macro F1 falls from 0.668 to 0.524 ($+0.145$) and AUC$_c$ from 0.719 to 0.624 ($+0.095$). The ResNet-152 goes from 0.671 to 0.421 in macro F1 and from 0.724 to 0.568 in AUC$_c$: without seeing other photographs of the same cases, it comes close to a network that does not separate the classes.
+
+With two different recipes, the one of this work (Section~\ref{sec:res_leak}) and that of Lira et al., the result has the same direction and the same asymmetry: the leaky split inflates the entry/exit task a little and the distance task a lot. Three caveats limit the reading. There is one partition per side, so the difference for a single model is noisy. The grouped test set has only 4 contact images, and the macro averages of the distance task depend heavily on them. And the networks that predict a single class (one with the leak and two without, on entry/exit; three and one, on distance) say nothing about the split. The pattern over the set, and that of the ResNets in particular, does not depend on those rows.
 
 \section{TransferKAN and the Transformers}
 \label{sec:res_transformers}
@@ -139,6 +156,7 @@ Table~\ref{tab:mt_desempenho} compares one multitask ResNet-152 with the pair of
 Under one protocol without case leakage, the results support the following statements, all tied to a pre-registered rule:
 \begin{itemize}
     \item the hold-out of the public code of Lira et al.\ inflates AUC by $+0.034$ (entry/exit) and $+0.155$ to $+0.158$ (distance) with everything else fixed;
+    \item with the recipe of Lira et al.\ (an analysis added later, with no pre-registered rule), the leak barely changes entry/exit (mean accuracy $+0.017$, same macro F1) and inflates distance in all 16 models tested (mean macro F1 $+0.095$; $+0.145$ on the ResNets);
     \item the KAN head of TransferKAN is equivalent to linear and MLP heads in entry/exit (outcome B) and, in the distance task, below the matched MLP while equivalent to the MLP-128 and the linear head (outcome C);
     \item the best architecture is Swin-B, which outperforms TransferKAN in both tasks;
     \item wavelet-KAN heads do not change this picture: equal AUC in entry/exit, clearly worse in distance, and not faster;

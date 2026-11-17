@@ -75,7 +75,24 @@ Em entrada/saída, a ResNet-152 de Lira et al.\ tem acurácia de 0,869, F1 macro
 
 Na tarefa de distância, as acurácias publicadas (0,855--0,925 em todas as linhas exceto a SqueezeNet) são maiores que qualquer acurácia do protocolo único, e a TransferKAN (0,813) fica abaixo de onze das doze linhas publicadas. Em AUC$_c$, a TransferKAN (0,664) fica acima de onze das doze linhas e abaixo da ResNet-152 deles (0,733). Vários modelos publicados têm AUC$_c$ perto de 0,5 (SqueezeNet 0,500, ShuffleNetV2 0,512), ou seja, quase não separam as classes, mesmo com acurácia alta, que nesta tarefa é dominada pela classe distância.
 
-Essas comparações sustentam uma afirmação mais estreita que a da versão anterior deste trabalho. No protocolo único, a TransferKAN é equivalente à mesma ResNet-152 com cabeça linear e fica abaixo dos melhores backbones pré-treinados (Seção~\ref{sec:res_transformers}). As diferenças em relação aos números de Lira et al.\ vêm da partição, do pré-treino e da receita, e não da cabeça KAN. Só o efeito da partição foi isolado com a mesma receita (Seção~\ref{sec:res_leak}).
+Essas comparações sustentam uma afirmação mais estreita que a da versão anterior deste trabalho. No protocolo único, a TransferKAN é equivalente à mesma ResNet-152 com cabeça linear e fica abaixo dos melhores backbones pré-treinados (Seção~\ref{sec:res_transformers}). As diferenças em relação aos números de Lira et al.\ vêm da partição, do pré-treino e da receita, e não da cabeça KAN. O efeito da partição foi isolado com a receita deste trabalho (Seção~\ref{sec:res_leak}) e com a receita deles (Seção~\ref{sec:res_repro}).
+
+\section{A Receita de Lira et al.\ com e sem Vazamento}
+\label{sec:res_repro}
+
+As seções anteriores deixam uma pergunta em aberto: o que acontece com os números de Lira et al.\ quando a receita \emph{deles} é avaliada sem o vazamento. As Tabelas~\ref{tab:repro_es} e~\ref{tab:repro_dist} respondem para 16 arquiteturas, com a receita da Seção~\ref{sec:repro_setup} rodada numa partição com vazamento e numa partição agrupada por caso.
+
+\input{comum/tabelas/tab_repro_es}
+
+\textbf{A reprodução.} Em entrada/saída, a coluna com vazamento acompanha a Tabela~4 publicada. O erro absoluto médio de acurácia é de 0,017, e a ordem dos 16 modelos por acurácia é quase a mesma (correlação de postos de 0,92). A ResNet-152 fica com 0,845, contra 0,869 no artigo; as ResNets ocupam o topo e as redes treinadas do zero ficam perto da classe majoritária, como no artigo. Na distância, a acurácia também é reproduzida (erro de 0,017, sem contar a SqueezeNet 1.0, cuja linha publicada, com acurácia de 0,095, não foi reproduzida), mas a ordem dos modelos é menos preservada (correlação de 0,53), porque quase todas as acurácias ficam numa faixa estreita em torno de 0,887, a fração da classe majoritária no teste.
+
+\textbf{Entrada/saída.} Sem o vazamento, a receita de Lira et al.\ quase não muda. A acurácia média dos 16 modelos vai de 0,771 para 0,754 ($+0{,}017$ a favor da partição com vazamento) e o F1 macro médio é o mesmo nas duas partições (0,636); em 6 dos 16 modelos o F1 macro é até maior sem vazamento. Nas cinco ResNets a diferença média é de $+0{,}002$ em acurácia e de $-0{,}005$ em F1 macro. A ResNet-152, a melhor linha do artigo, vai de 0,845 para 0,821.
+
+\input{comum/tabelas/tab_repro_dist}
+
+\textbf{Distância do disparo.} Aqui o vazamento pesa. Os 16 modelos têm acurácia maior com vazamento, e 15 dos 16 têm F1 macro maior. Na média dos 16, a acurácia cai de 0,884 para 0,829 ($+0{,}056$) e o F1 macro de 0,495 para 0,400 ($+0{,}095$). Nas ResNets, que são as redes que de fato aprendem a tarefa, o F1 macro médio cai de 0,668 para 0,524 ($+0{,}145$) e a AUC$_c$ de 0,719 para 0,624 ($+0{,}095$). A ResNet-152 passa de 0,671 para 0,421 em F1 macro e de 0,724 para 0,568 em AUC$_c$: sem ver outras fotografias dos mesmos casos, ela fica perto de uma rede que não separa as classes.
+
+Com duas receitas diferentes, a deste trabalho (Seção~\ref{sec:res_leak}) e a de Lira et al., o resultado tem a mesma direção e a mesma assimetria: a partição com vazamento infla pouco a tarefa de entrada/saída e muito a de distância. Três ressalvas limitam a leitura. Há uma partição de cada lado, então a diferença de um modelo isolado é ruidosa. O teste agrupado tem só 4 imagens de encostado, e as médias macro da distância dependem muito delas. E as redes que predizem uma única classe (uma com vazamento e duas sem, em entrada/saída; três e uma, na distância) nada dizem sobre a partição. O padrão do conjunto, e em especial o das ResNets, não depende dessas linhas.
 
 \section{A TransferKAN e os Transformers}
 \label{sec:res_transformers}
@@ -139,6 +156,7 @@ A Tabela~\ref{tab:mt_desempenho} compara uma única ResNet-152 multitarefa com o
 Num protocolo sem vazamento de casos, os resultados sustentam as seguintes afirmações, todas ligadas a uma regra pré-registrada:
 \begin{itemize}
     \item o hold-out do código público de Lira et al.\ infla a AUC em $+0{,}034$ (entrada/saída) e de $+0{,}155$ a $+0{,}158$ (distância), com todo o resto fixo;
+    \item com a receita de Lira et al.\ (análise acrescentada depois, sem regra pré-registrada), o vazamento quase não muda entrada/saída (acurácia média $+0{,}017$, F1 macro igual) e infla a distância nos 16 modelos testados (F1 macro médio $+0{,}095$; $+0{,}145$ nas ResNets);
     \item a cabeça KAN da TransferKAN é equivalente às cabeças linear e MLP em entrada/saída (desfecho B) e, na distância, fica abaixo da MLP isoparamétrica, sendo equivalente à MLP-128 e à cabeça linear (desfecho C);
     \item a melhor arquitetura é a Swin-B, que supera a TransferKAN nas duas tarefas;
     \item as cabeças Wav-KAN não mudam esse quadro: AUC igual em entrada/saída, claramente pior na distância, e não são mais rápidas;
