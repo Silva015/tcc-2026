@@ -28,6 +28,11 @@ TCC = os.path.join(RAIZ, "tcc_dissertation")
 RES = os.path.join(RAIZ, "resultados")
 PAPER = os.path.join(RAIZ, "references", "2024_paper.txt")
 
+# Desde 2026-11-23 só a versão PT é reescrita (feedback do orientador); a EN fica congelada. Com isso a
+# paridade EN x PT deixa de reprovar, e as afirmações do PT são procuradas em todos os capítulos PT.
+EN_CONGELADO = True
+TODO_PT = ""
+
 PARES = [  # (EN, PT)
     ("tex/1_Introduction.tex", "pt/tex/1_Introducao.tex"),
     ("tex/2_Background.tex", "pt/tex/2_Fundamentacao.tex"),
@@ -45,6 +50,7 @@ PARES = [  # (EN, PT)
 # Constantes do protocolo, versões, nomes de modelos e valores citados de fontes que não são resultados/
 # (cada uma com o motivo). Comparadas pelo valor exato mostrado.
 LISTA_BRANCA = {
+    "97.5": "percentil superior do IC de 95% (Seção 2.7)", "2.5": "percentil inferior do IC de 95% (Seção 2.7)",
     "0.5": "Dropout, p de aumento de dados, limiar 0,5, ShuffleNetV2 x0.5",
     "0.2": "aumento de dados (ColorJitter, std do GaussNoise, p)", "0.44": "std máx. do GaussNoise",
     "0.05": "shift do ShiftScaleRotate e matiz do ColorJitter", "0.1": "escala do ShiftScaleRotate; ruído ~0,1 min",
@@ -108,6 +114,7 @@ def limpar_tex(t):
     t = re.sub(r"\\(begin|end)\{[^}]*\}", " ", t)
     t = re.sub(r"\\setlength\{[^}]*\}\{[^}]*\}", " ", t)
     t = re.sub(r"\[\d+pt\]|\d+(\.\d+)?(pt|mm|cm|em)\b", " ", t)
+    t = re.sub(r"\d+(\.\d+)?\\(textwidth|linewidth)", " ", t)
     return t
 
 
@@ -133,8 +140,17 @@ def so_ingles(t):
         i = k
 
 
+def sem_desenhos(texto):
+    """Apaga o conteúdo de tikzpicture, axis/groupplot e lstlisting (coordenadas e código não são números
+    do texto), mantendo as quebras de linha para que os números de linha continuem certos."""
+    def apaga(m):
+        return "\n" * m.group(0).count("\n")
+    return re.sub(r"\\begin\{(tikzpicture|lstlisting)\}.*?\\end\{\1\}", apaga, texto, flags=re.S)
+
+
 def extrair(texto, lingua):
     """Lista de (número como texto normalizado, nº de casas, é_porcentagem, linha)."""
+    texto = sem_desenhos(texto)
     out = []
     if "\\EP{" in texto:
         texto = so_ingles(texto)
@@ -228,19 +244,32 @@ def main():
         if a != b:
             difs += 1
             print(f"  paridade {en} x {pt}: só EN {dict(a - b)}; só PT {dict(b - a)}")
-    print(f"[Paridade] {len(PARES) - difs}/{len(PARES)} pares de capítulos com os mesmos números")
+    print(f"[Paridade] {len(PARES) - difs}/{len(PARES)} pares de capítulos com os mesmos números"
+          + (" (informativo: a versão EN está congelada desde 2026-11-23)" if EN_CONGELADO else ""))
+    if EN_CONGELADO:
+        difs = 0
 
     # 4. afirmações: valores calculados das fontes têm de aparecer, formatados, no capítulo EN e no PT
     faltam = 0
     lista = afirmacoes()
+    global TODO_PT
+    TODO_PT = " ".join(normalizar(open(os.path.join(TCC, pt)).read(), "pt") for _, pt in PARES
+                       if not pt.endswith(("resumo.tex", "abstract.tex")))
+    TODO_PT += " " + " ".join(normalizar(so_ingles(open(a).read()).replace("{,}", ","), "pt")
+                              for a in sorted(glob.glob(os.path.join(TCC, "comum", "tabelas", "*.tex"))))
     for cap, tipo, valor, rotulo in lista:
         for rel, lingua in ((PARES[cap][0], "en"), (PARES[cap][1], "pt")):
+            if EN_CONGELADO and rel.startswith("pt/") and rel.endswith(("resumo.tex", "abstract.tex")):
+                continue  # o resumo PT novo é propositalmente menos específico (pedido do orientador)
             if rel.endswith("abstract.tex"):
                 lingua = "en"
             elif rel.endswith("resumo.tex"):
                 lingua = "pt"
             alvo = formatar(tipo, valor, lingua)
-            texto = normalizar(open(os.path.join(TCC, rel)).read(), lingua)
+            if lingua == "pt" and EN_CONGELADO and not rel.endswith("resumo.tex"):
+                texto = TODO_PT
+            else:
+                texto = normalizar(open(os.path.join(TCC, rel)).read(), lingua)
             if alvo not in texto:
                 faltam += 1
                 print(f"  afirmação não encontrada: {rel}: {rotulo} = {alvo!r}")

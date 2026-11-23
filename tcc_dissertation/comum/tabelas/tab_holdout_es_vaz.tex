@@ -1,0 +1,39 @@
+% Gerado por tcc_dissertation/scripts/gerar_tabelas.py a partir de resultados/. Não edite à mão.
+\begin{sidewaystable}[p]
+\centering
+\caption{\EP{Entry/exit, Table~4 of Lira et al.~\cite{Lira2025deep} reproduced \emph{with leakage}: the image-level hold-out of the public code of Lira et al., in which test images share their case with training images. Same 16 architectures, same training recipe (Section~\ref{sec:repro_setup}) and one single train/test split; no cross-validation. Columns follow the article: P = precision, R = recall (sensitivity), Sp = specificity; M = macro, m = micro, W = weighted. AUC$_c$ is computed from predicted classes, as in the article; AUC$_p$ from predicted probabilities. Micro precision, recall and F1 equal the accuracy and are omitted.}{Entrada/saída, Tabela~4 de Lira et al.~\cite{Lira2025deep} reproduzida \emph{com vazamento}: o \en{hold-out} por imagem do código público de Lira et al., em que as imagens de teste dividem o caso com imagens de treino. As mesmas 16 arquiteturas, a mesma receita de treino (Seção~\ref{sec:repro_setup}) e uma única partição treino/teste, sem validação cruzada. As colunas seguem o artigo: P = precisão, R = revocação (sensibilidade), Esp = especificidade; M = macro, m = micro, W = ponderada. A AUC$_c$ é calculada das classes previstas, como no artigo, e a AUC$_p$, das probabilidades previstas. Precisão, revocação e F1 micro são iguais à acurácia e foram omitidos.}}
+\label{tab:holdout_es_vaz}
+\footnotesize
+\setlength{\tabcolsep}{3pt}
+\begin{adjustbox}{max width=\textwidth}
+\begin{tabular}{lccccccccccccc}
+\toprule
+ & & \multicolumn{2}{c}{P} & \multicolumn{2}{c}{R} & \multicolumn{2}{c}{F1} & \multicolumn{3}{c}{AUC$_c$} & \multicolumn{2}{c}{\EP{Sp}{Esp}} & \\
+\cmidrule(lr){3-4}\cmidrule(lr){5-6}\cmidrule(lr){7-8}\cmidrule(lr){9-11}\cmidrule(lr){12-13}
+\EP{Model}{Modelo} & Acc & M & W & M & W & M & W & M & m & W & M & W & AUC$_p$ \\
+\midrule
+ResNet152 & \dec{0.845} & \dec{0.792} & \dec{0.841} & \dec{0.775} & \dec{0.845} & \dec{0.783} & \dec{0.842} & \dec{0.775} & \dec{0.775} & \dec{0.775} & \dec{0.775} & \dec{0.845} & \dec{0.873} \\
+ResNet101 & \dec{0.826} & \dec{0.763} & \dec{0.831} & \dec{0.777} & \dec{0.826} & \dec{0.770} & \dec{0.828} & \dec{0.777} & \dec{0.777} & \dec{0.777} & \dec{0.777} & \dec{0.826} & \dec{0.876} \\
+ResNet50 & \dec{0.851} & \dec{0.802} & \dec{0.847} & \dec{0.782} & \dec{0.851} & \dec{0.791} & \dec{0.849} & \dec{0.782} & \dec{0.782} & \dec{0.782} & \dec{0.782} & \dec{0.851} & \dec{0.875} \\
+ResNet34 & \dec{0.797} & \dec{0.726} & \dec{0.804} & \dec{0.740} & \dec{0.797} & \dec{0.732} & \dec{0.800} & \dec{0.740} & \dec{0.740} & \dec{0.740} & \dec{0.740} & \dec{0.797} & \dec{0.849} \\
+ResNet18 & \dec{0.834} & \dec{0.775} & \dec{0.833} & \dec{0.771} & \dec{0.834} & \dec{0.773} & \dec{0.834} & \dec{0.771} & \dec{0.771} & \dec{0.771} & \dec{0.771} & \dec{0.834} & \dec{0.860} \\
+\midrule
+AlexNet & \dec{0.753} & \dec{0.666} & \dec{0.755} & \dec{0.670} & \dec{0.753} & \dec{0.668} & \dec{0.754} & \dec{0.670} & \dec{0.670} & \dec{0.670} & \dec{0.670} & \dec{0.753} & \dec{0.718} \\
+DenseNet169 & \dec{0.746} & \dec{0.645} & \dec{0.733} & \dec{0.628} & \dec{0.746} & \dec{0.634} & \dec{0.738} & \dec{0.628} & \dec{0.628} & \dec{0.628} & \dec{0.628} & \dec{0.746} & \dec{0.717} \\
+EfficientNetV2-L & \dec{0.755} & \dec{0.378} & \dec{0.572} & \dec{0.499} & \dec{0.755} & \dec{0.430} & \dec{0.651} & \dec{0.499} & \dec{0.499} & \dec{0.499} & \dec{0.499} & \dec{0.755} & \dec{0.551} \\
+MaxViT-T & \dec{0.776} & \dec{0.694} & \dec{0.774} & \dec{0.691} & \dec{0.776} & \dec{0.693} & \dec{0.775} & \dec{0.691} & \dec{0.691} & \dec{0.691} & \dec{0.691} & \dec{0.776} & \dec{0.778} \\
+MNASNet1.3 & \dec{0.750} & \dec{0.378} & \dec{0.572} & \dec{0.496} & \dec{0.750} & \dec{0.429} & \dec{0.649} & \dec{0.496} & \dec{0.496} & \dec{0.496} & \dec{0.496} & \dec{0.750} & \dec{0.520} \\
+MobileNetV2 & \dec{0.723} & \dec{0.614} & \dec{0.712} & \dec{0.604} & \dec{0.723} & \dec{0.608} & \dec{0.717} & \dec{0.604} & \dec{0.604} & \dec{0.604} & \dec{0.604} & \dec{0.723} & \dec{0.697} \\
+RegNetY-16GF$^{\dagger}$ & \dec{0.709} & \dec{0.581} & \dec{0.687} & \dec{0.568} & \dec{0.709} & \dec{0.571} & \dec{0.696} & \dec{0.568} & \dec{0.568} & \dec{0.568} & \dec{0.568} & \dec{0.709} & \dec{0.619} \\
+ShuffleNetV2 x0.5 & \dec{0.709} & \dec{0.585} & \dec{0.691} & \dec{0.574} & \dec{0.709} & \dec{0.577} & \dec{0.698} & \dec{0.574} & \dec{0.574} & \dec{0.574} & \dec{0.574} & \dec{0.709} & \dec{0.629} \\
+SqueezeNet1.0 & \dec{0.757} & \dec{0.378} & \dec{0.573} & \dec{0.500} & \dec{0.757} & \dec{0.431} & \dec{0.652} & \dec{0.500} & \dec{0.500} & \dec{0.500} & \dec{0.500} & \dec{0.757} & \dec{0.633} \\
+Swin-B & \dec{0.740} & \dec{0.626} & \dec{0.715} & \dec{0.597} & \dec{0.740} & \dec{0.605} & \dec{0.724} & \dec{0.597} & \dec{0.597} & \dec{0.597} & \dec{0.597} & \dec{0.740} & \dec{0.679} \\
+VGG16 & \dec{0.767} & \dec{0.683} & \dec{0.765} & \dec{0.679} & \dec{0.767} & \dec{0.681} & \dec{0.766} & \dec{0.679} & \dec{0.679} & \dec{0.679} & \dec{0.679} & \dec{0.767} & \dec{0.735} \\
+\midrule
+\EP{Mean, 5 ResNets}{Média, 5 ResNets} & \dec{0.831} & \dec{0.772} & \dec{0.831} & \dec{0.769} & \dec{0.831} & \dec{0.770} & \dec{0.830} & \dec{0.769} & \dec{0.769} & \dec{0.769} & \dec{0.769} & \dec{0.831} & \dec{0.866} \\
+\EP{Mean, 16 models}{Média, 16 modelos} & \dec{0.771} & \dec{0.630} & \dec{0.732} & \dec{0.647} & \dec{0.771} & \dec{0.636} & \dec{0.748} & \dec{0.647} & \dec{0.647} & \dec{0.647} & \dec{0.647} & \dec{0.771} & \dec{0.726} \\
+\bottomrule
+\end{tabular}
+\end{adjustbox}
+\par\smallskip\parbox{\linewidth}{\scriptsize \EP{$^{\dagger}$ In the public code this row is built with \texttt{regnet\_y\_1\_6gf}.}{$^{\dagger}$ No código público esta linha é construída com a RegNetY-1.6GF, uma rede bem menor.}}
+\end{sidewaystable}

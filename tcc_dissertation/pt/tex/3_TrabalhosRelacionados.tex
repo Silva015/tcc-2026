@@ -1,8 +1,8 @@
 \label{chap:related}
 
-Este capítulo revisa os trabalhos de aprendizado profundo aplicados a ferimentos por arma de fogo, descreve em detalhe o estudo de Lira et al.~\cite{Lira2025deep}, que fornece a base de dados e os baselines desta dissertação, e revisa o uso de KANs como cabeças de classificação. Ele termina com a lacuna que motiva este trabalho.
+Este capítulo revisa os trabalhos de aprendizado profundo aplicados a ferimentos por arma de fogo, descreve em detalhe o estudo de Lira et al.~\cite{Lira2025deep}, que fornece a base de dados e o \en{baseline} desta dissertação, e revisa o uso de \glspl{KAN} como cabeças de classificação. Ele termina com a lacuna que motiva este trabalho.
 
-\section{IA na Patologia Forense}
+\section{\texorpdfstring{\gls{IA}}{IA} na Patologia Forense}
 \label{sec:ai_forensics}
 
 A inteligência artificial entrou na ciência forense mais devagar que na medicina clínica. Os primeiros estudos de ferimentos por arma de fogo usaram carcaças de animais, como porcos, para simular a pele humana~\cite{oura2021deep}. Esses cenários controlados permitiram acurácias altas, mas não têm a variabilidade, a contaminação e as alterações morfológicas dos casos reais. Cheng et al.~\cite{cheng2024gunshot} treinaram classificadores com fotografias de necropsia de ferimentos de entrada e saída, obtidas nas condições relativamente controladas da necropsia, e não trataram da distância do disparo.
@@ -10,26 +10,83 @@ A inteligência artificial entrou na ciência forense mais devagar que na medici
 \section{O Estudo de Lira et al.}
 \label{sec:2024_benchmark}
 
-Lira et al.~\cite{Lira2025deep} montaram a FDCPUnBGunshotDB, com 2.551 fotografias (1.883 ferimentos de entrada e 668 de saída) de 489 casos da Polícia Civil do Distrito Federal, e avaliaram 59 arquiteturas de aprendizado profundo do TorchVision em duas tarefas: entrada contra saída e a distância médico-legal do disparo (encostado, curta distância, distância). As tabelas de hold-out deles (Tabelas~4 e~5 do artigo) põem a ResNet-152 em primeiro lugar nas duas tarefas. Em entrada/saída ela tem acurácia de 0,869 e AUC macro de 0,821, os ``86,90\%'' e ``82,09\%'' do resumo. Na tarefa de distância ela tem acurácia de 0,925, AUC macro de 0,733 e AUC micro de 0,944; a ``AUC de até 94,36\%'' do resumo é a média micro. O artigo também relata uma análise k-fold da ResNet-152 em boxplots (a Figura~4 deles, reproduzida na Figura~\ref{fig:lira_boxplots}); em entrada/saída, a mediana da acurácia entre as dobras é de cerca de 0,70.
+Lira et al.~\cite{Lira2025deep} montaram a FDCPUnBGunshotDB, com 2.551 fotografias (1.883 ferimentos de entrada e 668 de saída) de 489 casos da \gls{PCDF}, e avaliaram nela 59 arquiteturas de aprendizado profundo da biblioteca torchvision em duas tarefas: entrada contra saída e a \gls{MLSD} (encostado, curta distância, distância). A Figura~\ref{fig:lira_framework} resume o fluxo do estudo.
+
+\figuraBib[htpb]{lira2024/fig1_framework}{Fluxo de treino e avaliação do estudo de Lira et al.: as imagens de treino são aumentadas, combinadas às originais e preparadas para treinar cada arquitetura, que é avaliada num conjunto de teste separado}{Lira2025deep}{fig:lira_framework}{width=0.95\textwidth}
+
+O artigo relata duas avaliações. A principal é um \en{hold-out}: uma única divisão da base em 80\% para treino e 20\% para teste, cujos resultados são as Tabelas~4 e~5 do artigo. Nessas tabelas, a ResNet-152 fica em primeiro lugar nas duas tarefas. Em entrada/saída ela tem acurácia de 0,869 e \gls{AUC} macro de 0,821, os ``86,90\%'' e ``82,09\%'' do resumo do artigo. Na tarefa de distância ela tem acurácia de 0,925, AUC macro de 0,733 e AUC micro de 0,944; a ``AUC de até 94,36\%'' do resumo é a média micro. A segunda avaliação é uma validação cruzada em cinco dobras, feita só para a ResNet-152 e relatada em gráficos de caixas (a Figura~4 do artigo, reproduzida na Figura~\ref{fig:lira_boxplots}); em entrada/saída, a mediana da acurácia entre as dobras é de cerca de 0,70.
 
 \subsection{O que o Artigo e o Código Público Dizem sobre a Partição}
+\label{sec:lira_particao}
 
-O artigo descreve as duas avaliações como separadas por caso: as imagens de um caso usado no treino não seriam usadas no teste, e o k-fold usaria dobras estratificadas e agrupadas com os casos como grupos~\cite{Lira2025deep}. O código público do estudo (\texttt{leguwoi}~\cite{leguwoi}, commit \texttt{83d82f1}) concorda quanto ao k-fold, que usa \texttt{StratifiedGroupKFold} com o número do caso como grupo, mas não quanto ao hold-out. A função \texttt{iterative\_split} aplica estratificação iterativa~\cite{sechidis2011stratification} às colunas \emph{número do caso} e \emph{rótulo}, ou seja, ela \emph{estratifica} pelo caso em vez de agrupar por caso. Estratificar pelo número do caso espalha as imagens de cada caso entre treino e teste. Reproduzindo essa função com os dados distribuídos, 98,7\% das imagens de teste de entrada/saída e 98,4\% das imagens de teste de distância têm o seu caso no treino (Seção~\ref{sec:res_leak}). Não é possível saber se as tabelas publicadas foram produzidas exatamente por essa versão do código; as afirmações desta dissertação sobre o hold-out se referem ao código público.
+As duas avaliações do artigo usam partições diferentes, implementadas por funções diferentes do código público~\cite{leguwoi}. A Tabela~\ref{tab:lira_particoes} separa o que diz o artigo e o que faz o código em cada uma; os trechos de código estão no Anexo~\ref{chap:anexo_codigo}.
 
-Três outros aspectos do código público importam para comparar números:
+\begin{table}[htpb]
+\centering
+\caption{As duas partições do estudo de Lira et al.: o que o artigo descreve e o que o código público faz.}
+\label{tab:lira_particoes}
+\small
+\begin{tabular}{p{0.17\textwidth}p{0.36\textwidth}p{0.36\textwidth}}
+\toprule
+ & \en{Hold-out} (Tabelas~4 e~5) & Validação cruzada (Figura~4) \\
+\midrule
+O artigo & 80\% dos casos no treino e 20\% no teste; imagens de casos do treino não são usadas no teste & dobras estratificadas e agrupadas, com os casos como grupos \\
+\addlinespace
+O código & estratificação iterativa sobre as colunas \emph{número do caso} e \emph{rótulo} (Listagem~\ref{lst:holdout_vazado}) & \en{StratifiedGroupKFold} com o número do caso como grupo (Listagem~\ref{lst:kfold_agrupado}) \\
+\addlinespace
+Resultado & cada caso é espalhado entre treino e teste: \textbf{há vazamento} & cada caso fica inteiro numa dobra: \textbf{não há vazamento} \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+Na validação cruzada, portanto, o código segue o artigo. No \en{hold-out}, não. A diferença está entre \emph{agrupar} e \emph{estratificar} pelo caso (Seção~\ref{sec:leakage_background}). Agrupar trata o caso como uma unidade indivisível: todas as suas fotografias vão para o mesmo lado. Estratificar pelo caso trata o número do caso como uma característica a ser equilibrada: a estratificação iterativa~\cite{sechidis2011stratification} tenta pôr em treino e em teste a mesma proporção das imagens de cada caso, isto é, cerca de 80\% das fotografias de cada caso no treino e 20\% no teste. O efeito é o oposto do pretendido: em vez de separar os casos, a função os divide de propósito (Figura~\ref{fig:lira_vazamento}). Reproduzindo essa função com os dados distribuídos, 98,7\% das imagens de teste de entrada/saída e 98,4\% das imagens de teste de distância têm o seu caso no treino (Seção~\ref{sec:res_leak}). Não é possível saber se as tabelas publicadas foram produzidas exatamente por essa versão do código; as afirmações desta dissertação sobre o \en{hold-out} se referem ao código público.
+
+\begin{figure}[htpb]
+\centering
+\begin{tikzpicture}[x=6mm, y=6mm, every node/.style={font=\footnotesize}]
+    % três casos, cinco fotos cada, cores por caso
+    \def\casoA{corA} \def\casoB{corB} \def\casoC{corC}
+    % painel esquerdo: estratificar pelo caso (código do hold-out)
+    \node[font=\small\bfseries, align=center] at (4.5,4.6) {Estratificar pelo caso\\(\en{hold-out} do código)};
+    \node at (2,3.3) {treino (80\%)}; \node at (7.5,3.3) {teste (20\%)};
+    \draw[rounded corners, thick, gray] (-0.4,-2.6) rectangle (4.4,2.6);
+    \draw[rounded corners, thick, gray] (5.6,-2.6) rectangle (9.4,2.6);
+    \foreach \y/\c in {1.6/corA, 0/corB, -1.6/corC} {
+        \foreach \x in {0,1,2,3} { \fill[\c] (\x,\y) circle (0.36); }
+        \fill[\c] (7.5,\y) circle (0.36);
+    }
+    % painel direito: agrupar por caso
+    \begin{scope}[xshift=72mm]
+    \node[font=\small\bfseries, align=center] at (4.5,4.6) {Agrupar por caso\\(validação cruzada do código)};
+    \node at (2,3.3) {treino}; \node at (7.5,3.3) {teste};
+    \draw[rounded corners, thick, gray] (-0.4,-2.6) rectangle (4.4,2.6);
+    \draw[rounded corners, thick, gray] (5.6,-2.6) rectangle (9.4,2.6);
+    \foreach \x in {0,1,2,3} { \fill[corA] (\x,1.6) circle (0.36); \fill[corB] (\x,0) circle (0.36); }
+    \fill[corA] (2,-1.6) circle (0.36); \fill[corB] (3,-1.6) circle (0.36);
+    \foreach \x in {6,7,8} { \fill[corC] (\x,0.8) circle (0.36); }
+    \foreach \x in {6.5,7.5} { \fill[corC] (\x,-0.6) circle (0.36); }
+    \end{scope}
+\end{tikzpicture}
+\caption{Esquema da diferença entre estratificar e agrupar pelo caso, com três casos de cinco fotografias cada (uma cor por caso). À esquerda, como no \en{hold-out} do código público, cada caso é dividido em cerca de 80\% e 20\%, e todo caso do teste também está no treino. À direita, como na validação cruzada do mesmo código, cada caso fica inteiro de um lado só.}
+\label{fig:lira_vazamento}
+\end{figure}
+
+Três outros aspectos do código público importam para comparar números com os deste trabalho:
 \begin{itemize}
-    \item \textbf{AUC das classes previstas.} A AUC é calculada com \texttt{roc\_auc\_score} sobre os rótulos previstos, e não sobre probabilidades. Com um único limiar, a AUC macro é igual à média entre revocação e especificidade, que no caso binário é a revocação macro. Isso aparece na Tabela~4 deles, em que a AUC macro de cada modelo é igual à sua revocação macro (0,821 e 0,821 na ResNet-152).
-    \item \textbf{Inicialização.} Só as ResNets partem dos pesos do ImageNet, e a primeira convolução delas é trocada por uma camada iniciada ao acaso; as demais famílias são treinadas do zero.
-    \item \textbf{Identidade do caso.} Os casos são identificados pelo número sem o ano, o que junta casos de anos diferentes (417 grupos em vez de 486).
+    \item \textbf{AUC das classes previstas.} O código calcula a AUC sobre os rótulos previstos, e não sobre as probabilidades. A AUC normalmente varia o limiar de decisão sobre uma probabilidade contínua (Seção~\ref{sec:auc_background}); com rótulos já decididos só há um limiar, a ``curva'' \gls{ROC} tem um único ponto, e a área vira a média entre a sensibilidade e a especificidade. Essa grandeza, chamada aqui de AUC$_c$, muda o que se compara de duas formas. Primeiro, ela é em geral bem menor que a AUC das probabilidades do mesmo modelo, então os dois números não podem ser postos lado a lado. Segundo, ela depende do limiar: um modelo que prevê sempre a classe majoritária tem AUC$_c$ de exatamente 0,5, por mais alta que seja a sua acurácia. Isso aparece na Tabela~4 do artigo, em que a AUC macro de cada modelo é igual à sua revocação macro (0,821 e 0,821 na ResNet-152), o que só acontece com a AUC$_c$.
+    \item \textbf{Inicialização.} O artigo fala em usar arquiteturas do estado da arte ``e seus modelos pré-treinados'', sem dizer quais. No código público, só as ResNets são criadas com os pesos do ImageNet, e a primeira convolução delas é trocada por uma camada iniciada ao acaso; as demais arquiteturas são criadas sem pesos pré-treinados, isto é, treinadas do zero. Essa afirmação se refere ao código, não ao texto do artigo.
+    \item \textbf{Identidade do caso.} Na base, o caso é o critério de unicidade de uma ocorrência, e ele é identificado pelo ano e pelo número do laudo: o caso 15 de 2014 e o caso 15 de 2019 são ocorrências diferentes. O código usa só o número, sem o ano, e por isso junta casos diferentes que têm o mesmo número (417 grupos em vez de 486). Isso não causa vazamento, porque só deixa os grupos maiores, mas muda as partições e a contagem de casos.
 \end{itemize}
-Essas observações não diminuem o valor da base nem do estudo, que é o primeiro a classificar ferimentos por arma de fogo de locais de crime reais nessa escala. Elas significam, porém, que os números das Tabelas~4 e~5 medem uma grandeza diferente da avaliação agrupada por caso adotada aqui, e a versão anterior desta dissertação comparou as duas como se fossem a mesma.
+Essas observações não diminuem o valor da base nem do estudo, que é o primeiro a classificar ferimentos por arma de fogo de locais de crime reais nessa escala. Elas significam, porém, que os números do \en{hold-out} das Tabelas~4 e~5 não são comparáveis, sem mais, com uma avaliação agrupada por caso. Por isso, antes de avaliar a TransferKAN, este trabalho refaz essas tabelas com e sem o vazamento (Seção~\ref{sec:res_holdout}).
 
 \section{KANs como Cabeças de Classificação}
 \label{sec:kan_related}
 
-As Redes de Kolmogorov-Arnold~\cite{liu2024kan} põem funções univariadas aprendíveis nas arestas da rede, em vez de ativações fixas nos nós (Seção~\ref{sec:kan_background}). O artigo original defende ganhos de precisão e de eficiência de parâmetros sobretudo em tarefas científicas e simbólicas pequenas. Em visão, as KANs foram usadas tanto dentro das convoluções, como nas KANs convolucionais da \texttt{torch-conv-kan}~\cite{drokin2024torchconvkan}, quanto como cabeças sobre extratores pré-treinados, como na TransferKAN. Várias bases foram propostas para as funções das arestas, entre elas as B-splines da KAN original, implementadas de forma eficiente na \texttt{efficient-kan}~\cite{efficientkan}, e as wavelets da Wav-KAN~\cite{bozorgasl2024wavkan}. Quando uma cabeça KAN é comparada com uma cabeça densa, a comparação muitas vezes muda ao mesmo tempo o backbone, a receita de treino ou o número de parâmetros, o que dificulta atribuir uma diferença à cabeça em si.
+As KANs~\cite{liu2024kan} põem funções de uma variável aprendíveis nas arestas da rede, em vez de ativações fixas nos nós (Seção~\ref{sec:kan_background}). O artigo original não as propõe como substitutas gerais das \glspl{MLP}. Ele apresenta análises e comparações em problemas científicos e simbólicos já estabelecidos, como o ajuste de fórmulas e a solução de equações diferenciais, em que KANs pequenas chegam a erros parecidos ou menores que os de MLPs maiores e podem ser interpretadas. Se essas vantagens se transferem para a classificação de imagens é uma questão em aberto.
+
+Em visão computacional, as KANs foram usadas de duas formas. Na primeira, entram dentro das convoluções, como nas KANs convolucionais da biblioteca torch-conv-kan~\cite{drokin2024torchconvkan}. Na segunda, servem de cabeça sobre um extrator de características pré-treinado, como na TransferKAN. Várias bases foram propostas para as funções das arestas, entre elas as B-\en{splines} da KAN original, implementadas de forma eficiente na biblioteca efficient-kan~\cite{efficientkan}, e as \en{wavelets} da Wav-KAN~\cite{bozorgasl2024wavkan}. Quando uma cabeça KAN é comparada com uma cabeça densa, a comparação muitas vezes muda ao mesmo tempo o \en{backbone}, a receita de treino ou o número de parâmetros, o que dificulta atribuir uma diferença à cabeça em si.
 
 \section{Lacuna de Pesquisa}
 \label{sec:research_gap}
 
-Três lacunas motivam este trabalho. Primeiro, os números disponíveis para esta base vêm de um hold-out em que, segundo o código público, imagens do mesmo caso aparecem no treino e no teste, com a maioria das arquiteturas treinada do zero e a AUC calculada das classes. Nenhum estudo tinha avaliado as arquiteturas num protocolo comum sem vazamento de casos. Segundo, a afirmação de que uma cabeça KAN melhora em relação a uma cabeça densa sobre o mesmo backbone pré-treinado não tinha sido testada com uma ablação controlada, que mantivesse fixos o backbone, a receita e o orçamento de parâmetros. Terceiro, as duas tarefas forenses são aprendidas por redes separadas, embora usem as mesmas imagens. Esta dissertação trata das três lacunas com um protocolo único (Capítulo~\ref{chap:methodology}).
+Três lacunas motivam este trabalho. Primeiro, não se sabe se uma cabeça KAN sobre um extrator pré-treinado classifica fotografias forenses reais melhor que uma cabeça densa, porque essa comparação nunca foi feita mantendo fixos o \en{backbone}, a receita e o número de parâmetros; nem se o resultado depende da base usada nas arestas (\en{splines} ou \en{wavelets}). Segundo, as duas tarefas periciais são resolvidas por redes separadas, embora usem as mesmas fotografias, e não se sabe se uma rede para as duas tarefas perderia desempenho. Terceiro, o único ponto de comparação disponível para esta base, as Tabelas~4 e~5 de Lira et al., vem de um \en{hold-out} que, no código público, mistura casos entre treino e teste; antes de usá-lo como \en{baseline}, é preciso saber quanto esse vazamento muda os números. Esta dissertação trata das três lacunas: a terceira com a validação do \en{baseline} (Seção~\ref{sec:repro_setup}) e as duas primeiras com a TransferKAN (Capítulo~\ref{chap:solution}) e um protocolo controlado (Capítulo~\ref{chap:methodology}).

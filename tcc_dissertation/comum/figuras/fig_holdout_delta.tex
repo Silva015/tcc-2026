@@ -1,0 +1,22 @@
+% Diferença (com vazamento - sem vazamento) do F1 macro por modelo, receita de Lira et al., hold-out.
+% Dados: img/protocolo/repro_delta_{es,dist}.csv (scripts/gerar_tabelas.py, a partir de resultados/reproducao_lira/).
+\pgfplotstableread[col sep=comma]{img/protocolo/repro_delta_es.csv}\tabreprodelta
+\begin{tikzpicture}
+\begin{groupplot}[
+    group style={group size=2 by 1, horizontal sep=4mm, yticklabels at=edge left},
+    width=0.44\textwidth, height=9.5cm, idioma,
+    ytick={0,...,15}, yticklabels from table={\tabreprodelta}{modelo},
+    ymin=-0.7, ymax=15.7,
+    xmin=-0.12, xmax=0.27,
+    xlabel={$\Delta$F1$_M$ \EP{(with $-$ without leakage)}{(com $-$ sem vazamento)}},
+    xmajorgrids, grid style={gray!25},
+    tick label style={font=\footnotesize}, label style={font=\small}, title style={font=\small},
+    xticklabel style={/pgf/number format/fixed, /pgf/number format/precision=2},
+    extra x ticks={0}, extra x tick style={grid style={black, thick}, tick label style={opacity=0}},
+]
+\nextgroupplot[title={\EP{Entry/exit}{Entrada/saída}}, xbar, bar width=5pt]
+\addplot[fill=corA!70, draw=corA] table[x=f1, y=y, col sep=comma]{img/protocolo/repro_delta_es.csv};
+\nextgroupplot[title={\EP{Shooting distance}{Distância do disparo}}, xbar, bar width=5pt]
+\addplot[fill=corD!70, draw=corD] table[x=f1, y=y, col sep=comma]{img/protocolo/repro_delta_dist.csv};
+\end{groupplot}
+\end{tikzpicture}

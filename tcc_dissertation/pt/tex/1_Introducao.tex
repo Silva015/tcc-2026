@@ -1,46 +1,59 @@
+\glsresetall
 \label{chap:introduction}
 
 \section{Definição do Problema}
 \label{sec_problem}
 
-As armas de fogo estão entre os instrumentos mais usados para cometer homicídios no mundo~\cite{unodc2023homicide}. Por isso, ferimentos por arma de fogo são comuns no trabalho pericial, em locais de crime e em necropsias, e os peritos precisam determinar a sua natureza. Duas perguntas são centrais: se um ferimento é de entrada ou de saída e, nos de entrada, de que distância o disparo foi feito, a distância médico-legal do disparo (MLSD).
+As armas de fogo estão entre os instrumentos mais usados para cometer homicídios no mundo~\cite{unodc2023homicide}. Por isso, ferimentos por arma de fogo são comuns no trabalho pericial, em locais de crime e em necropsias, e os peritos precisam determinar a sua natureza. Duas perguntas são centrais: se um ferimento é de entrada ou de saída (\gls{ES}) e, nos de entrada, de que distância o disparo foi feito, a \gls{MLSD}. As respostas ajudam a reconstruir a dinâmica do crime, por exemplo para distinguir um suicídio, em que a arma costuma estar encostada, de um homicídio a distância~\cite{dimaio2015gunshot}.
 
-Em condições ideais, características como a forma e o tamanho do ferimento, a orla de escoriação e as bordas tornam relativamente fácil distinguir entrada de saída. Na prática, essas características podem estar parcialmente ausentes, sobrepostas ou alteradas pela putrefação, e o calibre, a munição, o ângulo, os anteparos intermediários e a região do corpo complicam a classificação mesmo para legistas experientes.
+Em condições ideais, características como a forma e o tamanho do ferimento, a orla de escoriação e as bordas tornam relativamente fácil, para um perito humano experiente, distinguir entrada de saída. Na prática, essas características podem estar parcialmente ausentes, sobrepostas ou alteradas pela putrefação, e o calibre, a munição, o ângulo, os anteparos intermediários e a região do corpo complicam a classificação mesmo para legistas experientes. Um sistema automático que examinasse a fotografia do ferimento e indicasse as duas respostas (Figura~\ref{fig:visao_geral}) poderia servir de segunda opinião ao perito e padronizar a análise.
 
-O aprendizado profundo transformou a análise de imagens médicas, mas o seu uso na prática forense ainda é limitado. Um dos principais obstáculos são os dados: as fotografias forenses são feitas com equipamentos diferentes, em condições variadas e na rotina dos locais de crime, o que torna a padronização impraticável e produz bases pequenas e desbalanceadas. Lira et al.~\cite{Lira2025deep} montaram a primeira grande base de fotografias reais de ferimentos por arma de fogo em locais de crime, a FDCPUnBGunshotDB, e avaliaram nela 59 arquiteturas de aprendizado profundo.
+\begin{figure}[htpb]
+\centering
+\begin{adjustbox}{max width=\textwidth}
+\begin{tikzpicture}[>=Stealth, every node/.style={font=\small},
+    caixa/.style={rectangle, rounded corners, draw, thick, align=center, minimum height=12mm}]
+    \node[inner sep=0, draw, thick] (foto) {\includegraphics[width=30mm]{base/entrada_1}};
+    \node[below=1mm of foto, font=\footnotesize] {fotografia do ferimento};
+    \node[caixa, fill=orange!15, right=12mm of foto, minimum width=30mm] (modelo) {modelo de\\aprendizado profundo};
+    \node[caixa, fill=corA!12, above right=2mm and 14mm of modelo, text width=42mm] (es) {\textbf{Entrada ou saída?}\\entrada};
+    \node[caixa, fill=corD!12, below right=2mm and 14mm of modelo, text width=42mm] (dist) {\textbf{Se entrada, a que distância?}\\encostado, curta ou distância};
+    \draw[->, thick] (foto) -- (modelo);
+    \draw[->, thick] (modelo.east) -- (es.west);
+    \draw[->, thick] (modelo.east) -- (dist.west);
+\end{tikzpicture}
+\end{adjustbox}
+\caption{As duas tarefas estudadas. A partir da fotografia de um ferimento, o modelo indica se ele é de entrada ou de saída e, se for de entrada, a distância do disparo em três classes. Fotografia da base FDCPUnBGunshotDB~\cite{Lira2025deep}.}
+\label{fig:visao_geral}
+\end{figure}
 
-Este trabalho partiu de uma proposta específica: a TransferKAN, uma ResNet-152 pré-treinada no ImageNet cuja cabeça de classificação densa é trocada por uma Rede de Kolmogorov-Arnold (KAN)~\cite{liu2024kan}. Uma versão anterior desta dissertação relatou que a TransferKAN superava os baselines de Lira et al. Ao reexaminar essa comparação, viu-se que ela misturava coisas diferentes. Os baselines publicados vieram de uma partição em que, segundo o código público do estudo, imagens do mesmo caso aparecem no treino e no teste, com a maioria das arquiteturas treinada do zero e a AUC calculada das classes previstas. A TransferKAN, por sua vez, tinha sido avaliada com dobras agrupadas por caso, backbone pré-treinado, AUC das probabilidades e época escolhida no próprio conjunto de teste. Uma diferença entre números assim diz pouco sobre a cabeça KAN. Esta dissertação refaz a avaliação do zero, num protocolo único, e pergunta o que de fato se pode concluir.
+O aprendizado profundo transformou a análise de imagens médicas, mas o seu uso na prática forense ainda é limitado. Um dos principais obstáculos são os dados: as fotografias forenses são feitas com equipamentos diferentes, em condições variadas e na rotina dos locais de crime, o que torna a padronização impraticável e produz bases pequenas e desbalanceadas. Lira et al.~\cite{Lira2025deep} montaram a primeira grande base de fotografias reais de ferimentos por arma de fogo em locais de crime, a FDCPUnBGunshotDB, e avaliaram nela 59 arquiteturas de aprendizado profundo; a melhor nas duas tarefas foi uma rede convolucional, a ResNet-152.
+
+Este trabalho propõe e avalia a TransferKAN: a ResNet-152 pré-treinada no ImageNet, usada como extratora de características, com a sua camada final de classificação trocada por uma \gls{KAN}~\cite{liu2024kan}. As KANs são uma alternativa recente à \gls{MLP}, em que cada conexão da rede aprende uma função, em vez de um simples peso. A aposta é que essa flexibilidade ajudaria a separar classes forenses parecidas e desbalanceadas. Para saber se ajuda de fato, porém, não basta comparar a TransferKAN com os números publicados: é preciso compará-la com a mesma rede com outras cabeças, nas mesmas condições, e partir de um ponto de comparação confiável.
 
 \section{Perguntas de Pesquisa}
 \label{sec_goals}
 
-O trabalho se organiza em torno de cinco perguntas de pesquisa:
+O trabalho se organiza em torno de três \glspl{PP}, todas sobre o uso de KANs como camada de classificação:
 \begin{itemize}
-    \item \textbf{PP1:} O hold-out usado em 2024 infla os números relatados e, se sim, quanto, com todo o resto fixo?
-    \item \textbf{PP2:} Num protocolo sem vazamento de casos, uma cabeça KAN melhora em relação a cabeças linear e MLP sobre o mesmo backbone pré-treinado?
-    \item \textbf{PP3:} Como se comparam doze das arquiteturas avaliadas por Lira et al.\ no mesmo protocolo, e onde fica a TransferKAN entre elas?
-    \item \textbf{PP4:} Uma KAN com outra base, wavelets em vez de splines, muda a resposta da PP2?
-    \item \textbf{PP5:} Uma única rede com uma cabeça por tarefa pode substituir o par de redes usado hoje para entrada/saída e para a distância do disparo?
+    \item \textbf{PP1:} Sobre um extrator de características pré-treinado, uma cabeça KAN classifica fotografias de ferimentos por arma de fogo melhor que as cabeças densas usuais (uma camada linear ou uma MLP), quando o extrator, a forma de treino e o número de parâmetros são os mesmos?
+    \item \textbf{PP2:} A resposta à PP1 depende do tipo de função usado nas conexões da KAN, B-\en{splines} ou \en{wavelets}?
+    \item \textbf{PP3:} Hoje as duas tarefas são resolvidas por duas redes separadas. Uma única rede, com uma cabeça KAN para cada tarefa, pode substituí-las sem perder mais que uma margem pequena de desempenho, e a que custo?
 \end{itemize}
-
-\subsection{A Hipótese Original}
-\label{sec_hypothesis}
-
-A hipótese que motivou a TransferKAN era que trocar a cabeça MLP de uma ResNet-152 pré-treinada por uma KAN melhoraria a discriminação, medida pela AUC, nas duas tarefas, porque funções aprendíveis nas arestas modelariam melhor as fronteiras de decisão de classes forenses desbalanceadas. Essa hipótese não é descartada: ela vira a PP2 e é testada com uma ablação controlada e uma regra de decisão fixada antes dos experimentos (Seção~\ref{sec:stats}). A resposta é negativa.
+Para responder a essas perguntas, o trabalho precisa de um ponto de partida confiável. O único disponível para esta base são as tabelas de Lira et al., obtidas com uma única divisão da base em treino e teste (um \en{hold-out}). Por isso, antes do estudo das KANs, essas tabelas são reproduzidas e verificadas, inclusive quanto a fotografias de um mesmo caso aparecerem dos dois lados da divisão (Capítulo~\ref{chap:methodology}).
 
 \section{Contribuições}
 \label{sec_contributions}
 
-As contribuições desta dissertação são metodológicas e práticas:
+As contribuições desta dissertação são:
 \begin{itemize}
-    \item \textbf{Uma auditoria da partição de 2024.} O hold-out do código público de Lira et al.\ estratifica pelo caso em vez de agrupar por caso. Reproduzi-lo mostra que 98,7\% (entrada/saída) e 98,4\% (distância do disparo) das imagens de teste têm o seu caso no treino e que, com a mesma rede e a mesma receita, essa partição infla a AUC em $+0{,}034$ em entrada/saída e de $+0{,}155$ a $+0{,}158$ na distância do disparo.
-    \item \textbf{Um protocolo único sem vazamento.} Dobras agrupadas por caso, uma única receita de treino para todos os modelos, AUC das probabilidades, uma implementação congelada e com hash e regras de decisão escritas antes das rodadas. Nele foram treinadas e comparadas doze arquiteturas, cinco cabeças, cinco cabeças Wav-KAN e uma rede multitarefa.
-    \item \textbf{Uma ablação controlada da cabeça, com KANs de splines e de wavelets.} A cabeça KAN da TransferKAN é equivalente às cabeças linear e MLP em entrada/saída e fica abaixo de uma MLP do mesmo tamanho na distância do disparo. As KANs com wavelets não mudam isso, e nenhuma das duas famílias é eficiente em parâmetros nem mais rápida neste cenário. A melhor arquitetura é a Swin-B, que supera a TransferKAN nas duas tarefas.
-    \item \textbf{Uma rede para as duas tarefas, a meio custo.} Uma única ResNet-152 com duas cabeças tem cerca de metade dos parâmetros do par de redes e obtém as duas saídas duas vezes mais rápido. Ela é não inferior na distância do disparo e um pouco pior, de forma consistente, em entrada/saída, dentro da margem pré-registrada.
+    \item \textbf{A TransferKAN.} Uma arquitetura que combina aprendizado por transferência e uma cabeça KAN para classificar ferimentos por arma de fogo, descrita em detalhe com o seu treino em duas fases e estendida às duas tarefas periciais (Capítulo~\ref{chap:solution}). A proposta foi apresentada no SIBGRAPI 2026 e aceita na ACDSA 2027.
+    \item \textbf{Uma resposta controlada sobre cabeças KAN em imagens forenses reais.} Uma avaliação em que só a cabeça muda, com KANs de B-\en{splines} e de \en{wavelets} comparadas com cabeças densas do mesmo tamanho, que mostra o que a cabeça KAN acrescenta, ou não, a um extrator pré-treinado (Capítulo~\ref{chap:results}).
+    \item \textbf{Uma rede para as duas tarefas.} Uma variante multitarefa da TransferKAN, em que um único extrator alimenta uma cabeça por tarefa. Ela troca as duas redes usadas hoje por uma só, com cerca de metade dos parâmetros e do tempo de inferência, e é comparada com o par de redes nas mesmas imagens, com uma margem de perda aceitável fixada de antemão (Seções~\ref{sec:transferkan_mt} e~\ref{sec:res_mt}).
 \end{itemize}
-Os resultados também mostram onde está a dificuldade: os disparos encostados, com 42 imagens de 16 casos, quase nunca são reconhecidos quando o seu caso não está no treino.
+Como subproduto da validação do ponto de partida, o trabalho também refaz as Tabelas~4 e~5 de Lira et al.\ com e sem fotografias do mesmo caso dos dois lados da divisão (Seção~\ref{sec:res_holdout}), o que dá às próximas pesquisas nesta base uma referência sem esse vazamento.
 
 \section{Organização deste Documento}
 \label{sec_about}
 
-O Capítulo~\ref{chap:background} apresenta as tarefas forenses, os componentes de aprendizado profundo, as KANs com bases de splines e de wavelets e os conceitos de avaliação usados ao longo do texto. O Capítulo~\ref{chap:related} revisa os trabalhos relacionados, em particular o estudo de Lira et al.\ como descrito no artigo e como implementado no seu código público. O Capítulo~\ref{chap:solution} apresenta a TransferKAN, as hipóteses que ela representa e o desenho experimental. O Capítulo~\ref{chap:methodology} descreve o protocolo único. O Capítulo~\ref{chap:results} relata os resultados na ordem das perguntas de pesquisa, e o Capítulo~\ref{chap:conclusions} as responde e discute limitações e trabalhos futuros. O Apêndice~\ref{chap:apendice_mmw} traz os resultados no formato de Lira et al., e o Apêndice~\ref{chap:apendice_exploratorios} registra as arquiteturas KAN exploratórias treinadas do zero.
+O Capítulo~\ref{chap:background} apresenta a base teórica: as tarefas forenses, as redes neurais e as arquiteturas usadas, as KANs e os conceitos de avaliação. O Capítulo~\ref{chap:related} revisa os trabalhos relacionados, em particular o estudo de Lira et al., como descrito no artigo e como implementado no seu código público. O Capítulo~\ref{chap:solution} apresenta a solução proposta, a TransferKAN, e a sua variante multitarefa. O Capítulo~\ref{chap:methodology} descreve a metodologia: a base, o desenho experimental, a partição dos dados, a validação do ponto de partida e os detalhes de treino e de análise. O Capítulo~\ref{chap:results} relata os resultados, primeiro a validação do ponto de partida e depois o estudo das KANs, e o Capítulo~\ref{chap:conclusions} responde às perguntas de pesquisa e discute limitações e trabalhos futuros. O Apêndice~\ref{chap:apendice_mmw} traz os resultados no formato de Lira et al., o Apêndice~\ref{chap:apendice_exploratorios} registra as arquiteturas KAN exploratórias treinadas do zero, e o Anexo~\ref{chap:anexo_codigo} reproduz o código de partição do estudo de Lira et al.

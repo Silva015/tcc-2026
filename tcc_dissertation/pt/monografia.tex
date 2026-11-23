@@ -58,10 +58,21 @@
 \newcommand{\cmark}{\ding{51}} % ✔
 \newcommand{\xmark}{\ding{55}} % ✘
 \usepackage{rotating}
+% Listagens de código (Anexo do código de partição)
+\usepackage{listings}
+\lstset{basicstyle=\ttfamily\footnotesize, breaklines=true, frame=single, columns=fullflexible,
+        keywordstyle=\color{blue!60!black}\bfseries, commentstyle=\color{gray}\itshape,
+        stringstyle=\color{green!40!black}, showstringspaces=false, inputencoding=utf8}
+\renewcommand{\lstlistingname}{Listagem}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % Acrônimos
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+% Termos em inglês sempre em itálico
+\newcommand{\en}[1]{\textit{#1}}
+% Siglas: primeira ocorrência por extenso, depois só a sigla (\gls, \glspl)
+\setacronymstyle{long-short}
 
 % Relacionados à universidade
 \newacronym{UnB}{UnB}{Universidade de Brasília}
@@ -69,25 +80,25 @@
 \newacronym{CAPES}{CAPES}{Coordenação de Aperfeiçoamento de Pessoal de Nível Superior}
 
 % Específicos deste trabalho
-\newacronym{IA}{IA}{Inteligência Artificial}
-\newacronym{DL}{DL}{Aprendizado Profundo (Deep Learning)}
-\newacronym{ML}{ML}{Aprendizado de Máquina (Machine Learning)}
-\newacronym{CV}{CV}{Visão Computacional (Computer Vision)}
-\newacronym{CNN}{CNN}{Rede Neural Convolucional (Convolutional Neural Network)}
-\newacronym{MLP}{MLP}{Perceptron de Múltiplas Camadas (Multi-Layer Perceptron)}
-\newacronym{KAN}{KAN}{Rede de Kolmogorov-Arnold (Kolmogorov-Arnold Network)}
-\newacronym{KAR}{KAR}{Representação de Kolmogorov-Arnold}
-\newacronym{ResNet}{ResNet}{Rede Residual (Residual Network)}
-\newacronym{MLSD}{MLSD}{Distância Médico-Legal do Disparo (Medical-Legal Shooting Distance)}
-\newacronym{AUC}{AUC}{Área sob a Curva (Area Under the Curve)}
-\newacronym{ROC}{ROC}{Característica de Operação do Receptor (Receiver Operating Characteristic)}
-\newacronym{OOF}{OOF}{Fora da Dobra (Out-of-Fold)}
+\newacronym{IA}{IA}{inteligência artificial}
+\newacronym[shortplural={CNNs},longplural={redes neurais convolucionais, do inglês \en{convolutional neural networks}}]{CNN}{CNN}{rede neural convolucional, do inglês \en{convolutional neural network}}
+\newacronym[shortplural={MLPs},longplural={perceptrons de múltiplas camadas, do inglês \en{multilayer perceptrons}}]{MLP}{MLP}{perceptron de múltiplas camadas, do inglês \en{multilayer perceptron}}
+\newacronym[shortplural={KANs},longplural={Redes de Kolmogorov-Arnold, do inglês \en{Kolmogorov-Arnold Networks}}]{KAN}{KAN}{Rede de Kolmogorov-Arnold, do inglês \en{Kolmogorov-Arnold Network}}
+\newacronym[shortplural={ViTs},longplural={\en{transformers} de visão, do inglês \en{vision transformers}}]{ViT}{ViT}{\en{transformer} de visão, do inglês \en{vision transformer}}
+\newacronym{MLSD}{MLSD}{distância médico-legal do disparo, do inglês \en{medical-legal shooting distance}}
+\newacronym{ES}{E/S}{entrada/saída}
+\newacronym{AUC}{AUC}{área sob a curva ROC, do inglês \en{area under the curve}}
+\newacronym{ROC}{ROC}{característica de operação do receptor, do inglês \en{receiver operating characteristic}}
+\newacronym[longplural={intervalos de confiança}]{IC}{IC}{intervalo de confiança}
+\newacronym[longplural={perguntas de pesquisa}]{PP}{PP}{pergunta de pesquisa}
+\newacronym{OOF}{OOF}{fora da dobra, do inglês \en{out-of-fold}}
 \newacronym{PCDF}{PCDF}{Polícia Civil do Distrito Federal}
-\newacronym{CLAHE}{CLAHE}{Equalização de Histograma Adaptativa Limitada por Contraste}
-\newacronym{SMOTE}{SMOTE}{Técnica de Sobreamostragem de Minorias Sintéticas}
-\newacronym{ReLU}{ReLU}{Unidade Linear Retificada (Rectified Linear Unit)}
-\newacronym{DNN}{DNN}{Rede Neural Profunda (Deep Neural Network)}
-\newacronym{GPU}{GPU}{Unidade de Processamento Gráfico (Graphics Processing Unit)}
+\newacronym{CLAHE}{CLAHE}{equalização de histograma adaptativa com limite de contraste, do inglês \en{contrast limited adaptive histogram equalization}}
+\newacronym{SMOTEENN}{SMOTEENN}{sobreamostragem sintética de minorias seguida de limpeza por vizinhos mais próximos, do inglês \en{synthetic minority oversampling technique with edited nearest neighbours}}
+\newacronym{ReLU}{ReLU}{unidade linear retificada, do inglês \en{rectified linear unit}}
+\newacronym{SiLU}{SiLU}{unidade linear sigmoide, do inglês \en{sigmoid linear unit}}
+\newacronym{GPU}{GPU}{unidade de processamento gráfico, do inglês \en{graphics processing unit}}
+\newacronym{SGD}{SGD}{descida de gradiente estocástica, do inglês \en{stochastic gradient descent}}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % Informações do Trabalho
@@ -99,11 +110,11 @@
 
 \autor{Arthur Silva}{Carneiro}%
 
-\titulo{TransferKAN sob um Protocolo sem Vazamento: Reavaliação das Cabeças de Kolmogorov-Arnold na Classificação de Ferimentos por Arma de Fogo}%
+\titulo{Redes de Kolmogorov-Arnold na Classificação de Ferimentos por Arma de Fogo: a TransferKAN e uma Avaliação Controlada}%
 
-\palavraschave{Ferimentos por Arma de Fogo, Vazamento de Dados, Validação Cruzada Agrupada, Redes de Kolmogorov-Arnold (KAN), Aprendizado por Transferência, Aprendizado Multitarefa}
+\palavraschave{Redes de Kolmogorov-Arnold, Ferimentos por Arma de Fogo, Aprendizado por Transferência, Aprendizado Multitarefa, Ciência Forense, Vazamento de Dados}
 
-\keywords{Gunshot Wounds, Data Leakage, Grouped Cross-Validation, Kolmogorov-Arnold Networks (KAN), Transfer Learning, Multitask Learning}
+\keywords{Kolmogorov-Arnold Networks, Gunshot Wounds, Transfer Learning, Multitask Learning, Forensic Science, Data Leakage}
 
 \newcommand{\unbcic}{\texttt{UnB-CIC}}%
 
@@ -114,7 +125,7 @@
 \capitulo{1_Introducao}{Introdução}%
 \capitulo{2_Fundamentacao}{Fundamentação Teórica}%
 \capitulo{3_TrabalhosRelacionados}{Trabalhos Relacionados}%
-\capitulo{4_SolucaoProposta}{TransferKAN e o Desenho Experimental}%
+\capitulo{4_SolucaoProposta}{TransferKAN: Solução Proposta}%
 \capitulo{5_Metodologia}{Metodologia}%
 \capitulo{6_Resultados}{Resultados}%
 \capitulo{7_Conclusoes}{Conclusões}%
@@ -122,5 +133,6 @@
 \apendice{Apendice_MMW}{Resultados no Formato de Lira et al.}%
 \apendice{Apendice_Exploratorios}{Experimentos Exploratórios}%
 
+\anexo{Anexo_Codigo}{O Código de Partição de Lira et al.}
 \anexo{annex}{Artigos Produzidos}
 \end{document}%

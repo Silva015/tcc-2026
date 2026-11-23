@@ -1,19 +1,28 @@
 \label{chap:solution}
 
-Este capítulo apresenta a TransferKAN, o modelo que este trabalho se propôs a avaliar, as hipóteses que a motivaram e o desenho experimental usado para testá-las. O desenho isola a contribuição de cada componente: a cabeça, o backbone, a partição e o número de tarefas.
+Este capítulo apresenta a solução proposta, a TransferKAN: uma \gls{CNN} pré-treinada usada como extratora de características, seguida de uma \gls{KAN} como cabeça de classificação. O capítulo descreve a arquitetura, a forma de treiná-la, a variante que resolve as duas tarefas forenses com uma única rede e as hipóteses que motivaram a proposta. A forma de avaliá-la (o desenho experimental) fica no Capítulo~\ref{chap:methodology}.
 
-\section{A Arquitetura TransferKAN}
+\section{Visão Geral e Publicações}
+\label{sec:transferkan_overview}
+
+A ideia da TransferKAN junta dois componentes apresentados no Capítulo~\ref{chap:background}. O primeiro é o aprendizado por transferência (Seção~\ref{sec:transfer_background}): uma rede treinada no ImageNet já sabe extrair, de uma fotografia qualquer, características visuais gerais, como bordas, texturas e formas, e pode ser reaproveitada numa base pequena como a de ferimentos. O segundo é a KAN (Seção~\ref{sec:kan_background}): em vez de uma camada densa com ativações fixas, a camada que leva as características às classes passa a ter uma função aprendível em cada aresta. A aposta é que essa flexibilidade ajudaria a separar classes forenses parecidas entre si e desbalanceadas, como as três distâncias do disparo.
+
+A proposta foi apresentada em dois artigos, cujas primeiras páginas estão no Anexo~\ref{chap:annex}. O primeiro é um artigo curto com pôster no \en{Workshop of Undergraduate Works} do SIBGRAPI 2026, com o título ``TransKAN: Transfer Learning and Kolmogorov Arnold Networks for Gunshot Wound Classification''; nele o modelo se chama TransKAN, e a base, GuWID. O segundo, ``Transfer Learning and Kolmogorov-Arnold Networks for Gunshot Wound Classification'', foi aceito como artigo completo na ACDSA 2027. Os dois artigos apresentam a arquitetura e a avaliam na tarefa de entrada/saída. Esta dissertação é a versão estendida da proposta. Ela detalha a arquitetura e o treino, estende a TransferKAN à distância do disparo e a uma variante multitarefa, e a avalia com um protocolo controlado, em que só a cabeça muda entre as variantes comparadas (Capítulo~\ref{chap:methodology}). Por isso, os números dos artigos não são usados aqui: todos os resultados desta dissertação vêm do protocolo do Capítulo~\ref{chap:methodology}.
+
+\section{A Arquitetura}
 \label{sec:transferkan_arch}
 
-A TransferKAN\footnote{O artigo curto derivado deste trabalho para o SIBGRAPI 2026 chama o mesmo modelo de TransKAN.} combina um extrator de características convolucional pré-treinado no ImageNet com uma Rede de Kolmogorov-Arnold (KAN) como cabeça de classificação. Ela tem três estágios (Figura~\ref{fig:transferkan_arch}):
+A TransferKAN tem três estágios (Figura~\ref{fig:transferkan_arch}):
 \begin{enumerate}
-    \item \textbf{Extrator de características:} uma ResNet-152~\cite{he2016resnet} com os pesos do ImageNet~\cite{deng2009imagenet} e sem a sua última camada totalmente conectada. Para uma imagem de $224 \times 224$, ela produz um vetor de 2.048 características.
-    \item \textbf{Regularização:} Dropout com $p=0{,}5$ sobre esse vetor.
-    \item \textbf{Cabeça KAN:} uma KAN de duas camadas, $[2048, 128, K]$, com $K=2$ saídas em entrada/saída e $K=3$ na distância do disparo. Cada aresta tem uma função aprendível formada por um termo base SiLU e uma B-spline cúbica numa grade de tamanho 10 (Seção~\ref{sec:kan_background}), implementada com a \texttt{efficient-kan}~\cite{efficientkan}. A cabeça tem 3.936.000 parâmetros em entrada/saída e 3.937.920 na distância.
+    \item \textbf{Extrator de características (\en{backbone}).} Uma ResNet-152~\cite{he2016resnet} com os pesos do ImageNet~\cite{deng2009imagenet} e sem a sua última camada totalmente conectada. Para uma imagem de $224 \times 224$ pixels, ela produz um vetor de 2.048 características.
+    \item \textbf{Regularização.} Uma camada de \en{dropout}~\cite{srivastava2014dropout} com $p=0{,}5$ sobre esse vetor. O \en{dropout} só age durante o treino: a cada passo, zera ao acaso metade das 2.048 características, para que a cabeça não dependa de nenhuma delas isoladamente. Na avaliação, ele é desligado e todas as características passam.
+    \item \textbf{Cabeça KAN.} Uma KAN de duas camadas, $[2048, 128, K]$: 2.048 entradas, 128 nós intermediários e $K$ saídas, uma por classe ($K=2$ em entrada/saída e $K=3$ na distância do disparo). Cada aresta tem uma função aprendível formada por um termo base \gls{SiLU} e uma B-\en{spline} cúbica numa grade de 10 intervalos (Equação~\ref{eq:kan_spline}). A cabeça tem 3.936.000 parâmetros em entrada/saída e 3.937.920 na distância.
 \end{enumerate}
+As $K$ saídas da cabeça (os \en{logits}) passam por uma \en{softmax}, que as converte em probabilidades das classes; a classe prevista é a de maior probabilidade.
 
 \begin{figure}[htpb]
 \centering
+\begin{adjustbox}{max width=\textwidth}
 \begin{tikzpicture}[
     >=Stealth,
     node distance=8mm,
@@ -24,49 +33,70 @@ A TransferKAN\footnote{O artigo curto derivado deste trabalho para o SIBGRAPI 20
     io/.style={block, fill=gray!12, minimum width=16mm},
     every node/.style={font=\small},
 ]
-    \node[io] (input) {Imagem\\de entrada\\$224\times224$};
-    \node[backbone, right=of input] (resnet) {Backbone\\ResNet-152\\(ImageNet)};
-    \node[block, right=of resnet] (drop) {Dropout\\$p=0{,}5$};
+    \node[io] (input) {Fotografia\\do ferimento\\$224\times224$};
+    \node[backbone, right=of input] (resnet) {\en{Backbone}\\ResNet-152\\(ImageNet)};
+    \node[block, right=of resnet] (drop) {\en{Dropout}\\$p=0{,}5$\\(só no treino)};
     \node[kan, right=of drop] (kanlayer) {Cabeça\\KAN\\$[2048, 128, K]$};
-    \node[io, right=of kanlayer] (out) {Logits\\das classes\\($K{=}2$ ou $3$)};
+    \node[io, right=of kanlayer] (out) {Probabilidade\\de cada classe\\($K{=}2$ ou $3$)};
 
     \draw[->, thick] (input) -- (resnet);
-    \draw[->, thick] (resnet) -- node[above, font=\scriptsize] {2048-d} (drop);
+    \draw[->, thick] (resnet) -- node[above, font=\scriptsize] {2.048} (drop);
     \draw[->, thick] (drop) -- (kanlayer);
-    \draw[->, thick] (kanlayer) -- (out);
+    \draw[->, thick] (kanlayer) -- node[above, font=\scriptsize] {\en{softmax}} (out);
 
     \begin{scope}[on background layer]
         \node[draw=green!50!black, dashed, rounded corners, inner sep=3mm,
-              fit=(resnet), label={[font=\scriptsize, green!50!black]below:Congelado na fase~1}] {};
+              fit=(resnet), label={[font=\scriptsize, green!50!black]below:congelado na fase~1}] {};
         \node[draw=orange!70!black, dashed, rounded corners, inner sep=3mm,
-              fit=(kanlayer), label={[font=\scriptsize, orange!70!black]below:Cabeça em estudo}] {};
+              fit=(kanlayer), label={[font=\scriptsize, orange!70!black]below:cabeça em estudo}] {};
     \end{scope}
 \end{tikzpicture}
-\caption{A TransferKAN. Uma ResNet-152 pré-treinada no ImageNet extrai um vetor de 2.048 características, que passa por Dropout ($p=0{,}5$) e por uma cabeça KAN de duas camadas $[2048, 128, K]$ com grade de tamanho 10 e splines cúbicas ($K=2$ em entrada/saída, $K=3$ na distância do disparo). Na ablação da cabeça, só o bloco laranja muda.}
+\end{adjustbox}
+\caption{A TransferKAN. Uma ResNet-152 pré-treinada no ImageNet extrai um vetor de 2.048 características, que passa por um \en{dropout} ($p=0{,}5$, ativo só durante o treino) e por uma cabeça KAN de duas camadas $[2048, 128, K]$ com B-\en{splines} cúbicas numa grade de 10 intervalos ($K=2$ em entrada/saída, $K=3$ na distância do disparo). Nas comparações do Capítulo~\ref{chap:methodology}, só o bloco laranja muda.}
 \label{fig:transferkan_arch}
 \end{figure}
 
-\section{Hipóteses em Teste}
-\label{sec:justification}
+\textbf{Por que a ResNet-152.} O extrator foi escolhido a partir do estudo de Lira et al.~\cite{Lira2025deep}, que avaliou 59 arquiteturas nesta mesma base: a ResNet-152 foi a melhor nas duas tarefas, nas Tabelas~4 e~5 do artigo (Seção~\ref{sec:2024_benchmark}). Partir do melhor modelo conhecido também torna a proposta fácil de testar: se a cabeça KAN ajuda, a ResNet-152 com a cabeça KAN deve superar a mesma ResNet-152 com a cabeça densa de sempre. Como a Seção~\ref{sec:res_holdout} mostra, a posição da ResNet-152 no topo das tabelas publicadas se confirma com o \en{hold-out} do artigo; se ela continua sendo a melhor quando treino e teste não compartilham casos é uma das perguntas do Capítulo~\ref{chap:results}.
 
-A TransferKAN foi motivada por duas afirmações sobre KANs usadas como cabeças de classificação. Na versão anterior deste trabalho, elas foram apresentadas como vantagens; aqui são tratadas como hipóteses, cada uma com o resultado que a sustentaria:
-\begin{itemize}
-    \item \textbf{H1, melhor discriminação:} como as funções das arestas são aprendidas, uma cabeça KAN traçaria fronteiras de decisão mais finas que uma cabeça MLP sobre as mesmas características, sobretudo para as classes minoritárias. Isso seria sustentado por uma AUC maior que a da melhor cabeça MLP no mesmo backbone, pela regra pré-registrada da Seção~\ref{sec:stats} (desfecho A).
-    \item \textbf{H2, eficiência de parâmetros:} uma cabeça KAN chegaria ao mesmo desempenho com menos parâmetros. Isso seria sustentado por uma cabeça KAN que vencesse uma cabeça MLP com o mesmo número de parâmetros. Note-se que a cabeça da TransferKAN não é pequena: com 15 parâmetros por aresta, ela tem 3,94 milhões de parâmetros, 15 vezes os de uma MLP com as mesmas larguras (262.530).
-\end{itemize}
+\section{O Treino em Duas Fases}
+\label{sec:transferkan_treino}
 
-\section{Desenho Experimental}
-\label{sec:design}
+Uma cabeça nova, com pesos aleatórios, produz gradientes grandes e desorganizados no começo do treino. Se o extrator inteiro for ajustado desde o início, esses gradientes podem estragar as características que ele aprendeu no ImageNet. Por isso a TransferKAN é treinada em duas fases (Figura~\ref{fig:duas_fases}):
+\begin{enumerate}
+    \item \textbf{Fase 1 (15 épocas).} O extrator fica congelado: os seus pesos não mudam, e só a cabeça aprende, com uma taxa de aprendizado relativamente alta ($10^{-3}$).
+    \item \textbf{Fase 2 (45 épocas).} A rede inteira é ajustada (\en{fine-tuning}), com uma taxa cem vezes menor ($10^{-5}$), para adaptar o extrator às fotografias forenses sem apagar o que ele já sabe.
+\end{enumerate}
+Os detalhes (otimizador, aumentos de dados, pesos de classe) estão na receita de treino da Seção~\ref{sec:recipe}, que é a mesma para todos os modelos comparados neste trabalho.
 
-\textbf{Ablação da cabeça.} Para testar H1 e H2, a ResNet-152, as dobras e a receita ficam fixas e só a cabeça muda (Tabela~\ref{tab:cabecas}). A cabeça linear (a) é a referência mais simples. A MLP-128 (b) tem as mesmas larguras da KAN. A MLP isoparamétrica (c) tem praticamente o mesmo número de parâmetros da KAN, para que uma diferença entre (c) e (d) não possa ser atribuída ao tamanho. A KAN-8 (e) dá a uma KAN o orçamento de parâmetros de (b). Para verificar se a conclusão depende da base de splines, as cabeças Wav-KAN~\cite{bozorgasl2024wavkan} W1--W5 trocam as B-splines por wavelets: a W1 mantém a topologia de (d), a W2 o orçamento de (b) e a W5 o orçamento de (d), e a W3 e a W4 mudam a wavelet.
+\begin{figure}[htpb]
+\centering
+\begin{tikzpicture}[>=Stealth, every node/.style={font=\small}]
+    % eixo do tempo
+    \draw[->, thick] (0,0) -- (12.6,0) node[right] {época};
+    \foreach \x/\l in {0/0, 3/15, 12/60} { \draw (\x,0.1) -- (\x,-0.1) node[below] {\l}; }
+    % fase 1
+    \fill[orange!15] (0,0.3) rectangle (3,2.2);
+    \node[align=center] at (1.5,1.95) {\textbf{Fase 1}};
+    \node[align=center, font=\scriptsize] at (1.5,1.0) {\en{backbone}\\congelado;\\só a cabeça\\aprende;\\taxa $10^{-3}$};
+    % fase 2
+    \fill[green!12] (3,0.3) rectangle (12,2.2);
+    \node[align=center] at (7.5,1.75) {\textbf{Fase 2}};
+    \node[align=center, font=\footnotesize] at (7.5,1.05) {rede inteira ajustada (\en{fine-tuning})\\taxa $10^{-5}$};
+    % curva da taxa de aprendizado (cosseno em cada fase), escala ilustrativa
+    \draw[thick, corA, domain=0:3, samples=40] plot (\x, {-0.55 - 0.6*(1-cos(180*\x/3))/2});
+    \draw[thick, corA, domain=3:12, samples=60] plot (\x, {-1.25 - 0.3*(1-cos(180*(\x-3)/9))/2});
+    \node[corA, font=\footnotesize, anchor=west] at (12.1,-1.4) {taxa de aprendizado};
+\end{tikzpicture}
+\caption{O treino em duas fases da TransferKAN. Na fase~1, só a cabeça aprende, com o extrator congelado; na fase~2, a rede inteira é ajustada com uma taxa de aprendizado cem vezes menor. Em cada fase, a taxa decai em forma de cosseno (curva azul, escala ilustrativa).}
+\label{fig:duas_fases}
+\end{figure}
 
-\input{comum/tabelas/tab_cabecas}
+\section{A Variante Multitarefa}
+\label{sec:transferkan_mt}
 
-\textbf{Backbones.} Doze arquiteturas do estudo de Lira et al.~\cite{Lira2025deep}, entre elas a ResNet-152 e dois transformers, são retreinadas com a mesma receita e cabeça linear. Isso mostra onde a TransferKAN fica entre arquiteturas treinadas da mesma forma. Como todos os backbones partem dos pesos do ImageNet, o efeito do pré-treino não é isolado (Seção~\ref{sec:res_lira}).
+As duas perguntas periciais, se o ferimento é de entrada ou de saída e, se for de entrada, de que distância veio o disparo, são feitas sobre as mesmas fotografias. Hoje, cada uma é respondida por uma rede própria, treinada só para ela; neste texto, essas duas redes de tarefa única são chamadas de \emph{par de redes}. Isso duplica o treino, a memória e o tempo de inferência, e ignora que as duas tarefas olham para os mesmos vestígios na pele.
 
-\textbf{Partição.} O hold-out do código público de Lira et al.\ é reproduzido e comparado com as dobras agrupadas por caso, com todo o resto fixo, para medir quanto só a partição muda os números.
-
-\textbf{Uma rede para as duas tarefas.} Por fim, uma única ResNet-152 com duas cabeças, uma por tarefa, é comparada com o par de redes de tarefa única (Figura~\ref{fig:multitarefa_arch}). Essa variante muda o número de redes e mantém o tipo de cabeça; ela mede, portanto, o custo e o desempenho de compartilhar o backbone.
+A variante multitarefa da TransferKAN usa uma única ResNet-152 e um único \en{dropout} para as duas tarefas, com duas cabeças, uma por tarefa (Figura~\ref{fig:multitarefa_arch}). As duas cabeças são do mesmo tipo: duas KANs ou, para comparação, duas MLPs. A perda é a soma das perdas das duas tarefas, $L = L_{\mathrm{E/S}} + L_{\mathrm{dist}}$, e os ferimentos de saída ficam fora de $L_{\mathrm{dist}}$, porque não têm distância (Seção~\ref{sec:mt_background}). Uma única passagem da imagem pela rede dá as duas respostas.
 
 \begin{figure}[htpb]
 \centering
@@ -81,9 +111,9 @@ A TransferKAN foi motivada por duas afirmações sobre KANs usadas como cabeças
     io/.style={block, fill=gray!12, minimum width=16mm},
     every node/.style={font=\small},
 ]
-    \node[io] (input) {Imagem};
+    \node[io] (input) {Fotografia};
     \node[backbone, right=of input] (resnet) {ResNet-152\\(compartilhada)};
-    \node[block, right=of resnet] (drop) {Dropout\\$p=0{,}5$};
+    \node[block, right=of resnet] (drop) {\en{Dropout}\\$p=0{,}5$};
     \node[head, above right=2mm and 9mm of drop] (h1) {Cabeça de\\entrada/saída, $K=2$};
     \node[head, below right=2mm and 9mm of drop] (h2) {Cabeça de\\distância, $K=3$};
     \node[io, right=of h1] (o1) {$L_{\mathrm{E/S}}$\\todas as imagens};
@@ -96,6 +126,16 @@ A TransferKAN foi motivada por duas afirmações sobre KANs usadas como cabeças
     \draw[->, thick] (h2) -- (o2);
 \end{tikzpicture}
 \end{adjustbox}
-\caption{A variante multitarefa: uma ResNet-152 e um Dropout compartilhados por duas cabeças do mesmo tipo (KAN ou MLP-128). A perda é $L = L_{\mathrm{E/S}} + L_{\mathrm{dist}}$, com os ferimentos de saída fora do termo de distância.}
+\caption{A variante multitarefa: uma ResNet-152 e um \en{dropout} compartilhados por duas cabeças do mesmo tipo (KAN ou MLP-128). A perda é $L = L_{\mathrm{E/S}} + L_{\mathrm{dist}}$, com os ferimentos de saída fora do termo de distância.}
 \label{fig:multitarefa_arch}
 \end{figure}
+
+\section{Hipóteses}
+\label{sec:justification}
+
+A TransferKAN se apoia em duas afirmações sobre KANs usadas como cabeças de classificação. Este trabalho as trata como hipóteses, cada uma com o resultado que a sustentaria:
+\begin{itemize}
+    \item \textbf{H1, melhor discriminação.} Como as funções das arestas são aprendidas, uma cabeça KAN traçaria fronteiras de decisão mais finas que uma cabeça MLP sobre as mesmas características, sobretudo para as classes minoritárias. Isso seria sustentado por uma AUC maior que a da melhor cabeça MLP sobre o mesmo extrator, pela regra de decisão da Seção~\ref{sec:stats} (desfecho A).
+    \item \textbf{H2, eficiência de parâmetros.} Uma cabeça KAN chegaria ao mesmo desempenho com menos parâmetros. Isso seria sustentado por uma cabeça KAN que vencesse uma cabeça MLP com o mesmo número de parâmetros. A cabeça da TransferKAN, porém, não é pequena: com 15 parâmetros por aresta, ela tem 3,94 milhões de parâmetros, 15 vezes os de uma MLP com as mesmas larguras (262.530; Seção~\ref{sec:kan_background}).
+\end{itemize}
+Para a variante multitarefa, a hipótese é mais modesta: uma rede para as duas tarefas custaria cerca de metade do par de redes sem perder mais que uma margem pequena, fixada de antemão, em nenhuma das tarefas (Seção~\ref{sec:stats}).

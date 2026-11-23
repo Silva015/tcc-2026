@@ -1,142 +1,169 @@
 \label{chap:results}
 
-Este capítulo relata os experimentos do Capítulo~\ref{chap:methodology} na ordem das perguntas de pesquisa: primeiro o efeito da partição usada em 2024 (Seção~\ref{sec:res_leak}), depois a ablação da cabeça e os backbones nas duas tarefas (Seções~\ref{sec:results_entry_exit} e~\ref{sec:results_mlsd}), a comparação com os números publicados por Lira et al.\ (Seção~\ref{sec:res_lira}) e com os transformers (Seção~\ref{sec:res_transformers}) e, por fim, as cabeças Wav-KAN (Seção~\ref{sec:res_wavkan}) e a rede multitarefa (Seção~\ref{sec:res_mt}). Salvo indicação em contrário, os números são médias $\pm$ desvios-padrão entre as cinco dobras agrupadas por caso, a AUC é calculada das probabilidades, e as diferenças vêm com intervalos de confiança de 95\% do bootstrap pareado de casos.
+Este capítulo tem duas partes. A primeira (Seção~\ref{sec:res_holdout}) valida o ponto de partida do trabalho: antes de avaliar as cabeças \gls{KAN}, é preciso saber se os números publicados por Lira et al.~\cite{Lira2025deep} para a mesma base podem ser reproduzidos e se continuam de pé quando treino e teste não compartilham casos. Essa parte usa só \en{hold-out}, isto é, uma única divisão da base em treino e teste, como no artigo. Validado o ponto de partida, a segunda parte (Seções~\ref{sec:results_entry_exit} a~\ref{sec:res_mt}) apresenta o estudo das cabeças KAN, feito no protocolo de avaliação deste trabalho, com validação cruzada em cinco dobras agrupadas por caso (Seção~\ref{sec:particao}). Nessa segunda parte, salvo indicação em contrário, os números são médias $\pm$ desvios-padrão entre as cinco dobras, a \gls{AUC} é calculada das probabilidades previstas, e as diferenças entre modelos vêm com \glspl{IC} de 95\% obtidos por \en{bootstrap} pareado sobre os casos (Seção~\ref{sec:stats}).
 
-\section{O Hold-Out de 2024 Vaza Casos}
+\section{Validação do \texorpdfstring{\en{Baseline}}{Baseline}: as Tabelas de Lira et al.\ em \texorpdfstring{\en{Hold-out}}{Hold-out}}
+\label{sec:res_holdout}
+
+As Tabelas~4 e~5 de Lira et al.\ são a referência (o \en{baseline}) com que qualquer modelo nesta base é comparado. Esta seção as refaz duas vezes, para as mesmas 16 arquiteturas e com a mesma receita de treino (Seção~\ref{sec:repro_setup}): primeiro com o \en{hold-out} do código público do estudo, em que imagens de um mesmo caso aparecem no treino e no teste (\emph{com vazamento}); depois com um \en{hold-out} do mesmo tamanho em que cada caso fica inteiro de um lado só (\emph{sem vazamento}). Só a partição muda entre as duas versões. Por que o primeiro \en{hold-out} mistura casos é explicado na Seção~\ref{sec:2024_benchmark} e no Anexo~\ref{chap:anexo_codigo}.
+
+\subsection{As Tabelas Reproduzidas com Vazamento}
+\label{sec:res_holdout_vaz}
+
+As Tabelas~\ref{tab:holdout_es_vaz} e~\ref{tab:holdout_dist_vaz} trazem a reprodução no formato do artigo, com todas as métricas que ele relata. A Tabela~\ref{tab:repro_es} põe as três métricas principais ao lado dos números publicados.
+
+\input{comum/tabelas/tab_holdout_es_vaz}
+
+\input{comum/tabelas/tab_holdout_dist_vaz}
+
+Em entrada/saída, a reprodução acompanha a Tabela~4 publicada. O erro absoluto médio de acurácia é de 0,017, e a ordem dos 16 modelos por acurácia é quase a mesma (correlação de postos de 0,92). A ResNet-152 fica com 0,845, contra 0,869 no artigo; as ResNets ocupam o topo e as redes treinadas do zero ficam perto da classe majoritária, como no artigo. Na distância, a acurácia também é reproduzida (erro de 0,017, sem contar a SqueezeNet 1.0, cuja linha publicada, com acurácia de 0,095, não foi reproduzida), mas a ordem dos modelos é menos preservada (correlação de 0,53), porque quase todas as acurácias ficam numa faixa estreita em torno de 0,887, a fração da classe majoritária no teste. Ou seja: com o código público e a partição do código público, os números do artigo são reproduzidos de perto, e o \en{baseline} está validado.
+
+\input{comum/tabelas/tab_repro_es}
+
+\subsection{As Mesmas Tabelas sem Vazamento}
+\label{sec:res_holdout_agr}
+
+As Tabelas~\ref{tab:holdout_es_agr} e~\ref{tab:holdout_dist_agr} repetem as Tabelas~\ref{tab:holdout_es_vaz} e~\ref{tab:holdout_dist_vaz} trocando só a partição, e a Figura~\ref{fig:holdout_delta} mostra, para cada modelo, quanto o F1 macro cai quando o vazamento é retirado.
+
+\input{comum/tabelas/tab_holdout_es_agr}
+
+\input{comum/tabelas/tab_holdout_dist_agr}
+
+\begin{figure}[!htbp]
+\centering
+\input{comum/figuras/fig_holdout_delta}
+\caption{Quanto o vazamento infla o F1 macro de cada modelo com a receita de Lira et al.: diferença entre o \en{hold-out} com vazamento e o \en{hold-out} sem vazamento (barras à direita do zero = o modelo parece melhor com vazamento). Em entrada/saída as barras ficam dos dois lados do zero; na distância do disparo, 15 das 16 ficam à direita.}
+\label{fig:holdout_delta}
+\end{figure}
+
+\textbf{Entrada/saída.} Sem o vazamento, os números de Lira et al.\ quase não mudam. A acurácia média dos 16 modelos vai de 0,771 para 0,754 ($+0{,}017$ a favor da partição com vazamento) e o F1 macro médio é o mesmo nas duas partições (0,636); em 6 dos 16 modelos o F1 macro é até maior sem vazamento. Nas cinco ResNets a diferença média é de $+0{,}002$ em acurácia e de $-0{,}005$ em F1 macro. A ResNet-152, a melhor linha do artigo, vai de 0,845 para 0,821.
+
+\textbf{Distância do disparo.} Aqui o vazamento pesa. Os 16 modelos têm acurácia maior com vazamento, e 15 dos 16 têm F1 macro maior. Na média dos 16, a acurácia cai de 0,884 para 0,829 ($+0{,}056$) e o F1 macro de 0,495 para 0,400 ($+0{,}095$). Nas ResNets, que são as redes que de fato aprendem a tarefa, o F1 macro médio cai de 0,668 para 0,524 ($+0{,}145$) e a AUC$_c$ de 0,719 para 0,624 ($+0{,}095$). A ResNet-152 passa de 0,671 para 0,421 em F1 macro e de 0,724 para 0,568 em AUC$_c$: sem ver outras fotografias dos mesmos casos, ela fica perto de uma rede que não separa as classes.
+
+\input{comum/tabelas/tab_repro_dist}
+
+Três ressalvas limitam a leitura, e todas estão detalhadas na Seção~\ref{sec:threats}. Há uma partição de cada lado, então a diferença de um modelo isolado é ruidosa e só o padrão do conjunto é interpretado. O teste sem vazamento tem só 4 imagens de encostado, e as médias macro da distância dependem muito delas. E as redes que predizem uma única classe (uma com vazamento e duas sem, em entrada/saída; três e uma, na distância) nada dizem sobre a partição. O padrão do conjunto, e em especial o das ResNets, não depende dessas linhas.
+
+\subsection{O Mesmo Efeito com a Receita deste Trabalho}
 \label{sec:res_leak}
 
-Reproduzindo em três partições o hold-out do código público de Lira et al., 98,7\% das imagens de teste de entrada/saída e 98,4\% das imagens de teste de distância pertencem a um caso que também tem imagens no treino. A Tabela~\ref{tab:vazamento} e a Figura~\ref{fig:vazamento} comparam, com a mesma rede, a mesma receita e a mesma semente, os resultados nessas partições e nas dobras agrupadas por caso.
+A comparação acima usa a receita de treino de Lira et al. Para confirmar que o efeito vem da partição e não da receita, a ResNet-152 foi treinada também com a receita deste trabalho (Seção~\ref{sec:recipe}), com a cabeça linear (a) e com a cabeça KAN da TransferKAN (d), nos dois tipos de partição. A função de partição do código público não fixa a semente aleatória, de modo que cada execução sorteia um \en{hold-out} diferente; por isso ela foi executada três vezes, com as sementes 42, 43 e 44, o que dá as ``três partições com vazamento'' da Tabela~\ref{tab:vazamento}. Do outro lado estão as cinco dobras agrupadas por caso deste trabalho. Nas três partições com vazamento, 98,7\% das imagens de teste de entrada/saída e 98,4\% das imagens de teste de distância pertencem a um caso que também tem imagens no treino.
 
 \input{comum/tabelas/tab_vazamento}
 
 \begin{figure}[!htbp]
 \centering
 \input{comum/figuras/fig_vazamento}
-\caption{AUC da ResNet-152 com a cabeça linear (a) e com a cabeça KAN (d), semente 42, em cada dobra agrupada por caso (círculos) e em cada partição reproduzida de Lira et al.\ (quadrados). Mesma rede, receita e semente; só a partição muda.}
+\caption{AUC da ResNet-152 com a cabeça linear (a) e com a cabeça KAN (d), semente de treino 42, em cada dobra agrupada por caso (círculos) e em cada uma das três partições com vazamento sorteadas pela função do código público de Lira et al.\ (quadrados). Mesma rede, receita e semente de treino; só a partição muda.}
 \label{fig:vazamento}
 \end{figure}
 
-Em entrada/saída, a AUC sobe de 0,906 nas dobras agrupadas para 0,940 nas partições com vazamento, com as duas cabeças ($+0{,}034$). Na distância do disparo o efeito é cerca de cinco vezes maior: de 0,779 para 0,937 com a cabeça linear ($+0{,}158$) e de 0,788 para 0,942 com a cabeça KAN ($+0{,}155$); a acurácia balanceada vai de cerca de 0,51 para cerca de 0,78. As partições com vazamento também parecem muito mais estáveis (desvio-padrão de 0,003--0,004 na AUC, contra 0,011--0,013 em entrada/saída e 0,06--0,09 na distância entre as dobras agrupadas). Ou seja, uma partição que deixa a rede ver outras fotografias do mesmo caso faz a tarefa de distância parecer quase tão fácil quanto a de entrada/saída, enquanto as dobras agrupadas mostram que ela é bem mais difícil. Os números agrupados desta tabela usam só a semente 42 e por isso diferem um pouco dos números com três sementes das seções seguintes (0,906 em vez de 0,904 para a cabeça linear).
+Em entrada/saída, a AUC sobe de 0,906 nas dobras agrupadas para 0,940 nas partições com vazamento, com as duas cabeças ($+0{,}034$). Na distância do disparo o efeito é cerca de cinco vezes maior: de 0,779 para 0,937 com a cabeça linear ($+0{,}158$) e de 0,788 para 0,942 com a cabeça KAN ($+0{,}155$); a acurácia balanceada vai de cerca de 0,51 para cerca de 0,78. As partições com vazamento também parecem muito mais estáveis (desvio-padrão de 0,003--0,004 na AUC, contra 0,011--0,013 em entrada/saída e 0,06--0,09 na distância entre as dobras agrupadas). Os números agrupados desta tabela usam só a semente de treino 42 e por isso diferem um pouco dos números com três sementes das seções seguintes (0,906 em vez de 0,904 para a cabeça linear).
 
-A análise k-fold que Lira et al.\ relatam para a ResNet-152 deles aponta na mesma direção: com dobras agrupadas por caso, a mediana da acurácia do modelo deles em entrada/saída é de cerca de 0,70 (lida do boxplot, Figura~\ref{fig:lira_boxplots}), bem abaixo do 0,869 da tabela de hold-out.
+A análise com validação cruzada que Lira et al.\ relatam para a ResNet-152 deles, feita com dobras agrupadas por caso e portanto sem vazamento, aponta na mesma direção: a mediana da acurácia em entrada/saída é de cerca de 0,70 (lida do gráfico de caixas, Figura~\ref{fig:lira_boxplots}), bem abaixo do 0,869 da tabela de \en{hold-out}.
 
-\figuraBib[htpb]{lira2024/fig4_boxplots}{Análise de estabilidade da ResNet-152 de Lira et al.\ em k-folds agrupados, para o tipo de ferimento (a) e a distância do disparo (b); a caixa mais à esquerda (cinza) de cada painel é a acurácia}{Lira2025deep}{fig:lira_boxplots}{width=0.8\textwidth}
+\figuraBib[htpb]{lira2024/fig4_boxplots}{Análise de estabilidade da ResNet-152 de Lira et al.\ em validação cruzada com dobras agrupadas por caso, para o tipo de ferimento (a) e a distância do disparo (b); a caixa mais à esquerda (cinza) de cada painel é a acurácia}{Lira2025deep}{fig:lira_boxplots}{width=0.8\textwidth}
 
-\section{Entrada/Saída: Cabeças e Backbones}
+Com duas receitas diferentes, o resultado tem a mesma direção e a mesma assimetria: a partição com vazamento infla pouco a tarefa de entrada/saída e muito a de distância. A conclusão para o restante do trabalho é direta. Os números publicados são reproduzíveis, mas os da tarefa de distância não medem a generalização para casos novos. Por isso, todo o estudo das cabeças KAN a seguir usa só partições agrupadas por caso.
+
+\section{Entrada/Saída: Cabeças e \texorpdfstring{\en{Backbones}}{Backbones}}
 \label{sec:results_entry_exit}
 
-A Tabela~\ref{tab:protocolo_es} reúne todos os resultados de entrada/saída no protocolo único.
+A Tabela~\ref{tab:protocolo_es} reúne os resultados de entrada/saída no protocolo deste trabalho: as cinco cabeças da ablação sobre a ResNet-152 (Seção~\ref{sec:heads_setup}) e as doze arquiteturas retreinadas com a mesma receita (Seção~\ref{sec:backbones_setup}).
 
 \input{comum/tabelas/tab_protocolo_es}
 
-\textbf{Cabeças.} Com a ResNet-152 fixa, as cinco cabeças são indistinguíveis: AUC de 0,903 (KAN-8) a 0,906 (MLP isoparamétrica), e acurácia de 0,846 em todas. A regra pré-registrada dá o desfecho B. A melhor MLP é a isoparamétrica (c), e a cabeça KAN (d) difere dela em $\Delta$AUC $= -0{,}001$ (IC 95\% $[-0{,}002; +0{,}0003]$), vencendo 2 das 5 dobras. Contra a MLP-128 (b) a diferença é de $-0{,}0001$ ($[-0{,}001; +0{,}001]$, 3 de 5 dobras), e contra a cabeça linear (a), de $+0{,}001$ ($[-0{,}001; +0{,}003]$, 3 de 5 dobras); todos os intervalos incluem o zero. As curvas ROC das quatro cabeças praticamente coincidem (Figura~\ref{fig:roc_es}). No mesmo protocolo, portanto, a cabeça KAN tem desempenho equivalente ao das cabeças linear e MLP; ela não é a fonte dos resultados da TransferKAN.
+\textbf{Cabeças.} Com a ResNet-152 fixa, as cinco cabeças são indistinguíveis: AUC de 0,903 (KAN-8) a 0,906 (MLP isoparamétrica), e acurácia de 0,846 em todas. A regra de decisão fixada antes dos experimentos (Seção~\ref{sec:stats}) dá o desfecho B, ``equivalente''. A melhor \gls{MLP} é a isoparamétrica (c), e a cabeça KAN (d) difere dela em $\Delta$AUC $= -0{,}001$ (IC 95\% $[-0{,}002; +0{,}0003]$), vencendo 2 das 5 dobras. Contra a MLP-128 (b) a diferença é de $-0{,}0001$ ($[-0{,}001; +0{,}001]$, 3 de 5 dobras), e contra a cabeça linear (a), de $+0{,}001$ ($[-0{,}001; +0{,}003]$, 3 de 5 dobras); todos os intervalos incluem o zero. As curvas \gls{ROC} das quatro cabeças praticamente coincidem (Figura~\ref{fig:roc_es}). Sobre o mesmo extrator de características, portanto, a cabeça KAN tem desempenho equivalente ao das cabeças linear e MLP; ela não é a fonte dos resultados da TransferKAN.
 
 \begin{figure}[!htbp]
 \centering
 \input{comum/figuras/fig_roc_es}
-\caption{Curvas ROC fora da dobra das quatro cabeças na ResNet-152 (entrada/saída; probabilidades médias das sementes 42--44; saída é a classe positiva).}
+\caption{Curvas ROC das quatro cabeças na ResNet-152 em entrada/saída, calculadas com as predições fora da dobra (cada imagem é prevista pelo modelo que não a viu no treino) e com as probabilidades médias das sementes 42--44; saída é a classe positiva.}
 \label{fig:roc_es}
 \end{figure}
 
-Um diagnóstico gravado na avaliação sugere por que a spline acrescenta pouco. A \texttt{efficient-kan} define as B-splines só numa grade sobre $[-1, 1]$ (um pouco estendida nas bordas); fora dela, cada aresta se reduz ao seu ramo base SiLU, que funciona como uma MLP. Nas imagens de teste, 97--98\% das entradas da primeira camada KAN caem dentro da grade, mas só 46--64\% das entradas da segunda camada (27--39\% na KAN pequena (e)), de modo que boa parte da segunda camada trabalha sem as suas splines.
+Um diagnóstico gravado na avaliação sugere por que a \en{spline} acrescenta pouco. Na implementação usada, as B-\en{splines} só são definidas numa grade sobre $[-1, 1]$ (um pouco estendida nas bordas); fora dela, cada aresta se reduz ao seu ramo base \gls{SiLU}, que funciona como uma MLP (Seção~\ref{sec:kan_background}). Nas imagens de teste, 97--98\% das entradas da primeira camada KAN caem dentro da grade, mas só 46--64\% das entradas da segunda camada (27--39\% na KAN pequena (e)), de modo que boa parte da segunda camada trabalha sem as suas \en{splines}.
 
-\textbf{Backbones.} Os backbones pré-treinados vão de 0,839 (ShuffleNetV2 $\times$0.5) a 0,929 (Swin-B). A Swin-B é o melhor modelo do estudo (AUC $0{,}929 \pm 0{,}011$, acurácia 0,884), seguida pela MaxViT-T (0,917) e pela EfficientNetV2-L (0,916). A TransferKAN (0,905) fica junto da RegNetY-16GF (0,906), da DenseNet-169 (0,904) e da ResNet-152 com cabeça linear (0,904), no meio da tabela. As demais redes (VGG-16, MobileNetV2, MNASNet, SqueezeNet, AlexNet e ShuffleNetV2) ficam em 0,891 ou abaixo. Fora as cabeças da ResNet-152, a Swin-B e a MaxViT-T, essas linhas usam uma única semente.
+\textbf{\en{Backbones}.} Os \en{backbones} pré-treinados vão de 0,839 (ShuffleNetV2 $\times$0.5) a 0,929 (Swin-B). A Swin-B é o melhor modelo do estudo (AUC $0{,}929 \pm 0{,}011$, acurácia 0,884), seguida pela MaxViT-T (0,917) e pela EfficientNetV2-L (0,916). A TransferKAN (0,905) fica junto da RegNetY-16GF (0,906), da DenseNet-169 (0,904) e da ResNet-152 com cabeça linear (0,904), no meio da tabela. As demais redes (VGG-16, MobileNetV2, MNASNet, SqueezeNet, AlexNet e ShuffleNetV2) ficam em 0,891 ou abaixo. Fora as cabeças da ResNet-152, a Swin-B e a MaxViT-T, essas linhas usam uma única semente.
 
-\section{Distância do Disparo: Cabeças e Backbones}
+\section{Distância do Disparo: Cabeças e \texorpdfstring{\en{Backbones}}{Backbones}}
 \label{sec:results_mlsd}
 
 A Tabela~\ref{tab:protocolo_mlsd} traz a mesma comparação para a tarefa de distância.
 
 \input{comum/tabelas/tab_protocolo_mlsd}
 
-\textbf{Cabeças.} As AUC são $0{,}785 \pm 0{,}087$ (linear), $0{,}802 \pm 0{,}062$ (MLP-128), $0{,}807 \pm 0{,}055$ (MLP isoparamétrica) e $0{,}798 \pm 0{,}058$ (KAN). A regra pré-registrada dá o desfecho C: contra a melhor MLP, a isoparamétrica, a cabeça KAN tem $\Delta$AUC $= -0{,}011$ ($[-0{,}021; -0{,}003]$) e vence só 1 das 5 dobras. A KAN fica significativamente abaixo \emph{só} dessa MLP: contra a MLP-128 a diferença é de $-0{,}005$ ($[-0{,}012; +0{,}003]$), e contra a cabeça linear, de $+0{,}008$ ($[-0{,}005; +0{,}023]$), os dois intervalos incluindo o zero. As curvas ROC por classe (Figura~\ref{fig:roc_mlsd}) se sobrepõem para curta distância e distância e só se separam para encostado, que tem 42 imagens.
+\textbf{Cabeças.} As AUC são $0{,}785 \pm 0{,}087$ (linear), $0{,}802 \pm 0{,}062$ (MLP-128), $0{,}807 \pm 0{,}055$ (MLP isoparamétrica) e $0{,}798 \pm 0{,}058$ (KAN). A regra de decisão dá o desfecho C, ``a KAN é pior'': contra a melhor MLP, a isoparamétrica, a cabeça KAN tem $\Delta$AUC $= -0{,}011$ ($[-0{,}021; -0{,}003]$) e vence só 1 das 5 dobras. A KAN fica significativamente abaixo \emph{só} dessa MLP: contra a MLP-128 a diferença é de $-0{,}005$ ($[-0{,}012; +0{,}003]$), e contra a cabeça linear, de $+0{,}008$ ($[-0{,}005; +0{,}023]$), os dois intervalos incluindo o zero. As curvas ROC por classe (Figura~\ref{fig:roc_mlsd}) se sobrepõem para curta distância e distância e só se separam para encostado, que tem 42 imagens.
 
 \begin{figure}[!htbp]
 \centering
 \input{comum/figuras/fig_roc_mlsd}
-\caption{Curvas ROC um-contra-o-resto fora da dobra das quatro cabeças na ResNet-152 para a distância do disparo (só entradas; probabilidades médias das sementes 42--44). A legenda traz a AUC um-contra-o-resto de cada cabeça.}
+\caption{Curvas ROC um-contra-o-resto das quatro cabeças na ResNet-152 para a distância do disparo (só ferimentos de entrada; predições fora da dobra com as probabilidades médias das sementes 42--44). A legenda traz a AUC um-contra-o-resto de cada cabeça.}
 \label{fig:roc_mlsd}
 \end{figure}
 
 Todas as cabeças têm acurácia balanceada em torno de 0,51--0,52 e F1 macro em torno de 0,48--0,49. A revocação é de cerca de 0,88 para distância e de 0,51--0,53 para curta distância, e de só 0,13--0,17 para encostado. O número do encostado é descritivo: há de 4 a 13 imagens de encostado por dobra de teste. Quando o caso de um ferimento encostado não está no treino, as redes quase nunca o reconhecem. Essa é a principal limitação dos modelos atuais.
 
-\textbf{Backbones.} A Swin-B volta a ser a melhor ($0{,}838 \pm 0{,}054$), seguida pela MaxViT-T (0,828) e pela DenseNet-169 (0,821); os dois transformers têm só as sementes 42 e 43 nesta tarefa. Redes mais antigas ou menores, como AlexNet, MobileNetV2 e SqueezeNet, chegam a 0,805--0,806, acima da ResNet-152, enquanto a EfficientNetV2-L (0,744) varia muito entre dobras ($\pm 0{,}133$). A MNASNet colapsou nesta tarefa (acurácia 0,451, prevendo a maioria das entradas como curta distância), o que é uma instabilidade de otimização com esta receita, e não uma propriedade da arquitetura. Com desvios-padrão entre dobras de 0,05--0,13, a maioria das diferenças entre backbones nesta tarefa fica dentro do ruído.
+\textbf{\en{Backbones}.} A Swin-B volta a ser a melhor ($0{,}838 \pm 0{,}054$), seguida pela MaxViT-T (0,828) e pela DenseNet-169 (0,821); os dois \en{transformers} têm só as sementes 42 e 43 nesta tarefa. Redes mais antigas ou menores, como AlexNet, MobileNetV2 e SqueezeNet, chegam a 0,805--0,806, acima da ResNet-152, enquanto a EfficientNetV2-L (0,744) varia muito entre dobras ($\pm 0{,}133$). A MNASNet colapsou nesta tarefa (acurácia 0,451, prevendo a maioria das entradas como curta distância), o que é uma instabilidade de otimização com esta receita, e não uma propriedade da arquitetura. Com desvios-padrão entre dobras de 0,05--0,13, a maioria das diferenças entre \en{backbones} nesta tarefa fica dentro do ruído.
 
 \section{Comparação com os Números Publicados de Lira et al.}
 \label{sec:res_lira}
 
-As Tabelas~\ref{tab:lira_es} e~\ref{tab:lira_dist} põem os números das Tabelas~4 e~5 de Lira et al.\ ao lado dos mesmos backbones no protocolo único. Os dois lados diferem em três pontos ao mesmo tempo (a partição, a inicialização e a definição da AUC), então as tabelas comparam pacotes de avaliação, e não modelos; só a AUC das classes, AUC$_c$, é calculada do mesmo jeito nos dois lados.
+As Tabelas~\ref{tab:lira_es} e~\ref{tab:lira_dist} põem os números das Tabelas~4 e~5 de Lira et al.\ ao lado dos mesmos \en{backbones} no protocolo deste trabalho. Os dois lados diferem em três pontos ao mesmo tempo: a partição (\en{hold-out} com vazamento contra cinco dobras agrupadas por caso), a inicialização (no código público, só as ResNets partem de pesos pré-treinados; aqui, todas) e a definição da AUC (das classes previstas contra das probabilidades). As tabelas comparam, portanto, dois pacotes de avaliação, e não dois modelos; só a AUC$_c$, calculada das classes previstas, é obtida do mesmo jeito nos dois lados (Seção~\ref{sec:auc_background}).
 
 \input{comum/tabelas/tab_lira_es}
 
-Em entrada/saída, a ResNet-152 de Lira et al.\ tem acurácia de 0,869, F1 macro de 0,824 e AUC$_c$ de 0,821. O mesmo backbone com cabeça linear no protocolo único obtém 0,846, 0,805 e 0,814 (AUC das probabilidades 0,904). A TransferKAN, com 0,846, 0,806 e 0,816, fica acima de onze das doze linhas publicadas, mas \emph{abaixo} da ResNet-152 deles nas três métricas. Para as outras onze arquiteturas, o protocolo único dá números maiores que os publicados nas três métricas, em geral bem maiores (Swin-B: acurácia de 0,728 para 0,884; AUC$_c$ de 0,591 para 0,850), embora a sua partição seja a mais rigorosa. Isso é coerente com o fato de que, no código público, só as ResNets partem dos pesos do ImageNet; mas este trabalho não treinou do zero, então o efeito do pré-treino não é isolado aqui.
+Em entrada/saída, a ResNet-152 de Lira et al.\ tem acurácia de 0,869, F1 macro de 0,824 e AUC$_c$ de 0,821. O mesmo \en{backbone} com cabeça linear no protocolo deste trabalho obtém 0,846, 0,805 e 0,814 (AUC das probabilidades 0,904). A TransferKAN, com 0,846, 0,806 e 0,816, fica acima de onze das doze linhas publicadas, mas \emph{abaixo} da ResNet-152 deles nas três métricas. Para as outras onze arquiteturas, o protocolo deste trabalho dá números maiores que os publicados nas três métricas, em geral bem maiores (Swin-B: acurácia de 0,728 para 0,884; AUC$_c$ de 0,591 para 0,850), embora a sua partição seja a mais rigorosa. Isso é coerente com o fato de que, no código público, só as ResNets partem dos pesos do ImageNet; mas este trabalho não treinou do zero, então o efeito do pré-treino não é isolado aqui.
 
 \input{comum/tabelas/tab_lira_dist}
 
-Na tarefa de distância, as acurácias publicadas (0,855--0,925 em todas as linhas exceto a SqueezeNet) são maiores que qualquer acurácia do protocolo único, e a TransferKAN (0,813) fica abaixo de onze das doze linhas publicadas. Em AUC$_c$, a TransferKAN (0,664) fica acima de onze das doze linhas e abaixo da ResNet-152 deles (0,733). Vários modelos publicados têm AUC$_c$ perto de 0,5 (SqueezeNet 0,500, ShuffleNetV2 0,512), ou seja, quase não separam as classes, mesmo com acurácia alta, que nesta tarefa é dominada pela classe distância.
+Na tarefa de distância, as acurácias publicadas (0,855--0,925 em todas as linhas exceto a SqueezeNet) são maiores que qualquer acurácia do protocolo deste trabalho, e a TransferKAN (0,813) fica abaixo de onze das doze linhas publicadas. Em AUC$_c$, a TransferKAN (0,664) fica acima de onze das doze linhas e abaixo da ResNet-152 deles (0,733). Vários modelos publicados têm AUC$_c$ perto de 0,5 (SqueezeNet 0,500, ShuffleNetV2 0,512), ou seja, quase não separam as classes, mesmo com acurácia alta, que nesta tarefa é dominada pela classe distância.
 
-Essas comparações sustentam uma afirmação mais estreita que a da versão anterior deste trabalho. No protocolo único, a TransferKAN é equivalente à mesma ResNet-152 com cabeça linear e fica abaixo dos melhores backbones pré-treinados (Seção~\ref{sec:res_transformers}). As diferenças em relação aos números de Lira et al.\ vêm da partição, do pré-treino e da receita, e não da cabeça KAN. O efeito da partição foi isolado com a receita deste trabalho (Seção~\ref{sec:res_leak}) e com a receita deles (Seção~\ref{sec:res_repro}).
+Essas comparações sustentam uma afirmação estreita. No protocolo deste trabalho, a TransferKAN é equivalente à mesma ResNet-152 com cabeça linear e fica abaixo dos melhores \en{backbones} pré-treinados (Seção~\ref{sec:res_transformers}). As diferenças em relação aos números de Lira et al.\ vêm da partição, do pré-treino e da receita, e não da cabeça KAN; o efeito da partição foi isolado na Seção~\ref{sec:res_holdout}.
 
-\section{A Receita de Lira et al.\ com e sem Vazamento}
-\label{sec:res_repro}
-
-As seções anteriores deixam uma pergunta em aberto: o que acontece com os números de Lira et al.\ quando a receita \emph{deles} é avaliada sem o vazamento. As Tabelas~\ref{tab:repro_es} e~\ref{tab:repro_dist} respondem para 16 arquiteturas, com a receita da Seção~\ref{sec:repro_setup} rodada numa partição com vazamento e numa partição agrupada por caso.
-
-\input{comum/tabelas/tab_repro_es}
-
-\textbf{A reprodução.} Em entrada/saída, a coluna com vazamento acompanha a Tabela~4 publicada. O erro absoluto médio de acurácia é de 0,017, e a ordem dos 16 modelos por acurácia é quase a mesma (correlação de postos de 0,92). A ResNet-152 fica com 0,845, contra 0,869 no artigo; as ResNets ocupam o topo e as redes treinadas do zero ficam perto da classe majoritária, como no artigo. Na distância, a acurácia também é reproduzida (erro de 0,017, sem contar a SqueezeNet 1.0, cuja linha publicada, com acurácia de 0,095, não foi reproduzida), mas a ordem dos modelos é menos preservada (correlação de 0,53), porque quase todas as acurácias ficam numa faixa estreita em torno de 0,887, a fração da classe majoritária no teste.
-
-\textbf{Entrada/saída.} Sem o vazamento, a receita de Lira et al.\ quase não muda. A acurácia média dos 16 modelos vai de 0,771 para 0,754 ($+0{,}017$ a favor da partição com vazamento) e o F1 macro médio é o mesmo nas duas partições (0,636); em 6 dos 16 modelos o F1 macro é até maior sem vazamento. Nas cinco ResNets a diferença média é de $+0{,}002$ em acurácia e de $-0{,}005$ em F1 macro. A ResNet-152, a melhor linha do artigo, vai de 0,845 para 0,821.
-
-\input{comum/tabelas/tab_repro_dist}
-
-\textbf{Distância do disparo.} Aqui o vazamento pesa. Os 16 modelos têm acurácia maior com vazamento, e 15 dos 16 têm F1 macro maior. Na média dos 16, a acurácia cai de 0,884 para 0,829 ($+0{,}056$) e o F1 macro de 0,495 para 0,400 ($+0{,}095$). Nas ResNets, que são as redes que de fato aprendem a tarefa, o F1 macro médio cai de 0,668 para 0,524 ($+0{,}145$) e a AUC$_c$ de 0,719 para 0,624 ($+0{,}095$). A ResNet-152 passa de 0,671 para 0,421 em F1 macro e de 0,724 para 0,568 em AUC$_c$: sem ver outras fotografias dos mesmos casos, ela fica perto de uma rede que não separa as classes.
-
-Com duas receitas diferentes, a deste trabalho (Seção~\ref{sec:res_leak}) e a de Lira et al., o resultado tem a mesma direção e a mesma assimetria: a partição com vazamento infla pouco a tarefa de entrada/saída e muito a de distância. Três ressalvas limitam a leitura. Há uma partição de cada lado, então a diferença de um modelo isolado é ruidosa. O teste agrupado tem só 4 imagens de encostado, e as médias macro da distância dependem muito delas. E as redes que predizem uma única classe (uma com vazamento e duas sem, em entrada/saída; três e uma, na distância) nada dizem sobre a partição. O padrão do conjunto, e em especial o das ResNets, não depende dessas linhas.
-
-\section{A TransferKAN e os Transformers}
+\section{A TransferKAN e os \texorpdfstring{\en{Transformers}}{Transformers}}
 \label{sec:res_transformers}
 
-Como os dois transformers foram os melhores backbones, a TransferKAN foi comparada diretamente com eles, nas mesmas imagens (Tabela~\ref{tab:transformers}).
+Como os dois \en{transformers} foram os melhores \en{backbones}, a TransferKAN foi comparada diretamente com eles, nas mesmas imagens (Tabela~\ref{tab:transformers}).
 
 \input{comum/tabelas/tab_transformers}
 
-Em entrada/saída, a TransferKAN fica abaixo da Swin-B ($\Delta$AUC $= -0{,}023$, $[-0{,}035; -0{,}011]$) e da MaxViT-T ($-0{,}010$, $[-0{,}020; -0{,}001]$), e perde nas cinco dobras contra as duas. Na distância, fica abaixo da Swin-B ($-0{,}033$, $[-0{,}064; -0{,}0004]$, 1 de 5 dobras). Contra a MaxViT-T a diferença é parecida ($-0{,}030$), mas o intervalo inclui o zero. A afirmação de que a TransferKAN supera os baselines transformer, portanto, não se sustenta; o contrário vale para a Swin-B nas duas tarefas.
+Em entrada/saída, a TransferKAN fica abaixo da Swin-B ($\Delta$AUC $= -0{,}023$, $[-0{,}035; -0{,}011]$) e da MaxViT-T ($-0{,}010$, $[-0{,}020; -0{,}001]$), e perde nas cinco dobras contra as duas. Na distância, fica abaixo da Swin-B ($-0{,}033$, $[-0{,}064; -0{,}0004]$, 1 de 5 dobras). Contra a MaxViT-T a diferença é parecida ($-0{,}030$), mas o intervalo inclui o zero. A afirmação de que a TransferKAN supera os \en{transformers}, portanto, não se sustenta; o contrário vale para a Swin-B nas duas tarefas.
 
 \section{Cabeças Wav-KAN}
 \label{sec:res_wavkan}
 
-As Tabelas~\ref{tab:wavkan_es} e~\ref{tab:wavkan_mlsd} mostram as cabeças Wav-KAN ao lado das cabeças (a)--(d), a Tabela~\ref{tab:contrastes_wavkan} traz os contrastes pré-registrados e a Figura~\ref{fig:auc_parametros}, a AUC em função do número de parâmetros da cabeça.
+As cabeças Wav-KAN trocam as B-\en{splines} das arestas por \en{wavelets} (Seção~\ref{sec:kan_background}). As Tabelas~\ref{tab:wavkan_es} e~\ref{tab:wavkan_mlsd} as mostram ao lado das cabeças (a)--(d), a Tabela~\ref{tab:contrastes_wavkan} traz os contrastes definidos antes dos experimentos e a Figura~\ref{fig:auc_parametros}, a AUC em função do número de parâmetros da cabeça.
 
 \input{comum/tabelas/tab_wavkan_es}
 
 \begin{figure}[!htbp]
 \centering
 \input{comum/figuras/fig_auc_parametros}
-\caption{AUC (média $\pm$ dp entre dobras) em função do número de parâmetros da cabeça (escala log) para as cabeças linear e MLP, a KAN spline e as cabeças Wav-KAN. W3 e W4 têm o número de parâmetros da W1 e aparecem deslocadas na horizontal só para não se sobreporem; W3--W5 usam uma única semente.}
+\caption{AUC (média $\pm$ dp entre dobras) em função do número de parâmetros da cabeça (escala log) para as cabeças linear e MLP, a KAN com B-\en{splines} e as cabeças Wav-KAN. W3 e W4 têm o número de parâmetros da W1 e aparecem deslocadas na horizontal só para não se sobreporem; W3--W5 usam uma única semente.}
 \label{fig:auc_parametros}
 \end{figure}
 
-\textbf{Entrada/saída.} Todas as cabeças, spline ou wavelet, ficam na mesma faixa de AUC (0,901--0,908). O primeiro contraste primário, W2 contra a MLP do mesmo tamanho (b), é \emph{inconclusivo}: a diferença de AUC é pequena e cabe na margem ($-0{,}001$, $[-0{,}004; +0{,}002]$), mas a diferença de F1 ($-0{,}012$, $[-0{,}023; -0{,}003]$) tem o limite inferior além de $-0{,}02$, então a não inferioridade não é demonstrada; a inferioridade também não, e a W2 não vence nenhuma dobra. W1 e W5 são não inferiores à MLP isoparamétrica (c) e à KAN spline (d) (a W5, com uma única semente), e a W2 não chega à não inferioridade contra (d) pelo mesmo motivo do F1. As cabeças com wavelets ordenam as imagens tão bem quanto as MLPs (mesma AUC), mas, no limiar padrão de 0,5, têm cerca de um ponto a menos de acurácia (0,834--0,835 contra 0,846) e um pouco menos de F1 (0,799--0,800 contra 0,805--0,807), com revocação macro um pouco maior. Isso indica um deslocamento do limiar de decisão ou da calibração, e não uma perda de separação. Entre as rodadas de sensibilidade, com uma semente, a cabeça derivada de gaussiana (W3) tem a maior AUC da tabela (0,908), mas F1 e acurácia menores, e a cabeça Morlet (W4) tem o menor F1 ($\Delta$F1 contra a W1 $= -0{,}023$, $[-0{,}035; -0{,}012]$).
+\textbf{Entrada/saída.} Todas as cabeças, \en{spline} ou \en{wavelet}, ficam na mesma faixa de AUC (0,901--0,908). O primeiro contraste primário, W2 contra a MLP do mesmo tamanho (b), é \emph{inconclusivo}: a diferença de AUC é pequena e cabe na margem ($-0{,}001$, $[-0{,}004; +0{,}002]$), mas a diferença de F1 ($-0{,}012$, $[-0{,}023; -0{,}003]$) tem o limite inferior além de $-0{,}02$, então a não inferioridade não é demonstrada; a inferioridade também não, e a W2 não vence nenhuma dobra. W1 e W5 são não inferiores à MLP isoparamétrica (c) e à KAN com \en{splines} (d) (a W5, com uma única semente), e a W2 não chega à não inferioridade contra (d) pelo mesmo motivo do F1. As cabeças com \en{wavelets} ordenam as imagens tão bem quanto as MLPs (mesma AUC), mas, no limiar padrão de 0,5, têm cerca de um ponto a menos de acurácia (0,834--0,835 contra 0,846) e um pouco menos de F1 (0,799--0,800 contra 0,805--0,807), com revocação macro um pouco maior. Isso indica um deslocamento do limiar de decisão ou da calibração, e não uma perda de separação. Entre as rodadas de sensibilidade, com uma semente, a cabeça derivada de gaussiana (W3) tem a maior AUC da tabela (0,908), mas F1 e acurácia menores, e a cabeça Morlet (W4) tem o menor F1 ($\Delta$F1 contra a W1 $= -0{,}023$, $[-0{,}035; -0{,}012]$).
 
 \input{comum/tabelas/tab_wavkan_dist}
 
-\textbf{Distância do disparo.} Aqui as cabeças com wavelets perdem com clareza: AUC de $0{,}711 \pm 0{,}116$ (W1) e $0{,}715 \pm 0{,}113$ (W2), contra 0,785--0,807 das outras cabeças. Todos os contrastes dão inferior: a W2 contra a MLP (b) tem $\Delta$AUC $= -0{,}071$ ($[-0{,}098; -0{,}043]$) e perde nas cinco dobras, e os demais contrastes vão de $-0{,}066$ a $-0{,}086$. A variação entre dobras dobra (dp de 0,11--0,12 contra cerca de 0,06) e a acurácia cai para 0,65--0,67.
+\textbf{Distância do disparo.} Aqui as cabeças com \en{wavelets} perdem com clareza: AUC de $0{,}711 \pm 0{,}116$ (W1) e $0{,}715 \pm 0{,}113$ (W2), contra 0,785--0,807 das outras cabeças. Todos os contrastes dão inferior: a W2 contra a MLP (b) tem $\Delta$AUC $= -0{,}071$ ($[-0{,}098; -0{,}043]$) e perde nas cinco dobras, e os demais contrastes vão de $-0{,}066$ a $-0{,}086$. A variação entre dobras dobra (dp de 0,11--0,12 contra cerca de 0,06) e a acurácia cai para 0,65--0,67.
 
 \input{comum/tabelas/tab_contrastes_wavkan}
 
-\textbf{Custo e forma aprendida.} As cabeças com wavelets não são mais rápidas. A W2 leva quase o mesmo tempo por dobra que a MLP-128 (8,5 contra 8,3 minutos) e o mesmo que a KAN spline (8,46 contra 8,49 minutos, uma diferença de 0,35\%, dentro do ruído entre rodadas, de cerca de 0,1 minuto). A W1 é 3,6\% mais lenta por dobra que a KAN spline e 5,3\% mais lenta que a MLP isoparamétrica, e a W5 é 25--27\% mais lenta. Sozinha, a cabeça W1 leva 8,8 ms para o passo para a frente e para trás de 32 entradas e usa 223 MB de memória, contra 0,73 ms e 0,2 MB da MLP isoparamétrica: cada camada monta um tensor de tamanho lote $\times$ saídas $\times$ entradas. As wavelets também quase não mudaram de forma. No fim das duas fases e nas duas tarefas, a escala média fica entre 0,99 e 1,003 (dp 0,013--0,020) e a translação média fica perto de 0 (dp 0,013--0,025), a partir dos valores iniciais 1 e 0. Na prática, as cabeças aprenderam os pesos de wavelets de forma fixa, e nenhum resultado pode ser atribuído ao ajuste da forma da wavelet.
+\textbf{Custo e forma aprendida.} As cabeças com \en{wavelets} não são mais rápidas. A W2 leva quase o mesmo tempo por dobra que a MLP-128 (8,5 contra 8,3 minutos) e o mesmo que a KAN com \en{splines} (8,46 contra 8,49 minutos, uma diferença de 0,35\%, dentro do ruído entre rodadas, de cerca de 0,1 minuto). A W1 é 3,6\% mais lenta por dobra que a KAN com \en{splines} e 5,3\% mais lenta que a MLP isoparamétrica, e a W5 é 25--27\% mais lenta. Sozinha, a cabeça W1 leva 8,8 ms para o passo para a frente e para trás de 32 entradas e usa 223 MB de memória, contra 0,73 ms e 0,2 MB da MLP isoparamétrica: cada camada monta um tensor de tamanho lote $\times$ saídas $\times$ entradas. As \en{wavelets} também quase não mudaram de forma. No fim das duas fases e nas duas tarefas, a escala média fica entre 0,99 e 1,003 (dp 0,013--0,020) e a translação média fica perto de 0 (dp 0,013--0,025), a partir dos valores iniciais 1 e 0. Na prática, as cabeças aprenderam os pesos de \en{wavelets} de forma fixa, e nenhum resultado pode ser atribuído ao ajuste da forma da \en{wavelet}.
 
-Em resumo, uma KAN com wavelets não muda o quadro. Em entrada/saída ela empata com as MLPs em AUC e é um pouco pior no limiar padrão; na distância é claramente pior; e não é, na prática, nem menor que uma MLP de mesmo desempenho nem mais rápida.
+Em resumo, uma KAN com \en{wavelets} não muda o quadro. Em entrada/saída ela empata com as MLPs em AUC e é um pouco pior no limiar padrão; na distância é claramente pior; e não é, na prática, nem menor que uma MLP de mesmo desempenho nem mais rápida.
 
 \section{Uma Rede para as Duas Tarefas}
 \label{sec:res_mt}
 
-A Tabela~\ref{tab:mt_desempenho} compara uma única ResNet-152 multitarefa com o par de redes de tarefa única, a Tabela~\ref{tab:contrastes_mt} traz os contrastes e a Tabela~\ref{tab:mt_custo}, o custo.
+Esta seção compara a variante multitarefa da TransferKAN (Seção~\ref{sec:transferkan_mt}), uma única ResNet-152 com uma cabeça para entrada/saída e outra para a distância, com o que se faz hoje: duas redes de tarefa única, cada uma treinada para uma tarefa (o ``par de redes''). A Tabela~\ref{tab:mt_desempenho} compara o desempenho, a Tabela~\ref{tab:contrastes_mt} traz os contrastes e a Tabela~\ref{tab:mt_custo}, o custo.
 
 \input{comum/tabelas/tab_mt_desempenho}
 
-\textbf{Entrada/saída.} A rede multitarefa é pior, mas dentro da margem pré-registrada. Com cabeças KAN, a AUC vai de $0{,}905 \pm 0{,}013$ para $0{,}894 \pm 0{,}014$ ($\Delta$AUC $= -0{,}011$, $[-0{,}015; -0{,}006]$), e com cabeças MLP, de 0,905 para 0,895 ($-0{,}010$, $[-0{,}014; -0{,}005]$). A rede multitarefa perde nas cinco dobras, então a regra classifica o resultado como pior, enquanto o limite inferior do intervalo fica acima da margem de $-0{,}02$. As duas coisas valem: a perda é pequena e consistente. No limiar padrão a queda é maior: $\Delta$F1 $= -0{,}023$ ($[-0{,}034; -0{,}011]$) com cabeças KAN e $-0{,}022$ ($[-0{,}034; -0{,}010]$) com cabeças MLP, além da margem, e a acurácia cai de 0,846 para 0,820 e 0,823. Em 5 das 30 rodadas multitarefa a acurácia de entrada/saída de uma dobra ficou um pouco abaixo de 0,80 (0,792--0,797), o que reflete essa queda; as perdas continuaram finitas e a AUC dessas dobras foi normal (0,873--0,885).
+\textbf{Entrada/saída.} A rede multitarefa é pior, mas dentro da margem fixada antes dos experimentos. Com cabeças KAN, a AUC vai de $0{,}905 \pm 0{,}013$ para $0{,}894 \pm 0{,}014$ ($\Delta$AUC $= -0{,}011$, $[-0{,}015; -0{,}006]$), e com cabeças MLP, de 0,905 para 0,895 ($-0{,}010$, $[-0{,}014; -0{,}005]$). A rede multitarefa perde nas cinco dobras, então a regra classifica o resultado como pior, enquanto o limite inferior do intervalo fica acima da margem de $-0{,}02$. As duas coisas valem: a perda é pequena e consistente. No limiar padrão a queda é maior: $\Delta$F1 $= -0{,}023$ ($[-0{,}034; -0{,}011]$) com cabeças KAN e $-0{,}022$ ($[-0{,}034; -0{,}010]$) com cabeças MLP, além da margem, e a acurácia cai de 0,846 para 0,820 e 0,823. Em 5 das 30 rodadas multitarefa a acurácia de entrada/saída de uma dobra ficou um pouco abaixo de 0,80 (0,792--0,797), o que reflete essa queda; as perdas continuaram finitas e a AUC dessas dobras foi normal (0,873--0,885).
 
 \textbf{Distância do disparo.} A rede multitarefa é não inferior. Com cabeças KAN a AUC é de $0{,}805 \pm 0{,}065$ contra $0{,}798 \pm 0{,}058$ ($+0{,}007$, $[-0{,}003; +0{,}018]$, 3 de 5 dobras), e com cabeças MLP, de 0,806 contra 0,802 ($+0{,}004$, $[-0{,}006; +0{,}014]$). O F1 macro também não muda. A acurácia da rede multitarefa é maior (0,824 contra 0,813), mas a acurácia balanceada é igual ou menor (0,511 contra 0,515 com cabeças KAN; 0,520 nas duas com cabeças MLP), então a acurácia não deve ser lida como ganho.
 
@@ -144,22 +171,21 @@ A Tabela~\ref{tab:mt_desempenho} compara uma única ResNet-152 multitarefa com o
 
 \textbf{KAN contra MLP dentro da rede multitarefa.} Os dois tipos de cabeça voltam a empatar: $\Delta$AUC $= -0{,}001$ ($[-0{,}003; +0{,}0004]$) em entrada/saída e $-0{,}002$ ($[-0{,}009; +0{,}003]$) na distância. Isso compara tipos de cabeça, não eficiência: as duas cabeças KAN têm 7,87 milhões de parâmetros, contra 0,53 milhão das duas cabeças MLP.
 
-\textbf{Pipeline de quatro classes (secundário, descritivo).} Combinando as duas saídas em saída, encostado, curta e distância, o F1 macro fora da dobra é de 0,485 para a rede multitarefa contra 0,515 para o par com cabeças KAN ($\Delta$F1 $= -0{,}030$, $[-0{,}061; -0{,}004]$), e de 0,492 contra 0,514 com cabeças MLP ($-0{,}022$, $[-0{,}052; +0{,}004]$). A queda vem sobretudo da cabeça de entrada/saída: a rede multitarefa manda mais entradas para ``saída'' (283 entradas a distância previstas como saída, contra 204 no par), o que também aumenta a revocação de saída (0,788 contra 0,756). A revocação de encostado no pipeline vai de 5 para 2 das 42 imagens, poucas demais para qualquer conclusão sobre disparos encostados.
+\textbf{Classificação em quatro classes (secundária, descritiva).} As duas saídas podem ser combinadas numa classificação em quatro classes (saída, encostado, curta e distância): a cabeça de entrada/saída decide primeiro e, para as imagens previstas como entrada, a cabeça de distância decide a distância. Nessa combinação, o F1 macro OOF é de 0,485 para a rede multitarefa contra 0,515 para o par com cabeças KAN ($\Delta$F1 $= -0{,}030$, $[-0{,}061; -0{,}004]$), e de 0,492 contra 0,514 com cabeças MLP ($-0{,}022$, $[-0{,}052; +0{,}004]$). A queda vem sobretudo da cabeça de entrada/saída: a rede multitarefa manda mais entradas para ``saída'' (283 entradas a distância previstas como saída, contra 204 no par), o que também aumenta a revocação de saída (0,788 contra 0,756). A revocação de encostado na combinação vai de 5 para 2 das 42 imagens, poucas demais para qualquer conclusão sobre disparos encostados.
 
 \input{comum/tabelas/tab_mt_custo}
 
-\textbf{Custo.} Uma rede substitui duas. Com cabeças KAN, os parâmetros caem de 124,16 para 66,02 milhões ($-46{,}8\%$), e com cabeças MLP, de 116,81 para 58,67 milhões ($-49{,}8\%$). O treino leva 8,6 em vez de 14,9 minutos por dobra (KAN) e 8,1 em vez de 14,6 (MLP), com desvio-padrão de 0,1--0,2 minuto. Obter as duas saídas leva 1,12 em vez de 2,22 ms por imagem com lote 32 (2,0 vezes mais rápido) e 27,3 em vez de 51,0 ms com lote 1. O pico de memória da inferência com lote 32 cai de 282 para 163 MB, enquanto o pico de memória do treino fica quase igual (3,7 contra 3,6 GB). Essas economias vêm diretamente de fazer um passo para a frente em vez de dois; são uma vantagem de custo de compartilhar o backbone, e não um mérito de uma cabeça específica.
+\textbf{Custo.} Uma rede substitui duas. Com cabeças KAN, os parâmetros caem de 124,16 para 66,02 milhões ($-46{,}8\%$), e com cabeças MLP, de 116,81 para 58,67 milhões ($-49{,}8\%$). O treino leva 8,6 em vez de 14,9 minutos por dobra (KAN) e 8,1 em vez de 14,6 (MLP), com desvio-padrão de 0,1--0,2 minuto. Obter as duas saídas leva 1,12 em vez de 2,22 ms por imagem com lote 32 (2,0 vezes mais rápido) e 27,3 em vez de 51,0 ms com lote 1. O pico de memória da inferência com lote 32 cai de 282 para 163 MB, enquanto o pico de memória do treino fica quase igual (3,7 contra 3,6 GB). Essas economias vêm diretamente de fazer um passo para a frente em vez de dois; são uma vantagem de custo de compartilhar o \en{backbone}, e não um mérito de uma cabeça específica.
 
 \section{Resumo}
 \label{sec:results_summary}
 
-Num protocolo sem vazamento de casos, os resultados sustentam as seguintes afirmações, todas ligadas a uma regra pré-registrada:
+Os resultados sustentam as seguintes afirmações:
 \begin{itemize}
-    \item o hold-out do código público de Lira et al.\ infla a AUC em $+0{,}034$ (entrada/saída) e de $+0{,}155$ a $+0{,}158$ (distância), com todo o resto fixo;
-    \item com a receita de Lira et al.\ (análise acrescentada depois, sem regra pré-registrada), o vazamento quase não muda entrada/saída (acurácia média $+0{,}017$, F1 macro igual) e infla a distância nos 16 modelos testados (F1 macro médio $+0{,}095$; $+0{,}145$ nas ResNets);
-    \item a cabeça KAN da TransferKAN é equivalente às cabeças linear e MLP em entrada/saída (desfecho B) e, na distância, fica abaixo da MLP isoparamétrica, sendo equivalente à MLP-128 e à cabeça linear (desfecho C);
-    \item a melhor arquitetura é a Swin-B, que supera a TransferKAN nas duas tarefas;
-    \item as cabeças Wav-KAN não mudam esse quadro: AUC igual em entrada/saída, claramente pior na distância, e não são mais rápidas;
-    \item uma rede multitarefa custa cerca de metade do par de redes, é não inferior na distância e um pouco pior, de forma consistente, em entrada/saída, dentro da margem.
+    \item \textbf{\en{Baseline}.} As Tabelas~4 e~5 de Lira et al.\ são reproduzidas de perto com o código e o \en{hold-out} públicos. Sem o vazamento de casos, os números de entrada/saída quase não mudam (acurácia média $+0{,}017$, F1 macro igual), mas os de distância caem nos 16 modelos testados (F1 macro médio $+0{,}095$ a favor do vazamento; $+0{,}145$ nas ResNets). Com a receita deste trabalho, o mesmo vazamento infla a AUC em $+0{,}034$ (entrada/saída) e de $+0{,}155$ a $+0{,}158$ (distância).
+    \item \textbf{Cabeça KAN.} Sobre a mesma ResNet-152, a cabeça KAN da TransferKAN é equivalente às cabeças linear e MLP em entrada/saída (desfecho B) e, na distância, fica abaixo da MLP isoparamétrica, sendo equivalente à MLP-128 e à cabeça linear (desfecho C).
+    \item \textbf{Base das arestas.} As cabeças Wav-KAN não mudam esse quadro: AUC igual em entrada/saída, claramente pior na distância, e não são mais rápidas.
+    \item \textbf{\en{Backbones}.} A melhor arquitetura é a Swin-B, que supera a TransferKAN nas duas tarefas.
+    \item \textbf{Multitarefa.} Uma rede multitarefa custa cerca de metade do par de redes, é não inferior na distância e um pouco pior, de forma consistente, em entrada/saída, dentro da margem.
 \end{itemize}
-As afirmações proibidas pelas regras pré-registradas continuam sem sustentação: que só trocar a cabeça melhora os resultados, que a TransferKAN é um novo estado da arte, que ela supera os baselines transformer e que a cabeça KAN é eficiente em parâmetros.
+As afirmações que as regras de decisão só permitiriam com o resultado correspondente continuam sem sustentação: que só trocar a cabeça melhora os resultados, que a TransferKAN é um novo estado da arte, que ela supera os \en{transformers} e que a cabeça KAN é eficiente em parâmetros.

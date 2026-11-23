@@ -1,85 +1,480 @@
 \label{chap:background}
 
-Este capítulo traz a base necessária para o resto da dissertação: as tarefas forenses, os componentes de aprendizado profundo, as Redes de Kolmogorov-Arnold com bases de splines e de wavelets, e os conceitos de avaliação em que as conclusões se apoiam, a saber, a validação agrupada, as duas formas de calcular uma AUC, o aprendizado multitarefa e as comparações pareadas.
+Este capítulo apresenta a base teórica usada no resto da dissertação. Ele começa pelas duas tarefas forenses (Seção~\ref{sec:forensic_background}) e segue pelos componentes de aprendizado profundo: o neurônio artificial e a \gls{MLP}, as redes convolucionais e as arquiteturas usadas neste trabalho, o aprendizado por transferência e os \en{transformers} de visão (Seção~\ref{sec:dl_background}). Depois apresenta as \glspl{KAN}, com funções de base do tipo \en{spline} e \en{wavelet} (Seção~\ref{sec:kan_background}). Por fim, trata dos conceitos de avaliação em que as conclusões se apoiam: como dividir os dados sem vazamento, como medir o desempenho, o aprendizado multitarefa e as comparações estatísticas entre modelos (Seções~\ref{sec:leakage_background} a~\ref{sec:stats_background}).
 
 \section{Patologia Forense dos Ferimentos por Arma de Fogo}
 \label{sec:forensic_background}
 
-Na medicina legal, a análise dos ferimentos por arma de fogo ajuda a reconstruir os fatos de um crime. Um projétil produz alterações morfológicas que dependem da arma, da munição e da distância do disparo~\cite{dimaio2015gunshot,saukko2016knight}.
+Na medicina legal, a análise dos ferimentos por arma de fogo ajuda a reconstruir os fatos de um crime: de onde veio o disparo, em que direção o projétil atravessou o corpo e a que distância a arma estava. Um projétil produz alterações morfológicas na pele que dependem da arma, da munição e da distância do disparo~\cite{dimaio2015gunshot,saukko2016knight}. As duas tarefas estudadas neste trabalho correspondem a duas perguntas que o perito responde olhando para essas alterações.
 
 \subsection{Ferimentos de Entrada e de Saída}
-Um ferimento de entrada costuma ter uma \textit{orla de escoriação} (uma faixa de pele raspada), tecido invertido e forma regular, circular ou oval, conforme o ângulo de incidência. Um ferimento de saída costuma ter tecido evertido, forma irregular ou estrelada e nenhuma orla de escoriação nem resíduo do disparo, porque o projétil empurra o tecido de dentro para fora. Anteparos intermediários, desvios em ossos e alterações post mortem como a putrefação podem esconder esses sinais, de modo que a classificação visual depende muito da experiência do perito.
+\label{sec:entrada_saida}
 
-\subsection{Distância Médico-Legal do Disparo (MLSD)}
-Nos ferimentos de entrada, a distância médico-legal do disparo é estimada pelos vestígios macroscópicos deixados pela combustão da pólvora e da espoleta~\cite{dimaio2015gunshot}:
+Um ferimento de entrada costuma ter uma \textit{orla de escoriação} (uma faixa de pele raspada pelo projétil ao penetrar), bordas invertidas, voltadas para dentro, e forma regular, circular ou oval conforme o ângulo de incidência. Um ferimento de saída costuma ter bordas evertidas, voltadas para fora, forma irregular ou estrelada e nenhuma orla de escoriação nem resíduo do disparo, porque o projétil empurra o tecido de dentro para fora (Figura~\ref{fig:exemplos_es}). Anteparos intermediários, desvios em ossos e alterações após a morte, como a putrefação, podem esconder esses sinais, de modo que a classificação visual depende muito da experiência do perito.
+
+\begin{figure}[htpb]
+\centering
+\begin{subfigure}[t]{0.32\textwidth}\centering
+  \includegraphics[width=\linewidth]{base/entrada_1}
+  \caption{Entrada}
+\end{subfigure}\hfill
+\begin{subfigure}[t]{0.32\textwidth}\centering
+  \includegraphics[width=\linewidth]{base/entrada_2}
+  \caption{Entrada}
+\end{subfigure}\hfill
+\begin{subfigure}[t]{0.32\textwidth}\centering
+  \includegraphics[width=\linewidth]{base/saida_1}
+  \caption{Saída}
+\end{subfigure}
+\caption{Exemplos de ferimentos de entrada e de saída da base FDCPUnBGunshotDB, recortados em torno do ferimento. Nas entradas, a borda é regular e cercada pela orla de escoriação; na saída, a borda é irregular e voltada para fora.}
+\label{fig:exemplos_es}
+\end{figure}
+
+\subsection{Distância Médico-Legal do Disparo}
+\label{sec:mlsd}
+
+Nos ferimentos de entrada, a \gls{MLSD} é estimada pelos vestígios deixados pela combustão da pólvora e da espoleta, visíveis a olho nu~\cite{dimaio2015gunshot}. A classificação usada na base tem três classes (Figura~\ref{fig:exemplos_mlsd}):
 \begin{itemize}
-    \item \textbf{Encostado:} a boca do cano toca a pele. O ferimento costuma mostrar a marca da boca do cano e lacerações causadas pela expansão dos gases.
-    \item \textbf{Curta distância:} o disparo é feito de perto (em geral a menos de cerca de 60 cm), e o ferimento mostra \textit{tatuagem} (grãos de pólvora não queimados incrustados na pele) e fuligem.
+    \item \textbf{Encostado:} a boca do cano toca a pele. O ferimento costuma mostrar a marca da boca do cano e lacerações causadas pela expansão dos gases dentro da pele.
+    \item \textbf{Curta distância:} o disparo é feito de perto (em geral a menos de cerca de 60 cm), e o ferimento mostra \textit{tatuagem}, isto é, grãos de pólvora não queimados incrustados na pele ao redor do orifício, e fuligem.
     \item \textbf{Distância:} os resíduos da pólvora já não chegam à pele, e o ferimento mostra essencialmente a orla de escoriação.
 \end{itemize}
 Os ferimentos de saída não trazem informação de distância; por isso a tarefa de distância usa só as entradas.
 
+\begin{figure}[htpb]
+\centering
+\begin{subfigure}[t]{0.32\textwidth}\centering
+  \includegraphics[width=\linewidth]{base/encostado_1}
+  \caption{Encostado}
+\end{subfigure}\hfill
+\begin{subfigure}[t]{0.32\textwidth}\centering
+  \includegraphics[width=\linewidth]{base/curta_1}
+  \caption{Curta distância}
+\end{subfigure}\hfill
+\begin{subfigure}[t]{0.32\textwidth}\centering
+  \includegraphics[width=\linewidth]{base/distancia_1}
+  \caption{Distância}
+\end{subfigure}
+\caption{Exemplos das três classes de distância do disparo na base FDCPUnBGunshotDB (só ferimentos de entrada).}
+\label{fig:exemplos_mlsd}
+\end{figure}
+
 \section{Aprendizado Profundo em Visão Computacional}
 \label{sec:dl_background}
 
-\subsection{Redes Convolucionais, ResNet e Aprendizado por Transferência}
-As redes neurais convolucionais extraem características hierárquicas das imagens, de bordas nas primeiras camadas a formas complexas nas mais profundas. As redes residuais (ResNets)~\cite{he2016resnet} acrescentam conexões de atalho que facilitam o treino de modelos muito profundos; a ResNet-152 tem 152 camadas e produz um vetor de 2.048 características antes da sua última camada. No aprendizado por transferência, uma rede pré-treinada numa base grande como o ImageNet~\cite{deng2009imagenet} é reaproveitada como extratora de características e ajustada à tarefa de destino. Isso é útil sobretudo quando a base de destino é pequena, como nas imagens forenses. A última camada, que leva as características às classes, é chamada de \emph{cabeça}; em geral é uma camada linear ou um pequeno perceptron de múltiplas camadas (MLP).
+O aprendizado profundo é a família de métodos de aprendizado de máquina baseados em redes neurais com muitas camadas, que aprendem as características relevantes diretamente dos dados, em vez de recebê-las prontas de um especialista~\cite{goodfellow2016deep}. Esta seção apresenta os componentes usados neste trabalho, do mais simples ao mais complexo.
 
-\subsection{Transformers de Visão}
-Os transformers tratam uma imagem como uma sequência de blocos (\textit{patches}) com autoatenção. Duas das arquiteturas avaliadas aqui são desse tipo: o Swin Transformer~\cite{liu2021swin}, que calcula a atenção dentro de janelas locais deslocadas e monta uma hierarquia de resoluções, e o MaxViT~\cite{tu2022maxvit}, que combina convoluções com atenção local e atenção global dilatada.
+\subsection{O Neurônio Artificial e a MLP}
+\label{sec:mlp_background}
+
+Um neurônio artificial recebe um vetor de entradas $\mathbf{x} = (x_1, \ldots, x_n)$, calcula uma soma ponderada e aplica a ela uma função não linear $\sigma$, chamada de \emph{função de ativação}:
+\begin{equation}
+y = \sigma\!\left(\sum_{i=1}^{n} w_i x_i + b\right),
+\label{eq:neuronio}
+\end{equation}
+em que os pesos $w_i$ e o viés $b$ são os parâmetros aprendidos. Uma \gls{MLP} empilha camadas desses neurônios: cada neurônio de uma camada recebe as saídas de todos os neurônios da camada anterior (Figura~\ref{fig:mlp_kan}, à esquerda). A Equação~\ref{eq:neuronio} mostra onde cada coisa fica numa MLP: o \emph{peso} é um número associado a cada aresta, e a \emph{não linearidade} é uma função fixa aplicada em cada nó. Essa distinção é o que a KAN muda (Seção~\ref{sec:kan_background}).
+
+Duas funções de ativação aparecem neste trabalho (Figura~\ref{fig:ativacoes}). A \gls{ReLU}~\cite{nair2010rectified}, $\mathrm{ReLU}(x) = \max(0, x)$, é a mais usada em redes convolucionais e nas cabeças MLP. A \gls{SiLU}~\cite{elfwing2018sigmoid} multiplica a entrada pela função sigmoide:
+\begin{equation}
+\mathrm{SiLU}(x) = x \cdot \frac{1}{1 + e^{-x}},
+\label{eq:silu}
+\end{equation}
+o que dá uma curva parecida com a ReLU, mas suave e com uma pequena parte negativa. A SiLU é o termo base das arestas da KAN.
+
+\begin{figure}[htpb]
+\centering
+\begin{tikzpicture}
+\begin{axis}[
+    width=0.55\textwidth, height=5cm, idioma,
+    xmin=-4, xmax=4, ymin=-1, ymax=4, axis lines=middle,
+    xlabel={$x$}, ylabel={$\sigma(x)$}, xlabel style={anchor=west}, ylabel style={anchor=south},
+    tick label style={font=\footnotesize}, legend style={font=\footnotesize, draw=none, at={(0.03,0.97)}, anchor=north west},
+    grid=major, grid style={gray!20},
+]
+\addplot[thick, corA, domain=-4:4, samples=100] {max(0,x)};
+\addlegendentry{ReLU}
+\addplot[thick, corD, dashed, domain=-4:4, samples=100] {x/(1+exp(-x))};
+\addlegendentry{SiLU}
+\end{axis}
+\end{tikzpicture}
+\caption{As funções de ativação ReLU e SiLU. A SiLU é suave e tem um pequeno trecho negativo perto da origem.}
+\label{fig:ativacoes}
+\end{figure}
+
+Para classificar em $K$ classes, a última camada tem $K$ saídas (os \en{logits}), que a função \en{softmax} converte em probabilidades: $p_k = e^{z_k} / \sum_{j=1}^{K} e^{z_j}$. O treino ajusta os parâmetros para minimizar uma função de perda, em geral a \emph{entropia cruzada} $L = -\log p_{y}$, em que $y$ é a classe verdadeira. O gradiente da perda em relação a cada parâmetro é calculado pela retropropagação~\cite{rumelhart1986learning}, e os parâmetros são atualizados por variantes da descida de gradiente, como o \gls{SGD} e o AdamW~\cite{loshchilov2019adamw}, em pequenos lotes de imagens. Uma passagem completa pelo conjunto de treino é uma \emph{época}.
+
+Duas técnicas de regularização aparecem nas arquiteturas usadas aqui. O \en{dropout}~\cite{srivastava2014dropout} zera ao acaso uma fração $p$ das ativações durante o treino, o que impede a rede de depender de poucas unidades; na avaliação ele é desligado. A normalização em lote (\en{batch normalization})~\cite{ioffe2015batch} padroniza as ativações de cada camada com a média e a variância do lote, o que estabiliza e acelera o treino.
+
+\subsection{Redes Neurais Convolucionais}
+\label{sec:cnn_background}
+
+Uma imagem colorida de $224 \times 224$ pixels tem cerca de 150 mil valores. Ligar cada um deles a cada neurônio de uma MLP exigiria um número enorme de pesos e ignoraria a estrutura espacial da imagem. As \glspl{CNN}~\cite{lecun1998gradient} resolvem os dois problemas com a operação de convolução: um pequeno filtro de pesos, por exemplo de $3 \times 3$ pixels, desliza sobre a imagem e calcula, em cada posição, a soma ponderada da vizinhança. O mesmo filtro é usado em todas as posições, o que reduz muito o número de parâmetros e faz com que um padrão seja reconhecido em qualquer lugar da imagem. Cada filtro produz um \emph{mapa de características}, que indica onde o padrão aparece.
+
+Uma CNN empilha camadas de convolução e ativação, intercaladas com camadas de \en{pooling}, que reduzem a resolução dos mapas resumindo cada vizinhança pelo seu máximo ou pela sua média (Figura~\ref{fig:cnn}). As primeiras camadas aprendem padrões simples, como bordas e cores; as mais profundas combinam esses padrões em formas e texturas cada vez mais complexas. Ao fim, um \en{pooling} global transforma os mapas num vetor de características, e uma última camada, a \emph{cabeça}, leva esse vetor às classes.
+
+\begin{figure}[htpb]
+\centering
+\begin{adjustbox}{max width=\textwidth}
+\begin{tikzpicture}[>=Stealth, every node/.style={font=\footnotesize}]
+    % imagem
+    \fill[gray!25] (0,0) rectangle (1.8,1.8); \draw (0,0) rectangle (1.8,1.8);
+    \node[below] at (0.9,-0.05) {imagem};
+    \node[below] at (0.9,-0.4) {$224{\times}224{\times}3$};
+    % blocos de mapas
+    \foreach \i/\x/\s/\n/\c in {1/2.8/1.5/64/corA, 2/4.8/1.1/128/corA, 3/6.5/0.8/256/corA, 4/7.9/0.55/512/corA} {
+        \foreach \k in {0,1,2,3} {
+            \fill[\c!\the\numexpr 15+8*\k\relax, draw=\c!70!black] (\x+0.12*\k, 0.9-\s/2+0.08*\k) rectangle (\x+0.12*\k+\s, 0.9+\s/2+0.08*\k);
+        }
+    }
+    \node[below] at (3.6,-0.05) {conv + ReLU};
+    \node[below] at (5.5,-0.05) {\en{pooling}};
+    \node[below] at (7.0,-0.05) {conv};
+    \node[below] at (8.4,-0.05) {conv};
+    \draw[->, thick] (1.85,0.9) -- (2.75,0.9);
+    % vetor
+    \draw[->, thick] (8.95,0.9) -- node[above] {\en{pooling} global} (10.6,0.9);
+    \foreach \k in {0,...,9} { \fill[corB!60] (10.7,0.2+0.14*\k) rectangle (10.95,0.32+0.14*\k); }
+    \node[below, align=center] at (10.83,-0.05) {vetor de\\características};
+    \draw[->, thick] (11.05,0.9) -- (11.9,0.9);
+    \node[draw, rounded corners, fill=orange!15, align=center] at (12.75,0.9) {cabeça\\(classes)};
+    % rótulo extrator
+    \draw[decorate, decoration={brace, amplitude=5pt}, thick] (0,2.35) -- node[above=5pt] {extrator de características (\en{backbone})} (10.95,2.35);
+\end{tikzpicture}
+\end{adjustbox}
+\caption{Estrutura de uma rede neural convolucional. Camadas de convolução e \en{pooling} transformam a imagem em mapas de características cada vez menores e mais numerosos; um \en{pooling} global os resume num vetor, e a cabeça leva esse vetor às classes. O conjunto de camadas antes da cabeça é o extrator de características, ou \en{backbone}.}
+\label{fig:cnn}
+\end{figure}
+
+\subsection{Arquiteturas Convolucionais Usadas neste Trabalho}
+\label{sec:cnn_arquiteturas}
+
+Lira et al.~\cite{Lira2025deep} avaliaram 59 arquiteturas da biblioteca torchvision. Este trabalho usa 16 delas (Seções~\ref{sec:backbones_setup} e~\ref{sec:repro_setup}): 14 convolucionais, que representam as principais ideias de projeto de CNNs da última década, e dois \en{transformers} de visão (Seção~\ref{sec:vit_background}). A Tabela~\ref{tab:arquiteturas} resume as convolucionais, em ordem cronológica.
+
+\begin{table}[htpb]
+\centering
+\caption{As arquiteturas convolucionais usadas neste trabalho e a ideia central de cada uma.}
+\label{tab:arquiteturas}
+\small
+\begin{tabular}{p{0.21\textwidth}cp{0.62\textwidth}}
+\toprule
+Arquitetura & Ano & Ideia central \\
+\midrule
+AlexNet~\cite{krizhevsky2012alexnet} & 2012 & Primeira CNN profunda a vencer o desafio ImageNet: cinco convoluções e três camadas densas, com ReLU e \en{dropout}. \\
+VGG-16~\cite{simonyan2015vgg} & 2015 & Profundidade com filtros pequenos: 13 convoluções $3 \times 3$ empilhadas e três camadas densas; simples, mas com muitos parâmetros. \\
+ResNet-18 a 152~\cite{he2016resnet} & 2016 & Conexões residuais (Figura~\ref{fig:residual}), que permitem treinar redes de 18 a 152 camadas. \\
+SqueezeNet 1.0~\cite{iandola2016squeezenet} & 2016 & Módulos ``\en{fire}'' que comprimem os canais com convoluções $1 \times 1$ antes de expandi-los; precisão próxima à da AlexNet com cerca de 50 vezes menos parâmetros. \\
+DenseNet-169~\cite{huang2017densenet} & 2017 & Cada camada de um bloco recebe os mapas de \emph{todas} as camadas anteriores do bloco, concatenados, o que reaproveita características e reduz parâmetros. \\
+MobileNetV2~\cite{sandler2018mobilenetv2} & 2018 & Convoluções separáveis por canal e blocos residuais ``invertidos'', para celulares e dispositivos com pouca memória. \\
+ShuffleNetV2~\cite{ma2018shufflenetv2} & 2018 & Divisão e embaralhamento de canais, projetados para a velocidade real de execução, e não só para o número de operações. \\
+MNASNet~\cite{tan2019mnasnet} & 2019 & Arquitetura encontrada por busca automática de arquiteturas, otimizando precisão e latência em celulares. \\
+RegNetY~\cite{radosavovic2020regnet} & 2020 & Larguras e profundidades que seguem uma regra simples, obtida ao estudar espaços inteiros de projeto; a versão Y acrescenta atenção entre canais. \\
+EfficientNetV2-L~\cite{tan2021efficientnetv2} & 2021 & Escala conjunta de profundidade, largura e resolução, com blocos obtidos por busca automática e treino progressivo. \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+A ResNet~\cite{he2016resnet} merece mais detalhe, porque é o extrator da TransferKAN. Redes muito profundas costumavam treinar pior que redes rasas: o sinal do gradiente enfraquece ao atravessar dezenas de camadas. A ResNet resolve isso com \emph{blocos residuais}: em vez de aprender diretamente uma transformação $H(\mathbf{x})$, cada bloco aprende uma correção $F(\mathbf{x})$ e soma a entrada de volta, $H(\mathbf{x}) = F(\mathbf{x}) + \mathbf{x}$ (Figura~\ref{fig:residual}). O atalho deixa o gradiente passar diretamente, e um bloco que não tem nada a acrescentar pode simplesmente aprender $F = 0$. As ResNets mais profundas (50, 101 e 152 camadas) usam um bloco ``gargalo'', com convoluções $1 \times 1$ que reduzem e depois restauram o número de canais em torno de uma convolução $3 \times 3$. A ResNet-152 produz, antes da sua última camada, um vetor de 2.048 características.
+
+\begin{figure}[htpb]
+\centering
+\begin{tikzpicture}[>=Stealth, node distance=7mm,
+    camada/.style={rectangle, rounded corners, draw, thick, fill=corA!12, minimum width=34mm, minimum height=7mm, font=\small},
+    every node/.style={font=\small}]
+    \node (x) {$\mathbf{x}$};
+    \node[camada, below=of x] (c1) {convolução + ReLU};
+    \node[camada, below=of c1] (c2) {convolução};
+    \node[circle, draw, thick, below=of c2, inner sep=1pt] (soma) {$+$};
+    \node[below=of soma] (y) {$F(\mathbf{x}) + \mathbf{x}$};
+    \draw[->, thick] (x) -- (c1);
+    \draw[->, thick] (c1) -- (c2);
+    \draw[->, thick] (c2) -- node[left] {$F(\mathbf{x})$} (soma);
+    \draw[->, thick] (soma) -- node[right] {ReLU} (y);
+    \draw[->, thick, corD] (x.east) -- ++(22mm,0) |- node[pos=0.25, right] {atalho: $\mathbf{x}$} (soma.east);
+\end{tikzpicture}
+\caption{Um bloco residual. O ramo da esquerda aprende uma correção $F(\mathbf{x})$; o atalho (em vermelho) soma a entrada de volta à saída.}
+\label{fig:residual}
+\end{figure}
+
+\subsection{Aprendizado por Transferência}
+\label{sec:transfer_background}
+
+Treinar uma CNN profunda do zero exige muitos dados: a ImageNet~\cite{deng2009imagenet}, a base mais usada para isso, tem mais de um milhão de imagens rotuladas em mil classes. Bases forenses têm alguns milhares de imagens. O aprendizado por transferência contorna essa falta: uma rede treinada na ImageNet já aprendeu a extrair características visuais gerais, e as suas primeiras camadas, que detectam bordas, cores e texturas, servem para quase qualquer fotografia~\cite{yosinski2014transferable}.
+
+Na prática, reaproveita-se o extrator de características da rede pré-treinada, o \en{backbone}, e troca-se a sua cabeça de mil classes por uma cabeça nova, com uma saída por classe da tarefa de destino (Figura~\ref{fig:transferencia}). Neste texto, \emph{cabeça} é sempre essa parte final, que leva o vetor de características às classes; em geral é uma camada linear ou uma pequena MLP. A rede é então treinada na tarefa de destino, em geral em duas etapas: primeiro com o \en{backbone} congelado, isto é, com os seus pesos fixos, para que a cabeça nova aprenda sem estragar o extrator; depois com a rede inteira ajustada a uma taxa de aprendizado pequena, o que se chama de ajuste fino (\en{fine-tuning}).
+
+\begin{figure}[htpb]
+\centering
+\begin{adjustbox}{max width=\textwidth}
+\begin{tikzpicture}[>=Stealth, node distance=5mm and 7mm,
+    bloco/.style={rectangle, rounded corners, draw, thick, align=center, minimum height=11mm, font=\small},
+    every node/.style={font=\small}]
+    % linha de cima: pré-treino
+    \node[bloco, fill=gray!12, minimum width=24mm] (img1) {ImageNet\\1,2 milhão de imagens};
+    \node[bloco, fill=green!12, minimum width=28mm, right=of img1] (bb1) {\en{backbone}\\(aprende)};
+    \node[bloco, fill=gray!20, minimum width=26mm, right=of bb1] (h1) {cabeça\\1.000 classes};
+    \draw[->, thick] (img1) -- (bb1); \draw[->, thick] (bb1) -- (h1);
+    \node[left=3mm of img1, font=\small\bfseries, align=right] {1. pré-treino};
+    % linha de baixo: transferência
+    \node[bloco, fill=gray!12, minimum width=24mm, below=12mm of img1] (img2) {fotografias\\forenses};
+    \node[bloco, fill=green!12, minimum width=28mm, right=of img2] (bb2) {\en{backbone}\\(pesos copiados)};
+    \node[bloco, fill=orange!15, minimum width=26mm, right=of bb2] (h2) {cabeça nova\\$K$ classes};
+    \draw[->, thick] (img2) -- (bb2); \draw[->, thick] (bb2) -- (h2);
+    \node[left=3mm of img2, font=\small\bfseries, align=right] {2. transferência};
+    \draw[->, thick, dashed, green!50!black] (bb1) -- node[right, font=\footnotesize] {copiar pesos} (bb2);
+    \draw[thick, gray] (h1.north east) -- (h1.south west); \draw[thick, gray] (h1.north west) -- (h1.south east);
+\end{tikzpicture}
+\end{adjustbox}
+\caption{Aprendizado por transferência. O \en{backbone} treinado na ImageNet é copiado; a sua cabeça de mil classes é descartada e substituída por uma cabeça nova, com uma saída por classe da tarefa forense.}
+\label{fig:transferencia}
+\end{figure}
+
+\subsection{\texorpdfstring{\en{Transformers}}{Transformers} de Visão}
+\label{sec:vit_background}
+
+Os \en{transformers} surgiram no processamento de texto~\cite{vaswani2017attention}. O seu componente central é a \emph{autoatenção}: cada elemento de uma sequência calcula, a partir de projeções aprendidas chamadas consulta ($Q$), chave ($K$) e valor ($V$), o quanto deve olhar para cada um dos outros elementos, e combina os valores com esses pesos:
+\begin{equation}
+\mathrm{Atenção}(Q, K, V) = \mathrm{softmax}\!\left(\frac{Q K^{\top}}{\sqrt{d}}\right) V,
+\end{equation}
+em que $d$ é a dimensão das chaves. Ao contrário da convolução, que só combina vizinhos próximos, a atenção pode relacionar quaisquer duas partes da entrada.
+
+O \gls{ViT}~\cite{dosovitskiy2021image} aplicou essa ideia a imagens: a imagem é cortada em blocos (\en{patches}) de $16 \times 16$ pixels, cada bloco vira um vetor, e a sequência de vetores passa por camadas de \en{transformer} (Figura~\ref{fig:vit}). Duas arquiteturas avaliadas aqui derivam dessa ideia. O Swin Transformer~\cite{liu2021swin} calcula a atenção dentro de janelas locais que se deslocam de uma camada para a outra e monta uma hierarquia de resoluções, como uma CNN. O MaxViT~\cite{tu2022maxvit} combina convoluções com dois tipos de atenção, uma local, em blocos, e uma global, sobre uma grade espaçada da imagem.
+
+\begin{figure}[htpb]
+\centering
+\begin{adjustbox}{max width=\textwidth}
+\begin{tikzpicture}[>=Stealth, every node/.style={font=\small}]
+    % imagem em blocos
+    \foreach \i in {0,1,2} { \foreach \j in {0,1,2} {
+        \fill[corA!\the\numexpr 20+15*\i+10*\j\relax] (\i*0.6, \j*0.6) rectangle (\i*0.6+0.56, \j*0.6+0.56);
+    } }
+    \node[below] at (0.9,-0.05) {imagem em blocos};
+    \draw[->, thick] (2.0,0.9) -- (2.8,0.9);
+    % sequência
+    \foreach \k in {0,...,8} {
+        \fill[corA!\the\numexpr 20+8*\k\relax, draw=corA!70!black] (3.0+0.45*\k, 0.65) rectangle (3.0+0.45*\k+0.35, 1.15);
+    }
+    \node[below, align=center] at (5.0,0.55) {sequência de vetores\\(um por bloco)};
+    \draw[->, thick] (7.2,0.9) -- (8.0,0.9);
+    \node[draw, rounded corners, thick, fill=green!12, align=center, minimum height=12mm] (tr) at (9.4,0.9) {camadas de\\\en{transformer}\\(autoatenção)};
+    \draw[->, thick] (10.8,0.9) -- (11.6,0.9);
+    \node[draw, rounded corners, thick, fill=orange!15, align=center] at (12.4,0.9) {cabeça\\(classes)};
+\end{tikzpicture}
+\end{adjustbox}
+\caption{O \en{transformer} de visão: a imagem é cortada em blocos, cada bloco vira um vetor, e a autoatenção relaciona todos os blocos entre si antes da cabeça de classificação.}
+\label{fig:vit}
+\end{figure}
 
 \section{Redes de Kolmogorov-Arnold}
 \label{sec:kan_background}
 
 \subsection{Do Teorema da Representação às Camadas KAN}
-O teorema da representação de Kolmogorov-Arnold diz que qualquer função contínua de várias variáveis num domínio limitado pode ser escrita como uma composição finita de funções contínuas de uma variável e de somas. As Redes de Kolmogorov-Arnold (KANs)~\cite{liu2024kan} transformam essa ideia numa camada treinável. Numa MLP, cada aresta tem um peso escalar e cada nó aplica uma não linearidade fixa. Numa camada KAN, cada aresta tem uma função de uma variável aprendível $\phi_{j,i}$, e o nó só soma:
-\begin{equation}
-x^{(l+1)}_j = \sum_{i=1}^{n_l} \phi^{(l)}_{j,i}\!\left(x^{(l)}_i\right).
-\end{equation}
-Uma KAN $[n_0, n_1, n_2]$ tem duas dessas camadas; a cabeça da TransferKAN é $[2048, 128, K]$.
 
-\subsection{Arestas com B-Splines e Contagem de Parâmetros}
-Na KAN original e na implementação \texttt{efficient-kan}~\cite{efficientkan} usada aqui, cada função de aresta é a soma de um termo base e de uma spline:
+O teorema da representação de Kolmogorov-Arnold~\cite{kolmogorov1957representation} diz que qualquer função contínua de $n$ variáveis, $f(x_1, \ldots, x_n)$, definida num domínio limitado, pode ser escrita usando apenas funções contínuas de \emph{uma} variável e somas:
+\begin{equation}
+f(x_1, \ldots, x_n) = \sum_{q=0}^{2n} \Phi_q\!\left(\sum_{p=1}^{n} \phi_{q,p}(x_p)\right),
+\end{equation}
+em que cada $\phi_{q,p}$ e cada $\Phi_q$ é uma função contínua de uma única variável. Em outras palavras, toda a ``mistura'' entre as variáveis é feita por somas; tudo o que é não linear acontece em funções de uma variável só.
+
+As \glspl{KAN}~\cite{liu2024kan} transformam essa ideia numa camada de rede neural (Figura~\ref{fig:mlp_kan}). Numa MLP, cada aresta tem um peso, um número, e cada nó aplica uma não linearidade fixa (Equação~\ref{eq:neuronio}). Numa camada KAN é o contrário: cada aresta tem uma \emph{função} de uma variável aprendível, e o nó só soma o que chega a ele. Se a camada $l$ tem $n_l$ nós, com valores $x^{(l)}_1, \ldots, x^{(l)}_{n_l}$, o valor do nó $j$ da camada seguinte é
+\begin{equation}
+x^{(l+1)}_j = \sum_{i=1}^{n_l} \phi^{(l)}_{j,i}\!\left(x^{(l)}_i\right),
+\label{eq:kan_camada}
+\end{equation}
+em que $\phi^{(l)}_{j,i}$ é a função aprendível da aresta que liga o nó $i$ da camada $l$ ao nó $j$ da camada $l+1$. Uma KAN é descrita pela lista dos números de nós das suas camadas: uma KAN $[n_0, n_1, n_2]$ tem $n_0$ entradas, $n_1$ nós intermediários e $n_2$ saídas, e duas camadas de arestas entre eles. A cabeça da TransferKAN é a KAN $[2048, 128, K]$: 2.048 entradas (as características da ResNet-152), 128 nós intermediários e $K$ saídas, uma por classe.
+
+\begin{figure}[htpb]
+\centering
+\begin{tikzpicture}[>=Stealth,
+    no/.style={circle, draw, thick, minimum size=7mm, inner sep=0pt, font=\footnotesize},
+    every node/.style={font=\small}]
+    % MLP
+    \begin{scope}
+    \node[font=\small\bfseries] at (1.6,3.6) {MLP};
+    \foreach \i in {1,2,3} { \node[no, fill=gray!15] (a\i) at (0,3.0-\i*0.9) {$x_\i$}; }
+    \foreach \j in {1,2} { \node[no, fill=corA!25] (b\j) at (3.2,2.55-\j*0.9) {$\sigma$}; }
+    \foreach \i in {1,2,3} { \foreach \j in {1,2} { \draw[->, thick, gray] (a\i) -- (b\j); } }
+    \node[font=\footnotesize, gray!60!black] at (1.6,-0.35) {peso $w_{j,i}$ (número) na aresta};
+    \node[font=\footnotesize, corA!80!black] at (1.6,-0.8) {ativação $\sigma$ fixa no nó};
+    \end{scope}
+    % KAN
+    \begin{scope}[xshift=70mm]
+    \node[font=\small\bfseries] at (1.6,3.6) {KAN};
+    \foreach \i in {1,2,3} { \node[no, fill=gray!15] (c\i) at (0,3.0-\i*0.9) {$x_\i$}; }
+    \foreach \j in {1,2} { \node[no, fill=gray!5] (d\j) at (3.2,2.55-\j*0.9) {$\Sigma$}; }
+    \foreach \i in {1,2,3} { \foreach \j in {1,2} {
+        \draw[->, thick, corD] (c\i) -- (d\j);
+    } }
+    % pequenas curvas nas arestas
+    \foreach \i/\j in {1/1,2/1,3/1,1/2,2/2,3/2} {
+        \path (c\i) -- (d\j) coordinate[pos=0.3] (m\i\j);
+        \fill[white] (m\i\j) circle (1.6mm);
+        \draw[corD, thick] ($(m\i\j)+(-1.3mm,-0.6mm)$) .. controls ($(m\i\j)+(-0.4mm,1.6mm)$) and ($(m\i\j)+(0.4mm,-1.6mm)$) .. ($(m\i\j)+(1.3mm,0.6mm)$);
+    }
+    \node[font=\footnotesize, corD!80!black] at (1.6,-0.35) {função $\phi_{j,i}$ aprendível na aresta};
+    \node[font=\footnotesize] at (1.6,-0.8) {o nó só soma};
+    \end{scope}
+\end{tikzpicture}
+\caption{Uma camada de MLP e uma camada de KAN com três entradas e dois nós. Na MLP, cada aresta multiplica a entrada por um peso e cada nó aplica uma ativação fixa $\sigma$. Na KAN, cada aresta aplica uma função de uma variável aprendida, $\phi_{j,i}$, e cada nó só soma.}
+\label{fig:mlp_kan}
+\end{figure}
+
+\subsection{Arestas com B-\texorpdfstring{\en{Splines}}{Splines} e Contagem de Parâmetros}
+
+Para que a função de cada aresta possa ser aprendida por descida de gradiente, ela precisa ser escrita com um número finito de parâmetros. Na KAN original, cada função de aresta é a soma de um termo base e de uma \en{spline}:
 \begin{equation}
 \phi(x) = w_b\,\mathrm{SiLU}(x) + w_s \sum_{m=1}^{G+k} c_m B_m(x),
+\label{eq:kan_spline}
 \end{equation}
-em que as $B_m$ são B-splines de ordem $k$ numa grade de $G$ intervalos sobre $[-1, 1]$, estendida por $k$ intervalos de cada lado. Com $G=10$ e $k=3$ há 13 coeficientes $c_m$ por aresta, mais os pesos $w_b$ e $w_s$: 15 parâmetros por aresta. Fora da grade estendida as B-splines se anulam, e a aresta se reduz ao seu termo base.
+em que SiLU é a função da Equação~\ref{eq:silu}; $w_b$ e $w_s$ são pesos aprendidos que dosam o termo base e a \en{spline}; e $c_m$ são os coeficientes aprendidos da \en{spline}. As funções $B_m$ são B-\en{splines}~\cite{deboor1978practical}: pequenos ``morros'' polinomiais de ordem $k$, cada um diferente de zero só num trecho curto do eixo, definidos sobre uma grade de $G$ intervalos no intervalo $[-1, 1]$, estendida por $k$ intervalos de cada lado. Somando esses morros com pesos $c_m$ diferentes, obtém-se uma curva suave de forma quase qualquer. Com $G=10$ e $k=3$ (\en{splines} cúbicas) há 13 coeficientes $c_m$ por aresta, mais os pesos $w_b$ e $w_s$: 15 parâmetros por aresta. Fora da grade estendida as B-\en{splines} se anulam, e a aresta se reduz ao seu termo base.
 
-A contagem de parâmetros importa para as afirmações deste trabalho. O artigo da KAN defende que as KANs podem ser mais eficientes em parâmetros que as MLPs, sobretudo em tarefas científicas e simbólicas pequenas~\cite{liu2024kan}. Como cabeça de classificação sobre 2.048 características, porém, uma KAN é grande: a cabeça $[2048, 128, 2]$ tem $15 \times (2048 \times 128 + 128 \times 2) = 3.936.000$ parâmetros, enquanto uma MLP com as mesmas larguras tem 262.530. Saber se uma cabeça KAN é mais eficiente é, portanto, uma questão empírica, testada neste trabalho contra MLPs do mesmo tamanho.
+A contagem de parâmetros importa para as conclusões deste trabalho. O artigo da KAN mostra que KANs pequenas podem ser mais eficientes em parâmetros que MLPs em tarefas científicas e simbólicas~\cite{liu2024kan}. Como cabeça de classificação sobre 2.048 características, porém, uma KAN é grande, porque cada aresta tem 15 parâmetros em vez de um: a cabeça $[2048, 128, 2]$ tem $15 \times (2048 \times 128 + 128 \times 2) = 3.936.000$ parâmetros, enquanto uma MLP com as mesmas larguras tem 262.530. Saber se uma cabeça KAN é mais eficiente é, portanto, uma questão empírica, testada neste trabalho contra MLPs do mesmo tamanho.
 
-\subsection{KANs com Wavelets}
-A Wav-KAN~\cite{bozorgasl2024wavkan} troca a spline por uma wavelet com escala $s$ e translação $\tau$ aprendíveis em cada aresta:
+\subsection{KANs com \texorpdfstring{\en{Wavelets}}{Wavelets}}
+
+Outras bases podem substituir as B-\en{splines}. Uma \en{wavelet}~\cite{mallat2009wavelet} é uma função oscilante e localizada, que vale quase zero longe da origem; a partir de uma \en{wavelet}-mãe $\psi$, deslocada por uma translação $\tau$ e esticada por uma escala $s$, obtém-se uma família de funções capaz de representar detalhes em várias escalas. A Wav-KAN~\cite{bozorgasl2024wavkan} usa uma única \en{wavelet} por aresta, com escala e translação aprendíveis:
 \begin{equation}
 \phi(x) = w_\psi\, \psi\!\left(\frac{x - \tau}{s}\right) + w_b\,\mathrm{SiLU}(x),
 \end{equation}
-seguida de normalização em lote da saída da camada. Isso usa quatro parâmetros por aresta em vez de quinze. Três wavelets-mãe são usadas aqui, escritas a menos de constantes de normalização: o chapéu mexicano $\psi(t) = (1 - t^2)\,e^{-t^2/2}$, a derivada de gaussiana $\psi(t) = -t\,e^{-t^2/2}$ e a Morlet $\psi(t) = \cos(\omega_0 t)\,e^{-t^2/2}$, com $\omega_0 = 5$. Em princípio, a escala e a translação aprendíveis poderiam adaptar cada aresta à faixa da sua entrada; se isso acontece é verificado na Seção~\ref{sec:res_wavkan}.
+seguida de normalização em lote da saída da camada. Isso usa quatro parâmetros por aresta ($w_\psi$, $w_b$, $s$ e $\tau$) em vez de quinze. Três \en{wavelets}-mãe são usadas aqui (Figura~\ref{fig:wavelets}), escritas a menos de constantes de normalização: o chapéu mexicano $\psi(t) = (1 - t^2)\,e^{-t^2/2}$, a derivada de gaussiana $\psi(t) = -t\,e^{-t^2/2}$ e a Morlet $\psi(t) = \cos(\omega_0 t)\,e^{-t^2/2}$, com $\omega_0 = 5$. Em princípio, a escala e a translação aprendíveis poderiam adaptar cada aresta à faixa de valores da sua entrada; se isso acontece é verificado na Seção~\ref{sec:res_wavkan}.
 
-\section{Avaliação sem Vazamento}
+\begin{figure}[htpb]
+\centering
+\begin{tikzpicture}
+\begin{axis}[
+    width=0.62\textwidth, height=5cm, idioma,
+    xmin=-4, xmax=4, ymin=-1.05, ymax=1.1, axis lines=middle,
+    xlabel={$t$}, ylabel={$\psi(t)$}, xlabel style={anchor=west}, ylabel style={anchor=south},
+    tick label style={font=\footnotesize},
+    legend style={font=\footnotesize, draw=none, at={(1.02,0.5)}, anchor=west},
+    grid=major, grid style={gray!20},
+]
+\addplot[thick, corA, domain=-4:4, samples=200] {(1-x^2)*exp(-x^2/2)};
+\addlegendentry{chapéu mexicano}
+\addplot[thick, corB, dashed, domain=-4:4, samples=200] {-x*exp(-x^2/2)};
+\addlegendentry{derivada de gaussiana}
+\addplot[thick, corC, dotted, domain=-4:4, samples=300] {cos(deg(5*x))*exp(-x^2/2)};
+\addlegendentry{Morlet ($\omega_0=5$)}
+\end{axis}
+\end{tikzpicture}
+\caption{As três \en{wavelets}-mãe usadas nas cabeças Wav-KAN, sem as constantes de normalização.}
+\label{fig:wavelets}
+\end{figure}
+
+\section{Partição dos Dados e Vazamento}
 \label{sec:leakage_background}
 
-Há vazamento de dados quando informação que não estaria disponível no momento da predição chega ao treino de um modelo, de modo que o desempenho no teste superestima o desempenho em dados novos~\cite{kapoor2023leakage}. Uma forma comum aparece em dados agrupados: quando várias observações vêm da mesma unidade (um paciente, um local, um caso), as observações da mesma unidade se parecem mais entre si que com o resto. Se elas são divididas entre treino e teste, o modelo pode reconhecer a unidade em vez de aprender a tarefa~\cite{roberts2017cross}. O remédio é a validação agrupada: cada grupo fica inteiro no treino ou inteiro no teste.
+Para medir quão bem um modelo funciona em dados que ele nunca viu, os dados disponíveis são divididos em uma parte de treino e uma parte de teste~\cite{hastie2009elements}. Há duas formas usuais de fazer isso (Figura~\ref{fig:holdout_kfold}). No \en{hold-out}, a base é dividida uma única vez, por exemplo 80\% para treino e 20\% para teste; é simples, mas o resultado depende de quais exemplos caíram no teste. Na validação cruzada em $k$ dobras (\en{k-fold}), a base é dividida em $k$ partes; o modelo é treinado $k$ vezes, cada vez testado numa parte diferente e treinado nas outras $k-1$, de modo que cada exemplo é testado uma vez e o resultado é uma média de $k$ avaliações~\cite{kohavi1995study}. Quando as classes são desbalanceadas, a divisão costuma ser \emph{estratificada}: cada parte recebe aproximadamente a mesma proporção de cada classe.
 
-Na base de ferimentos, um caso costuma ter várias fotografias do mesmo ferimento ou de ferimentos da mesma vítima. A unidade de avaliação é, portanto, o caso. A validação cruzada $k$-fold agrupada atribui casos inteiros às dobras; a $k$-fold estratificada e agrupada faz o mesmo mantendo proporções de classes parecidas entre as dobras. Estratificar \emph{pelo} identificador do caso é diferente: a estratificação iterativa~\cite{sechidis2011stratification} sobre o número do caso tenta pôr em cada subconjunto uma parte proporcional das imagens de cada caso, e por isso espalha de propósito cada caso entre treino e teste. A diferença entre agrupar e estratificar pelo caso está no centro da Seção~\ref{sec:res_leak}.
+\begin{figure}[htpb]
+\centering
+\begin{tikzpicture}[x=10mm, y=6mm, every node/.style={font=\footnotesize}]
+    % hold-out
+    \node[font=\small\bfseries, anchor=west] at (-0.2,1.2) {\en{Hold-out}};
+    \fill[corA!25] (0,0) rectangle (4,0.8); \fill[corD!55] (4,0) rectangle (5,0.8);
+    \draw[gray] (0,0) rectangle (5,0.8); \draw[gray] (4,0) -- (4,0.8);
+    \node at (2,0.4) {treino (80\%)}; \node at (4.5,0.4) {teste};
+    % k-fold
+    \node[font=\small\bfseries, anchor=west] at (6.3,1.2) {Validação cruzada ($k=5$)};
+    \foreach \r in {0,...,4} {
+        \foreach \c in {0,...,4} {
+            \ifnum\r=\c \fill[corD!55] (6.5+\c,-\r) rectangle (7.45+\c,-\r+0.8);
+            \else \fill[corA!25] (6.5+\c,-\r) rectangle (7.45+\c,-\r+0.8); \fi
+        }
+    }
+    \fill[corA!25] (0,-2.2) rectangle (0.4,-1.8); \node[anchor=west] at (0.45,-2) {treino};
+    \fill[corD!55] (0,-3.2) rectangle (0.4,-2.8); \node[anchor=west] at (0.45,-3) {teste};
+\end{tikzpicture}
+\caption{As duas formas usuais de dividir os dados. No \en{hold-out} há uma única divisão; na validação cruzada em $k$ dobras, cada dobra é usada uma vez como teste, e o resultado é a média das $k$ rodadas.}
+\label{fig:holdout_kfold}
+\end{figure}
 
-\section{AUC das Probabilidades e das Classes}
+Há \emph{vazamento de dados} quando informação que não estaria disponível no momento da predição chega ao treino de um modelo, de modo que o desempenho medido no teste superestima o desempenho em dados realmente novos~\cite{kapoor2023leakage}. Uma forma comum de vazamento aparece em dados agrupados: quando várias observações vêm da mesma unidade (um paciente, um local, um caso), elas se parecem mais entre si que com o resto. Se as observações de uma mesma unidade são divididas entre treino e teste, o modelo pode acertar o teste reconhecendo a unidade, em vez de aprender a tarefa~\cite{roberts2017cross}. O remédio é a divisão \emph{agrupada}: cada grupo fica inteiro no treino ou inteiro no teste. Ela pode ser combinada com a estratificação, mantendo proporções de classes parecidas entre as partes; é o que faz a validação cruzada estratificada e agrupada.
+
+Estratificar e agrupar são operações diferentes, e confundi-las pode produzir o vazamento que se queria evitar. Agrupar usa o identificador da unidade como \emph{grupo}: as observações com o mesmo identificador ficam juntas. Estratificar usa uma variável como \emph{característica a equilibrar}: cada parte recebe uma fração proporcional das observações de cada valor dessa variável. Estratificar pelo identificador da unidade, portanto, põe parte de cada unidade em cada lado, o oposto de agrupar. A Seção~\ref{sec:lira_particao} mostra um caso concreto dessa diferença.
+
+\section{Métricas de Classificação}
 \label{sec:auc_background}
 
-A curva ROC traça a taxa de verdadeiros positivos contra a taxa de falsos positivos à medida que o limiar de decisão sobre um escore contínuo varia, e a área sob ela (AUC) é igual à probabilidade de um exemplo positivo escolhido ao acaso receber um escore maior que um negativo escolhido ao acaso~\cite{fawcett2006roc}. Ela mede quão bem o modelo ordena os exemplos, independentemente do limiar. Com mais de duas classes, a AUC macro um-contra-o-resto é a média das AUC de cada classe contra as demais.
+Numa tarefa binária, cada predição cai numa de quatro situações, organizadas na \emph{matriz de confusão} (Figura~\ref{fig:confusao}): verdadeiro positivo (VP), falso positivo (FP), falso negativo (FN) e verdadeiro negativo (VN). A partir dela se definem a acurácia, $(\mathrm{VP}+\mathrm{VN})/n$, a fração de acertos; a precisão, $\mathrm{VP}/(\mathrm{VP}+\mathrm{FP})$, a fração dos positivos previstos que são de fato positivos; a revocação ou sensibilidade, $\mathrm{VP}/(\mathrm{VP}+\mathrm{FN})$, a fração dos positivos encontrados; a especificidade, $\mathrm{VN}/(\mathrm{VN}+\mathrm{FP})$, a revocação dos negativos; e o F1, a média harmônica entre precisão e revocação. Com mais de duas classes, cada métrica é calculada para cada classe contra as demais e depois resumida: a média \emph{macro} dá o mesmo peso a todas as classes, a média \emph{ponderada} pesa cada classe pelo seu número de exemplos, e a média \emph{micro} soma os acertos e erros de todas as classes antes de calcular a métrica. A acurácia balanceada é a revocação macro. Com classes desbalanceadas, a acurácia engana: um modelo que sempre prevê a classe majoritária tem acurácia alta e revocação nula nas demais classes. Por isso, as métricas macro são as mais informativas aqui.
 
-Se a AUC é calculada a partir dos rótulos previstos em vez dos escores, há um único limiar e a ``curva'' ROC tem um só ponto interior. A área passa a ser
+\begin{figure}[htpb]
+\centering
+\begin{tikzpicture}[x=22mm, y=11mm, every node/.style={font=\small}]
+    \fill[green!15] (0,1) rectangle (1,2); \fill[red!12] (1,1) rectangle (2,2);
+    \fill[red!12] (0,0) rectangle (1,1); \fill[green!15] (1,0) rectangle (2,1);
+    \draw[thick] (0,0) grid (2,2);
+    \node at (0.5,1.5) {VP}; \node at (1.5,1.5) {FN};
+    \node at (0.5,0.5) {FP}; \node at (1.5,0.5) {VN};
+    \node at (0.5,2.25) {previsto positivo}; \node at (1.5,2.25) {previsto negativo};
+    \node[anchor=east] at (-0.05,1.5) {real positivo}; \node[anchor=east] at (-0.05,0.5) {real negativo};
+\end{tikzpicture}
+\caption{A matriz de confusão de uma tarefa binária. Os acertos ficam na diagonal (verde) e os erros fora dela (vermelho).}
+\label{fig:confusao}
+\end{figure}
+
+Essas métricas dependem de um limiar de decisão: o modelo prevê o positivo quando a probabilidade prevista passa de, por exemplo, 0,5. A curva \gls{ROC} elimina essa dependência: ela traça a taxa de verdadeiros positivos (a sensibilidade) contra a taxa de falsos positivos (um menos a especificidade) à medida que o limiar varia de 1 a 0 (Figura~\ref{fig:roc_auc}). A \gls{AUC}~\cite{fawcett2006roc} é a área sob essa curva. Ela é igual à probabilidade de que um exemplo positivo escolhido ao acaso receba uma probabilidade maior que um negativo escolhido ao acaso: vale 1 para um modelo que ordena todos os exemplos corretamente e 0,5 para um modelo que ordena ao acaso. Com mais de duas classes, a AUC macro um-contra-o-resto é a média das AUC de cada classe contra as demais.
+
+\begin{figure}[htpb]
+\centering
+\begin{tikzpicture}
+\begin{axis}[
+    width=0.5\textwidth, height=0.5\textwidth, idioma,
+    xmin=0, xmax=1, ymin=0, ymax=1,
+    xlabel={taxa de falsos positivos}, ylabel={taxa de verdadeiros positivos},
+    tick label style={font=\footnotesize}, label style={font=\small},
+    legend style={font=\footnotesize, draw=none, at={(0.97,0.03)}, anchor=south east},
+    grid=major, grid style={gray!20},
+]
+\addplot[thick, corA, domain=0:1, samples=100] {1-(1-x)^4};
+\addlegendentry{probabilidades: AUC}
+\addplot[thick, corD, mark=*, mark options={fill=corD}] coordinates {(0,0) (0.25,0.70) (1,1)};
+\addlegendentry{classes previstas: AUC$_c$}
+\addplot[gray, dashed, domain=0:1] {x};
+\addlegendentry{acaso}
+\end{axis}
+\end{tikzpicture}
+\caption{Curva ROC de um modelo hipotético. Com as probabilidades, o limiar varia e a curva (azul) é contínua. Com as classes já previstas, só há um limiar: a ``curva'' (vermelha) tem um único ponto interior, e a área sob ela, AUC$_c$, é menor.}
+\label{fig:roc_auc}
+\end{figure}
+
+Se a AUC é calculada a partir das classes previstas, e não das probabilidades, há um único limiar, e a ``curva'' ROC tem um só ponto interior (Figura~\ref{fig:roc_auc}). A área passa a ser
 \begin{equation}
-\mathrm{AUC}_c = \frac{\mathrm{TPR} + \mathrm{TNR}}{2},
+\mathrm{AUC}_c = \frac{\mathrm{sensibilidade} + \mathrm{especificidade}}{2},
 \end{equation}
-a média entre sensibilidade e especificidade, que no caso binário é igual à acurácia balanceada e à revocação macro. A AUC$_c$ depende do limiar e costuma ser bem menor que a AUC das probabilidades do mesmo modelo. Nesta dissertação, AUC significa sempre a AUC das probabilidades; a AUC$_c$ é calculada só para comparar com as tabelas de Lira et al., que a relatam (Capítulo~\ref{chap:related}).
+que no caso binário é igual à acurácia balanceada e à revocação macro. A AUC$_c$ depende do limiar e costuma ser bem menor que a AUC das probabilidades do mesmo modelo; um modelo que prevê sempre a mesma classe tem AUC$_c$ de exatamente 0,5. Nesta dissertação, quando se escreve só ``AUC'', trata-se da AUC calculada das probabilidades previstas; a versão calculada das classes previstas aparece sempre marcada como AUC$_c$, e é usada só para comparar com as tabelas de Lira et al., que a relatam (Seção~\ref{sec:lira_particao}).
 
 \section{Aprendizado Multitarefa}
 \label{sec:mt_background}
 
-O aprendizado multitarefa treina um único modelo em várias tarefas relacionadas, para que elas compartilhem uma representação~\cite{caruana1997multitask,ruder2017overview}. Na forma mais comum, o compartilhamento rígido de parâmetros, um único backbone alimenta uma cabeça por tarefa, e a perda é uma soma ponderada das perdas das tarefas. O compartilhamento pode ajudar quando as tarefas usam características parecidas e pode atrapalhar quando uma tarefa domina a representação comum. Quando um rótulo não existe para alguns exemplos, como a distância nos ferimentos de saída, esses exemplos ficam fora do termo correspondente da perda. Um backbone compartilhado também tem um efeito prático direto: as duas saídas vêm de um único passo para a frente em vez de dois.
+O aprendizado multitarefa treina um único modelo em várias tarefas relacionadas, para que elas compartilhem uma representação~\cite{caruana1997multitask,ruder2017overview}. Na forma mais comum, o compartilhamento rígido de parâmetros, um único extrator alimenta uma cabeça por tarefa, e a perda total é uma soma, possivelmente ponderada, das perdas das tarefas (a Figura~\ref{fig:multitarefa_arch} mostra o caso deste trabalho). O compartilhamento pode ajudar quando as tarefas usam características parecidas, porque cada tarefa funciona como um sinal extra de treino para a outra, e pode atrapalhar quando uma tarefa domina a representação comum. Quando um rótulo não existe para alguns exemplos, como a distância nos ferimentos de saída, esses exemplos ficam fora do termo correspondente da perda. Um extrator compartilhado também tem um efeito prático direto: as respostas de todas as tarefas vêm de uma única passagem da imagem pela rede, em vez de uma passagem por tarefa.
 
 \section{Comparações Pareadas e Não Inferioridade}
 \label{sec:stats_background}
 
-Quando dois modelos são avaliados nas mesmas imagens de teste, a diferença entre eles deve ser estimada de forma pareada, já que os dois são afetados pelas mesmas imagens difíceis e fáceis. Um bootstrap não paramétrico~\cite{efron1993bootstrap} reamostra as unidades de avaliação com reposição e recalcula a diferença em cada reamostra; os percentis das diferenças reamostradas dão um intervalo de confiança. Como as imagens de um mesmo caso são dependentes, as unidades reamostradas aqui são os casos, e não as imagens.
+Quando dois modelos são avaliados nas mesmas imagens de teste, a diferença entre eles deve ser estimada de forma \emph{pareada}, já que os dois são afetados pelas mesmas imagens difíceis e fáceis. O \en{bootstrap} não paramétrico~\cite{efron1993bootstrap} é uma forma de obter um \gls{IC} para essa diferença sem supor uma distribuição: a partir do conjunto de teste, sorteiam-se, com reposição, muitos conjuntos do mesmo tamanho (as reamostras); em cada um, recalcula-se a diferença entre os modelos; e os percentis 2,5 e 97,5 dessas diferenças dão um IC de 95\%. Como as imagens de um mesmo caso são dependentes, as unidades sorteadas aqui são os casos, e não as imagens.
 
-Uma pergunta de superioridade quer saber se o intervalo da diferença fica acima de zero. Uma pergunta de \emph{não inferioridade} pede algo mais fraco: se um modelo não é pior que uma referência por mais de uma margem $\delta$ fixada de antemão, isto é, se o limite inferior do intervalo da diferença fica acima de $-\delta$. A não inferioridade é a pergunta adequada quando o candidato tem outra vantagem, como menos parâmetros ou menor custo, e a margem precisa ser fixada antes de ver os resultados.
+Com a diferença $\Delta$ definida como candidato menos referência, valores positivos favorecem o candidato e valores negativos favorecem a referência. Três perguntas podem ser feitas sobre o IC de $\Delta$ (Figura~\ref{fig:nao_inferioridade}):
+\begin{itemize}
+    \item \textbf{Superioridade:} o candidato é melhor que a referência? A resposta é sim se o IC inteiro fica acima de zero.
+    \item \textbf{Inferioridade:} o candidato é pior? A resposta é sim se o IC inteiro fica abaixo de zero.
+    \item \textbf{Não inferioridade:} o candidato não é pior que a referência por mais que uma margem $\delta > 0$, fixada de antemão~\cite{piaggio2012reporting}? A resposta é sim se o limite inferior do IC fica acima de $-\delta$.
+\end{itemize}
+O sinal negativo em $-\delta$ vem da definição de $\Delta$: perder desempenho dá diferenças negativas, e a margem diz quanto se aceita perder no máximo. Por exemplo, com $\delta = 0{,}02$, um candidato é não inferior se o pior cenário compatível com os dados é perder menos de 0,02 de AUC. A não inferioridade é a pergunta adequada quando o candidato tem outra vantagem, como menos parâmetros ou menor custo, e a margem precisa ser fixada antes de ver os resultados, para não ser escolhida a favor do candidato. Quando nenhuma das três condições vale, o resultado é \emph{inconclusivo}.
+
+\begin{figure}[htpb]
+\centering
+\begin{tikzpicture}[x=55mm, y=7mm, every node/.style={font=\footnotesize}]
+    % eixos verticais: -delta e 0
+    \draw[thick, dashed, corD] (-0.4,0.4) -- (-0.4,-4.4) node[below] {$-\delta$};
+    \draw[thick] (0,0.4) -- (0,-4.4) node[below] {$0$};
+    \draw[->] (-0.85,-4.4) -- (0.75,-4.4) node[right] {$\Delta$ = candidato $-$ referência};
+    % ICs
+    \foreach \y/\a/\b/\t in {0/0.12/0.55/superior, -1/-0.3/0.25/não inferior, -2/-0.62/0.15/inconclusivo, -3/-0.75/-0.18/inferior} {
+        \draw[thick, |-|] (\a,\y) -- (\b,\y);
+        \fill ({(\a+\b)/2},\y) circle (1.5pt);
+        \node[anchor=west] at (0.8,\y) {\t};
+    }
+\end{tikzpicture}
+\caption{Leitura do intervalo de confiança da diferença $\Delta$. O candidato é superior se o IC fica todo acima de zero; não inferior se o IC fica todo acima de $-\delta$; inferior se fica todo abaixo de zero; e o resultado é inconclusivo nos demais casos. As regras de decisão completas deste trabalho estão na Seção~\ref{sec:stats}.}
+\label{fig:nao_inferioridade}
+\end{figure}

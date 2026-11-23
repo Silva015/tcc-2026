@@ -1,0 +1,69 @@
+\label{chap:anexo_codigo}
+
+Este anexo reproduz os trechos do código público de Lira et al.~\cite{leguwoi} (licença MIT) que definem as duas partições do estudo, e mostra uma versão do \en{hold-out} sem vazamento. Os trechos foram encurtados só nas linhas que não afetam a partição (comentários de documentação e carregamento das imagens); nenhuma linha de partição foi alterada.
+
+\section{O \texorpdfstring{\en{Hold-out}}{Hold-out}, com Vazamento}
+
+A função abaixo produz as partições das Tabelas~4 e~5 do artigo. Ela recebe a lista de imagens e as colunas a estratificar; na chamada, essas colunas são o número do caso (\texttt{split\_criterion}, cujo valor padrão é \texttt{"case\_number"}) e o rótulo (\texttt{target\_column}). A estratificação iterativa~\cite{sechidis2011stratification} transforma cada número de caso numa coluna binária e tenta pôr, em treino e em teste, a mesma proporção de imagens de \emph{cada} coluna, isto é, de cada caso. Ela espalha cada caso entre os dois lados, em vez de mantê-lo inteiro num lado só.
+
+\begin{lstlisting}[language=Python, caption={\en{Hold-out} do código público (arquivo de dados do \en{hold-out}).}, label={lst:holdout_vazado}]
+from skmultilearn.model_selection import IterativeStratification
+
+def iterative_split(df, test_size, stratify_columns):
+    # One-hot encode the stratify columns and concatenate them
+    one_hot_cols = [pd.get_dummies(df[col]) for col in stratify_columns]
+    one_hot_cols = pd.concat(one_hot_cols, axis=1).to_numpy()
+    stratifier = IterativeStratification(
+        n_splits=2,
+        order=len(stratify_columns),
+        sample_distribution_per_fold=[test_size, 1 - test_size]
+    )
+    train_indices, test_indices = next(
+        stratifier.split(df.to_numpy(), one_hot_cols)
+    )
+    train, test = df.iloc[train_indices], df.iloc[test_indices]
+    return train, test
+
+# chamada, dentro de get_gunshow_dataset(...):
+df_train, df_test = iterative_split(
+    df,
+    test_size=split_test_proportion,                    # 0.2
+    stratify_columns=[split_criterion, target_column]   # caso e rotulo
+)
+\end{lstlisting}
+
+\section{A Validação Cruzada, sem Vazamento}
+
+A validação cruzada do mesmo código usa outra função, que agrupa por caso: \en{StratifiedGroupKFold} põe cada grupo (cada caso) inteiro numa única dobra e só equilibra as classes entre as dobras. Aqui o caso é tratado como grupo, não como coluna a estratificar, e por isso não há vazamento.
+
+\begin{lstlisting}[language=Python, caption={Validação cruzada do código público (arquivo de dados da validação cruzada).}, label={lst:kfold_agrupado}]
+from sklearn.model_selection import StratifiedGroupKFold
+
+def iterative_kfold_split(df, n_folds, target_column):
+    df = df.sort_values(by='case_number')
+    # um numero de grupo para cada numero de caso
+    ...
+    x_df = df['path'].to_list()
+    y_df = df[target_column].to_list()
+    sgkf = StratifiedGroupKFold(n_splits=n_folds, shuffle=True)
+    for i, (train_index, test_index) in enumerate(sgkf.split(x_df, y_df, groups)):
+        train, test = df.iloc[train_index], df.iloc[test_index]
+        ...
+\end{lstlisting}
+
+\section{Um \texorpdfstring{\en{Hold-out}}{Hold-out} sem Vazamento}
+
+Basta usar no \en{hold-out} a mesma ideia da validação cruzada: tratar o caso como grupo. O trecho abaixo, escrito para este trabalho, separa cerca de 20\% dos casos para teste com uma divisão estratificada e agrupada, e confere que nenhum caso aparece nos dois lados. O grupo é o identificador único do caso, formado pelo ano e pelo número, para que casos de anos diferentes com o mesmo número não sejam confundidos.
+
+\begin{lstlisting}[language=Python, caption={\en{Hold-out} agrupado por caso, sem vazamento.}, label={lst:holdout_agrupado}]
+from sklearn.model_selection import StratifiedGroupKFold
+
+def hold_out_agrupado(df, target_column, seed=42):
+    # o caso (ano + numero) e o criterio de unicidade
+    grupos = df["ano"].astype(str) + "/" + df["case_number"].astype(str)
+    sgkf = StratifiedGroupKFold(n_splits=5, shuffle=True, random_state=seed)
+    train_idx, test_idx = next(sgkf.split(df, df[target_column], groups=grupos))
+    # nenhum caso pode estar nos dois lados
+    assert not set(grupos.iloc[train_idx]) & set(grupos.iloc[test_idx])
+    return df.iloc[train_idx], df.iloc[test_idx]
+\end{lstlisting}

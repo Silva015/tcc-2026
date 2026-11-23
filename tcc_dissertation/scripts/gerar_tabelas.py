@@ -25,8 +25,16 @@ def js(nome):
     return json.load(open(os.path.join(RES, nome)))
 
 
+TERMOS_EN = re.compile(r"(?<![\w{:_/-])(hold-outs?|backbones?|bootstrap|transformers?|splines?|wavelets?|pipeline|benchmark)(?![\w}])")
+
+
+def italico_pt(pt):
+    """No texto em português, termos em inglês vão em itálico (\\en{...}); o EN não é tocado."""
+    return TERMOS_EN.sub(lambda m: f"\\en{{{m.group(1)}}}", pt)
+
+
 def EP(en, pt):
-    return f"\\EP{{{en}}}{{{pt}}}"
+    return f"\\EP{{{en}}}{{{italico_pt(pt)}}}"
 
 
 def pm(txt):
@@ -73,10 +81,10 @@ def celulas_bilingues(linha):
 
 
 def tabela(nome, legenda_en, legenda_pt, rotulo, colunas, cabecalho, linhas, tamanho="\\footnotesize",
-           larga=False, nota_en="", nota_pt="", espaco="4pt", posicao="!htbp"):
+           larga=False, nota_en="", nota_pt="", espaco="4pt", posicao="!htbp", ambiente="table"):
     corpo = []
     corpo.append("% Gerado por tcc_dissertation/scripts/gerar_tabelas.py a partir de resultados/. Não edite à mão.")
-    corpo.append(f"\\begin{{table}}[{posicao}]")
+    corpo.append(f"\\begin{{{ambiente}}}[{posicao}]")
     corpo.append("\\centering")
     corpo.append(f"\\caption{{{EP(legenda_en, legenda_pt)}}}")
     corpo.append(f"\\label{{{rotulo}}}")
@@ -99,7 +107,7 @@ def tabela(nome, legenda_en, legenda_pt, rotulo, colunas, cabecalho, linhas, tam
         corpo.append("\\end{adjustbox}")
     if nota_en:
         corpo.append(f"\\par\\smallskip\\parbox{{\\linewidth}}{{\\scriptsize {EP(nota_en, nota_pt)}}}")
-    corpo.append("\\end{table}")
+    corpo.append(f"\\end{{{ambiente}}}")
     with open(os.path.join(SAIDA, nome + ".tex"), "w") as f:
         f.write("\n".join(corpo) + "\n")
     print("gravado", nome)
@@ -256,9 +264,10 @@ def t_vazamento():
            "on case number and label) reproduced with three partitions; mean $\\pm$ s.d.\\ over the partitions. "
            "\\emph{Grouped}: the five case-grouped folds of this work; mean $\\pm$ s.d.\\ over folds. "
            "Leak: share of test images whose case also has images in training. $\\Delta$ = Lira $-$ grouped.",
-           "Efeito da partição com todo o resto fixo (ResNet-152, mesma receita, semente 42). "
-           "\\emph{Lira et al.}: o hold-out por imagem do código público de Lira et al.\\ (estratificação iterativa "
-           "sobre o número do caso e o rótulo) reproduzido em três partições; média $\\pm$ dp entre as partições. "
+           "Efeito da partição com todo o resto fixo (ResNet-152, receita deste trabalho, semente de treino 42). "
+           "\\emph{Lira et al.}: o \\en{hold-out} por imagem do código público de Lira et al.\\ (estratificação "
+           "iterativa sobre o número do caso e o rótulo). Como a função pública não fixa a semente, ela foi executada "
+           "três vezes (sementes 42, 43 e 44), o que gera três partições diferentes; média $\\pm$ dp entre as três. "
            "\\emph{Agrupada}: as cinco dobras agrupadas por caso deste trabalho; média $\\pm$ dp entre dobras. "
            "Vaz.: fração das imagens de teste cujo caso também tem imagens no treino. $\\Delta$ = Lira $-$ agrupada.",
            "tab:vazamento", "lllrcccc",
@@ -651,6 +660,73 @@ def t_reproducao(tarefa):
                    "\\texttt{regnet\\_y\\_16gf} usada no protocolo único.")
 
 
+def t_holdout(tarefa, lado):
+    """As Tabelas 4 (entrada/saída) e 5 (distância) de Lira et al. refeitas em hold-out, no formato do artigo:
+    lado = 'vaz' (hold-out do código público, com vazamento) ou 'agr' (hold-out agrupado por caso)."""
+    n = 4 if tarefa == "es" else 5
+    arq = "reproduzida" if lado == "vaz" else "sem_vazamento"
+    dados = {r["modelo_leguwoi"]: r for r in ler(f"reproducao_lira/tabela{n}_{arq}.csv")}
+    ordem = PRE_TREINADAS + [m for m in dados if m not in PRE_TREINADAS]
+    C = ("acc", "prec_M", "prec_W", "rec_M", "rec_W", "f1_M", "f1_W", "auc_M", "auc_m", "auc_W",
+         "espec_M", "espec_W", "auc_prob_M")
+    linha = lambda nome, d: f"{nome} & " + " & ".join(f"{float(d[c]):.3f}" for c in C)
+    linhas = [linha(NOMES_REPRO[m], dados[m]) for m in ordem[:5]]
+    linhas.append("\\midrule")
+    linhas += [linha(NOMES_REPRO[m], dados[m]) for m in ordem[5:]]
+    linhas.append("\\midrule")
+    med = lambda mods: {c: sum(float(dados[x][c]) for x in mods) / len(mods) for c in C}
+    linhas.append(linha(EP("Mean, 5 ResNets", "Média, 5 ResNets"), med(ordem[:5])))
+    linhas.append(linha(EP("Mean, 16 models", "Média, 16 modelos"), med(ordem)))
+    if tarefa == "es":
+        en_t, pt_t = "Entry/exit", "Entrada/saída"
+    else:
+        en_t, pt_t = "Shooting distance (entries only)", "Distância do disparo (só entradas)"
+    if lado == "vaz":
+        en_l = ("\\emph{with leakage}: the image-level hold-out of the public code of Lira et al., in which test images "
+                "share their case with training images")
+        pt_l = ("\\emph{com vazamento}: o \\en{hold-out} por imagem do código público de Lira et al., em que as imagens "
+                "de teste dividem o caso com imagens de treino")
+    else:
+        en_l = ("\\emph{without leakage}: a hold-out grouped by case, in which every case is entirely in training or "
+                "entirely in test")
+        pt_l = ("\\emph{sem vazamento}: um \\en{hold-out} agrupado por caso, em que cada caso fica inteiro no treino "
+                "ou inteiro no teste")
+    tabela(f"tab_holdout_{tarefa}_{lado}",
+           f"{en_t}, Table~{n} of Lira et al.~\\cite{{Lira2025deep}} reproduced {en_l}. Same 16 architectures, same "
+           "training recipe (Section~\\ref{sec:repro_setup}) and one single train/test split; no cross-validation. "
+           "Columns follow the article: P = precision, R = recall (sensitivity), Sp = specificity; M = macro, "
+           "m = micro, W = weighted. AUC$_c$ is computed from predicted classes, as in the article; AUC$_p$ from "
+           "predicted probabilities. Micro precision, recall and F1 equal the accuracy and are omitted.",
+           f"{pt_t}, Tabela~{n} de Lira et al.~\\cite{{Lira2025deep}} reproduzida {pt_l}. As mesmas 16 arquiteturas, "
+           "a mesma receita de treino (Seção~\\ref{sec:repro_setup}) e uma única partição treino/teste, sem validação "
+           "cruzada. As colunas seguem o artigo: P = precisão, R = revocação (sensibilidade), Esp = especificidade; "
+           "M = macro, m = micro, W = ponderada. A AUC$_c$ é calculada das classes previstas, como no artigo, e a "
+           "AUC$_p$, das probabilidades previstas. Precisão, revocação e F1 micro são iguais à acurácia e foram omitidos.",
+           f"tab:holdout_{tarefa}_{lado}", "l" + "c" * len(C),
+           [f" & & \\multicolumn{{2}}{{c}}{{P}} & \\multicolumn{{2}}{{c}}{{R}} & \\multicolumn{{2}}{{c}}{{F1}} & "
+            f"\\multicolumn{{3}}{{c}}{{AUC$_c$}} & \\multicolumn{{2}}{{c}}{{{EP('Sp', 'Esp')}}} & \\\\",
+            "\\cmidrule(lr){3-4}\\cmidrule(lr){5-6}\\cmidrule(lr){7-8}\\cmidrule(lr){9-11}\\cmidrule(lr){12-13}",
+            f"{EP('Model', 'Modelo')} & Acc & M & W & M & W & M & W & M & m & W & M & W & AUC$_p$ \\\\"],
+           linhas, larga=True, espaco="3pt", ambiente="sidewaystable", posicao="p",
+           nota_en="$^{\\dagger}$ In the public code this row is built with \\texttt{regnet\\_y\\_1\\_6gf}.",
+           nota_pt="$^{\\dagger}$ No código público esta linha é construída com a RegNetY-1.6GF, uma rede bem menor.")
+
+
+def d_repro_delta():
+    """Dados da figura comum/figuras/fig_holdout_delta.tex: diferença (com vazamento - sem vazamento)
+    do F1 macro e da acurácia por modelo, nas duas tarefas, em img/protocolo/repro_delta_<tarefa>.csv."""
+    destino = os.path.join(RAIZ, "tcc_dissertation", "img", "protocolo")
+    for tarefa, n in (("es", 4), ("dist", 5)):
+        dif = {r["modelo_leguwoi"]: r for r in ler(f"reproducao_lira/tabela{n}_diferenca.csv")}
+        ordem = PRE_TREINADAS + sorted(m for m in dif if m not in PRE_TREINADAS)
+        with open(os.path.join(destino, f"repro_delta_{tarefa}.csv"), "w") as f:
+            f.write("y,modelo,acc,f1\n")
+            for i, m in enumerate(reversed(ordem)):
+                nome = NOMES_REPRO[m].replace("$^{\\dagger}$", "")
+                f.write(f"{i},{nome},{float(dif[m]['acc']):.4f},{float(dif[m]['f1_M']):.4f}\n")
+        print("gravado", f"img/protocolo/repro_delta_{tarefa}.csv")
+
+
 def t_diagnostico():
     d = js("reproducao_lira/diagnostico_lira.json")
     res = {r["receita"]: r for r in d["resumo"]}
@@ -717,3 +793,7 @@ if __name__ == "__main__":
     t_reproducao("es")
     t_reproducao("dist")
     t_diagnostico()
+    for _t in ("es", "dist"):
+        for _l in ("vaz", "agr"):
+            t_holdout(_t, _l)
+    d_repro_delta()
