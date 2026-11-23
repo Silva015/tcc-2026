@@ -277,6 +277,6 @@ O pitch de 3 min, **mais**:
 - **Não saiba?** Diga: *"Não testei isso, mas é uma ótima ideia. Posso anotar seu contato?"*. Isso vale mais do que inventar uma resposta.
 - **Antes do evento:**
   - Coloque sua foto em `poster/img/author.jpg` e recompile.
-  - **Troque as fotos pelos originais em alta resolução.** As extraídas do PDF ficam com cerca de 56–130 dpi no A0; o ideal é ≥150 dpi. Mantenha os mesmos nomes de arquivo em `poster/img/`.
+  - **Troque as fotos pelos originais em alta resolução.** No A2, as extraídas do PDF ficam com 120–280 dpi; duas delas (a primeira foto bruta e o primeiro recorte) ficam em ~120 dpi, abaixo do ideal de ≥150 dpi. Mantenha os mesmos nomes de arquivo em `poster/img/`.
   - Confirme que o QR (`\qrurl`) aponta para um link **público**. Hoje ele aponta para `github.com/Silva015/tcc-2026`.
-  - Confirme o tamanho exigido pelo evento. O pôster está em A0 retrato (84,1 × 118,9 cm).
+  - Confirme o tamanho exigido pelo evento. O pôster está em **A2 retrato (42 × 59,4 cm)**.

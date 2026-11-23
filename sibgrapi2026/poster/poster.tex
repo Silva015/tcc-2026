@@ -1,9 +1,10 @@
 %% =====================================================================
 %%  TransKAN — SIBGRAPI 2026 poster
 %%  Layout modelled on the HenriquesLab poster template (a0poster, 3 cols)
+%%  Paper: A2 portrait (42 x 59.4 cm)
 %%  Build: make   (pdfLaTeX)
 %% =====================================================================
-\documentclass[a0,portrait]{a0poster}
+\documentclass[a2,portrait]{a0poster}
 
 \usepackage[utf8]{inputenc}
 \usepackage[T1]{fontenc}
@@ -23,6 +24,31 @@
 \usepackage{pgfplots}
 \pgfplotsset{compat=1.18}
 
+% a0poster keeps A0 font sizes for every paper size; scale them to A2
+% (about 0.55x the A0 sizes, slightly larger than the 0.475 page ratio for legibility)
+\renewcommand{\tiny}{\fontsize{6.6}{8}\selectfont}
+\renewcommand{\scriptsize}{\fontsize{7.9}{9.8}\selectfont}
+\renewcommand{\footnotesize}{\fontsize{9.5}{12}\selectfont}
+\renewcommand{\small}{\fontsize{11.4}{13.8}\selectfont}
+\renewcommand{\normalsize}{\fontsize{13.7}{16.5}\selectfont}
+\renewcommand{\large}{\fontsize{16.4}{20}\selectfont}
+\renewcommand{\Large}{\fontsize{19.7}{24}\selectfont}
+\renewcommand{\LARGE}{\fontsize{23.6}{29}\selectfont}
+\renewcommand{\huge}{\fontsize{28.4}{35}\selectfont}
+\renewcommand{\Huge}{\fontsize{34}{42}\selectfont}
+\normalsize
+
+% Diagrams below are drawn in A0 centimetres and shrunk with \resizebox, so
+% inside them we restore the original A0 font sizes (the box scales them).
+\newcommand{\useAzeroFonts}{%
+  \renewcommand{\scriptsize}{\fontsize{14.4}{18}\selectfont}%
+  \renewcommand{\small}{\fontsize{20.74}{25}\selectfont}%
+  \renewcommand{\normalsize}{\fontsize{24.88}{30}\selectfont}%
+  \renewcommand{\large}{\fontsize{29.86}{37}\selectfont}%
+  \renewcommand{\Large}{\fontsize{35.83}{45}\selectfont}%
+  \renewcommand{\LARGE}{\fontsize{43}{54}\selectfont}%
+  \normalsize}
+
 % ---------------------------------------------------------------------
 %  Switches you may want to flip
 % ---------------------------------------------------------------------
@@ -34,6 +60,7 @@
 \newif\ifchartauc \chartaucfalse
 \newcommand{\chartlabel}{\ifchartauc macro AUC\else macro F1-score\fi}
 \newcommand{\qrurl}{https://github.com/Silva015/tcc-2026}
+\newcommand{\qrlinkedin}{https://www.linkedin.com/in/arthur-carneiro-7b0538234/}
 
 % ---------------------------------------------------------------------
 %  Colours
@@ -50,17 +77,17 @@
 % ---------------------------------------------------------------------
 %  Layout helpers
 % ---------------------------------------------------------------------
-\setlength{\columnsep}{50pt}
+\setlength{\columnsep}{24pt}
 \setlength{\columnseprule}{0pt}
 \setlength{\parindent}{0pt}
 \setlength{\parskip}{0.45em}
-\captionsetup{skip=12pt}
+\captionsetup{skip=6pt}
 \setlist{leftmargin=1.2em,itemsep=0.25em,topsep=0.3em}
 
 \newcommand{\postersection}[1]{%
   \vspace{1.1em}%
   {\raggedright\color{NavyBlue}\LARGE\bfseries #1\par}%
-  \vspace{0.15em}{\color{kangold}\rule{\linewidth}{5pt}}\par\vspace{0.4em}}
+  \vspace{0.15em}{\color{kangold}\rule{\linewidth}{2.5pt}}\par\vspace{0.4em}}
 
 \newcommand{\figtitle}[1]{\textbf{#1}}
 
@@ -75,9 +102,9 @@
 %% =====================================================================
 %%  HEADER
 %% =====================================================================
-\begin{minipage}[t]{0.74\linewidth}
+\begin{minipage}[t]{0.72\linewidth}
   \vspace{0pt}
-  {\color{NavyBlue}\fontsize{62}{72}\selectfont\bfseries
+  {\color{NavyBlue}\fontsize{32}{38}\selectfont\bfseries
    TransKAN: Transfer Learning and Kolmogorov--Arnold\\[0.1em]
    Networks for Gunshot Wound Classification\par}
   \vspace{1.0em}
@@ -86,25 +113,28 @@
   {\large Department of Computer Science, University of Bras\'ilia (UnB), Bras\'ilia, Brazil\par}
   \vspace{0.3em}
   {\large \faEnvelope~arthur.carneiro@aluno.unb.br \quad \faEnvelope~pedro.freitas@unb.br
-   \quad \faGithub~Silva015\par}
+   \quad \faGithub~Silva015 \quad \faLinkedin~in/arthur-carneiro-7b0538234\par}
   \vspace{0.3em}
   {\normalsize\color{DimGray} SIBGRAPI 2026 \,---\, Conference on Graphics, Patterns and Images\par}
 \end{minipage}%
 \hfill
-\begin{minipage}[t]{0.24\linewidth}
+\begin{minipage}[t]{0.26\linewidth}
   \vspace{0pt}\raggedleft
   \IfFileExists{img/author.png}{%
-    \includegraphics[height=11.5cm]{img/author.png}%
+    \includegraphics[height=5.6cm]{img/author.png}%
   }{%
-    \tikz\node[draw=gray,line width=2pt,dashed,minimum width=9.5cm,minimum height=11.5cm,
+    \tikz\node[draw=gray,line width=1pt,dashed,minimum width=4.6cm,minimum height=5.6cm,
                align=center,font=\small\color{gray}]{author photo\\(img/author.jpg)};%
   }\\[1.0em]
-  \raisebox{-0.5\height}{\includegraphics[height=5.5cm]{img/unb_logo.pdf}}\hspace{1.2cm}%
-  \raisebox{-0.5\height}{\qrcode[height=5.5cm]{\qrurl}}
+  \includegraphics[height=2.0cm]{img/unb_logo.pdf}\\[0.6em]
+  \begin{tabular}{@{}c@{\hspace{0.4cm}}c@{}}
+    \qrcode[height=2.4cm]{\qrurl} & \qrcode[height=2.4cm]{\qrlinkedin}\\[2pt]
+    {\scriptsize code \& paper} & {\scriptsize\faLinkedin~connect}
+  \end{tabular}
 \end{minipage}
 
 \vspace{1.2em}
-{\color{NavyBlue}\rule{\linewidth}{6pt}}
+{\color{NavyBlue}\rule{\linewidth}{3pt}}
 \vspace{0.6em}
 
 %% =====================================================================
@@ -114,25 +144,22 @@
 \raggedcolumns
 
 %% ------------------------------ COLUMN 1 ----------------------------
-Telling an \textbf{entry} from an \textbf{exit} gunshot wound, and estimating
-the \textbf{shooting distance}, are core forensic tasks. They still rely on
-expert judgement and depend on lighting and imaging conditions at the scene.
-Deep CNNs have been tried, but conventional fully connected (MLP) heads
-struggle with the \emph{irregular, noisy and imbalanced} decision boundaries of
-real forensic photographs.
-\textbf{TransKAN} keeps a pre-trained \textbf{ResNet-152} backbone and replaces
-its dense classifier with a \textbf{Kolmogorov--Arnold Network (KAN)} head,
-which has \emph{learnable spline activations on every edge}.
-It is validated on \textbf{GuWID}, a new database of
-\textbf{2,551 real wound images} from Federal District Civil Police (PCDF)
-casework.
+Telling an \textbf{entry} from an \textbf{exit} gunshot wound is a core
+forensic task that still relies on expert judgement. CNNs with conventional
+MLP heads struggle with the \emph{irregular, noisy and imbalanced} boundaries
+of real forensic photos.
+\textbf{TransKAN} keeps a pre-trained \textbf{ResNet-152} and replaces its
+dense classifier with a \textbf{Kolmogorov--Arnold Network (KAN)} head, with
+\emph{learnable spline activations on every edge}. It is validated on
+\textbf{GuWID}: \textbf{2,551 real wound images} from Federal District Civil
+Police (PCDF) casework.
 
 \postersection{Real Forensic Evidence}
 
 {\small\color{wound}\faExclamationTriangle~\textit{Contains real forensic imagery.}\par}
 \vspace{0.3em}
 \begin{center}
-\resizebox{\linewidth}{!}{%
+\resizebox{\linewidth}{!}{\useAzeroFonts%
 \begin{tikzpicture}[x=1cm,y=1cm]
   % raw photographs (same height)
   \node[anchor=north west,inner sep=0] (r1) at (0,0)     {\includegraphics[height=10cm]{img/wound_raw1.png}};
@@ -149,22 +176,19 @@ casework.
   \node[rotate=90,anchor=south,font=\large\bfseries,text=DimGray] at ($(r1.west)+(-0.2,0)$) {raw scene photo};
   \node[rotate=90,anchor=south,font=\large\bfseries,text=DimGray] at ($(c1.west)+(-0.9,0)$) {model input};
 \end{tikzpicture}}
-\captionof{figure}{\figtitle{From crime-scene photograph to model input.} Raw PCDF
-photographs (top; note the forensic ruler) are cropped in GIMP to a square region
-centred on the wound (bottom), then resized to $224\times224$. All three samples
-are entry wounds.}
+\captionof{figure}{\figtitle{From crime-scene photo to model input.} Raw PCDF
+photos (top, with forensic ruler) are cropped in GIMP to a square around the
+wound (bottom) and resized to $224\times224$. All three are entry wounds.}
 \end{center}
 
 \postersection{GuWID: Gunshot Wound Image Database}
 
-Built from records of \textbf{real homicide and suicide cases} examined by PCDF
-forensic experts (UnB Research Ethics Committee, protocol
-4418221.9.0000.0030). Labels (wound type, anatomical location, shooting distance)
-were transcribed \emph{verbatim} from the forensic pathologist's autopsy
-reports.
+Real homicide and suicide cases examined by PCDF experts (UnB Ethics
+Committee, protocol 4418221.9.0000.0030). Labels are transcribed
+\emph{verbatim} from autopsy reports.
 
 \begin{center}
-\resizebox{\linewidth}{!}{%
+\resizebox{\linewidth}{!}{\useAzeroFonts%
 \begin{tikzpicture}[x=1cm,y=1cm,font=\large]
   \fill[navyD]  (0,6)   -- (24,6)   -- (21,4)   -- (3,4)   -- cycle;
   \fill[navyC]  (3,3.8) -- (21,3.8) -- (18.2,1.8)-- (5.8,1.8)-- cycle;
@@ -182,7 +206,7 @@ reports.
   \fill[#4] ({#1*\stripw},#3) rectangle ({#2*\stripw},#3+1.6);
   \node[font=\small\bfseries,text=#6] at ({(#1+#2)/2*\stripw},#3+0.8) {#5};}
 \begin{center}
-\begin{tikzpicture}[x=1cm,y=1cm]
+\begin{tikzpicture}[x=1cm,y=0.5cm]
   % wound type
   \node[anchor=east,font=\small\bfseries,align=right] at (-0.3,6.8) {Wound\\type};
   \seg{0}{0.738}{6}{navyA}{Entry 1,883}{white}
@@ -192,22 +216,20 @@ reports.
   \seg{0}{0.8545}{3}{navyB}{Distant 1,609}{white}
   \seg{0.8545}{0.9777}{3}{navyC}{}{black}
   \seg{0.9777}{1}{3}{wound}{}{white}
-  \draw[line width=1.5pt] ({0.916*\stripw},3) -- ({0.916*\stripw},2.3) node[below,font=\scriptsize]{Close 232};
-  \draw[line width=1.5pt] ({0.989*\stripw},3) -- ({0.989*\stripw},1.5) node[below,font=\scriptsize]{Contact 42};
+  \draw[line width=0.8pt] ({0.916*\stripw},3) -- ({0.916*\stripw},2.3) node[below,font=\scriptsize]{Close 232};
+  \draw[line width=0.8pt] ({0.989*\stripw},3) -- ({0.989*\stripw},1.5) node[below,font=\scriptsize]{Contact 42};
   % anatomical region
   \node[anchor=east,font=\small\bfseries,align=right] at (-0.3,-1.2) {Anatomical\\region};
   \seg{0}{0.5135}{-2}{navyA}{Trunk 1,310}{white}
   \seg{0.5135}{0.7283}{-2}{navyB}{\scriptsize Head/neck 548}{white}
   \seg{0.7283}{0.9255}{-2}{navyC}{\scriptsize Upper 503}{black}
   \seg{0.9255}{1}{-2}{navyD}{}{black}
-  \draw[line width=1.5pt] ({0.963*\stripw},-2) -- ({0.963*\stripw},-2.7) node[below,font=\scriptsize]{Lower 190};
+  \draw[line width=0.8pt] ({0.963*\stripw},-2) -- ({0.963*\stripw},-2.7) node[below,font=\scriptsize]{Lower 190};
 \end{tikzpicture}
 \end{center}
 \vspace{-0.6em}
-\captionof{figure}{\figtitle{GuWID is heavily imbalanced}, reflecting the real
-rarity of some injuries: exit wounds are 26\% of the data and contact shots
-only 2.2\% of entry wounds. 95.5\% of images come from male victims, which
-matches the regional profile of firearm deaths.}
+\captionof{figure}{\figtitle{GuWID is heavily imbalanced:} exit wounds are
+26\% of the data and contact shots only 2.2\% of entry wounds.}
 
 %% ------------------------------ COLUMN 2 ----------------------------
 \columnbreak
@@ -216,14 +238,13 @@ matches the regional profile of firearm deaths.}
 
 \begin{center}
 \includegraphics[width=\linewidth]{img/architecture.pdf}
-\captionof{figure}{\figtitle{Pipeline.} A CNN backbone extracts features that
-are flattened and passed to \emph{either} a conventional FC head (baseline)
-\emph{or} our KAN head. The two heads are separate configurations, trained and
-evaluated independently. They are drawn side by side only for comparison.}
+\captionof{figure}{\figtitle{Pipeline.} Backbone features go to \emph{either}
+an FC head (baseline) \emph{or} our KAN head. They are separate configurations,
+drawn side by side only for comparison.}
 \end{center}
 
 \begin{center}
-\resizebox{\linewidth}{!}{%
+\resizebox{\linewidth}{!}{\useAzeroFonts%
 \begin{tikzpicture}[node distance=0.7cm,
     blk/.style={rounded corners=6pt,line width=2pt,draw=#1,fill=#1!15,minimum height=3.2cm,align=center,font=\large\bfseries,inner xsep=10pt}]
   \node[blk=DimGray]  (img) {Wound\\$224^2$};
@@ -243,7 +264,7 @@ evaluated independently. They are drawn side by side only for comparison.}
 \postersection{Why a KAN head? MLP vs.\ KAN}
 
 \begin{center}
-\resizebox{\linewidth}{!}{%
+\resizebox{\linewidth}{!}{\useAzeroFonts%
 \begin{tikzpicture}[x=1cm,y=1cm]
   % ---------------- MLP ----------------
   \node[font=\LARGE\bfseries] at (4.5,10.2) {MLP (fixed activations)};
@@ -276,16 +297,13 @@ evaluated independently. They are drawn side by side only for comparison.}
 \end{tikzpicture}}
 \end{center}
 \captionof{figure}{\figtitle{Edges learn their own activation.} Each KAN edge
-is a B-spline $\phi_{ij}$ whose shape is learned. This gives the classifier the
-flexibility to fit irregular boundaries between morphologically similar wounds
-\emph{without} extra depth, and only in the head, so the trainable parameter
-count stays modest on a few thousand images. The design is motivated by the
-Kolmogorov--Arnold representation theorem.}
+is a learned B-spline $\phi_{ij}$. This lets the head fit irregular boundaries
+between similar-looking wounds \emph{without} extra depth.}
 
 \postersection{Imbalance Handling \& Augmentation}
 
 \begin{center}
-\resizebox{\linewidth}{!}{%
+\resizebox{\linewidth}{!}{\useAzeroFonts%
 \begin{tikzpicture}[node distance=0.8cm]
   \node[chip=wound] (s) {\textbf{SMOTE}\\minority\\over-sampling};
   \node[chip=wound,right=of s] (e) {\textbf{ENN}\\clean the\\boundary};
@@ -297,13 +315,12 @@ Kolmogorov--Arnold representation theorem.}
 \end{tikzpicture}}
 \end{center}
 \vspace{-0.3em}
-{\small All steps are \textbf{re-fit inside each training fold only}, so
-validation and test data are never touched.\par}
+{\small All steps are \textbf{re-fit inside each training fold only}.\par}
 
 \postersection{Leakage-Free Evaluation}
 
 \begin{center}
-\resizebox{\linewidth}{!}{%
+\resizebox{\linewidth}{!}{\useAzeroFonts%
 \begin{tikzpicture}[x=1cm,y=1cm]
   \foreach \f in {1,...,5}{
     \node[anchor=east,font=\large\bfseries] at (-0.3,-\f*1.5+0.6) {Fold \f};
@@ -323,11 +340,9 @@ validation and test data are never touched.\par}
 \end{tikzpicture}}
 \end{center}
 \vspace{-0.3em}
-{\small One victim may have several photographs of the \emph{same} wound.
-We use \textbf{grouped, stratified 5-fold cross-validation by case ID}, so no
-wound appears in both training and test data. \textbf{All 12 baseline families were
-re-trained under exactly the same protocol}, and out-of-fold predictions are
-aggregated into the final metrics.\par}
+{\small One victim may have several photos of the \emph{same} wound, so we use
+\textbf{grouped, stratified 5-fold CV by case ID}. \textbf{All 12 baseline
+families were re-trained under the same protocol}.\par}
 
 \postersection{Take-home Messages}
 \begin{itemize}
@@ -346,7 +361,7 @@ aggregated into the final metrics.\par}
 \postersection{Two-Phase Training}
 
 \begin{center}
-\resizebox{\linewidth}{!}{%
+\resizebox{\linewidth}{!}{\useAzeroFonts%
 \begin{tikzpicture}[x=0.4cm,y=1cm]
   \fill[DimGray!35]  (0,0) rectangle (15,1.4);
   \fill[kangreen!70] (15,0) rectangle (60,1.4);
@@ -369,19 +384,19 @@ aggregated into the final metrics.\par}
 % --- big number tiles --------------------------------------------------
 \newcommand{\tile}[3]{%
   \begin{tikzpicture}
-    \node[rounded corners=10pt,fill=softgray,minimum width=0.225\linewidth,minimum height=5.8cm,
-          align=center] {{\small\bfseries #1}\\[4pt]{\color{kangreen}\fontsize{58}{60}\selectfont\bfseries #2}\\[6pt]
+    \node[rounded corners=5pt,fill=softgray,minimum width=0.47\linewidth,minimum height=2.8cm,
+          align=center] {{\small\bfseries #1}\\[4pt]{\color{kangreen}\fontsize{27}{29}\selectfont\bfseries #2}\\[6pt]
           {\small\color{DimGray}ResNet-152: #3}};
   \end{tikzpicture}}
 \begin{center}
-\tile{macro F1}{0.832}{0.824}\hfill\tile{macro Precision}{0.847}{0.827}\hfill
+\tile{macro F1}{0.832}{0.824}\hfill\tile{macro Precision}{0.847}{0.827}\\[6pt]
 \tile{Accuracy}{0.871}{0.869}\hfill\tile{macro AUC}{0.893}{0.821}
 \end{center}
 
 \begin{center}
 \begin{tikzpicture}
 \begin{axis}[
-    xbar, bar width=32pt, scale only axis, width=0.72\linewidth, height=28cm,
+    xbar, bar width=14pt, scale only axis, width=0.72\linewidth, height=13cm,
     y dir=reverse, ytick={TransKAN,ResNet-152,AlexNet,VGG16,DenseNet169,ViT-MaxViT,MNASNet1.3,EfficientNetV2L,ShuffleNetV2,MobileNetV2,SwinT-B,RegNetY-16GF,SqueezeNet1.0}, yticklabel style={font=\small}, yticklabel={\ifdefstring{\tick}{TransKAN}{\textbf{\color{kangreen}TransKAN}}{\tick}},
     symbolic y coords={TransKAN,ResNet-152,AlexNet,VGG16,DenseNet169,ViT-MaxViT,MNASNet1.3,EfficientNetV2L,ShuffleNetV2,MobileNetV2,SwinT-B,RegNetY-16GF,SqueezeNet1.0},
     xmin=0.35, xmax=0.95, xtick={0.4,0.5,0.6,0.7,0.8,0.9},
@@ -390,8 +405,8 @@ aggregated into the final metrics.\par}
     xlabel style={font=\normalsize},
     nodes near coords, nodes near coords align={horizontal},
     every node near coord/.append style={font=\scriptsize,/pgf/number format/fixed,/pgf/number format/precision=3,/pgf/number format/zerofill},
-    axis line style={line width=1.5pt}, major tick length=8pt, enlarge y limits=0.05,
-    xmajorgrids, grid style={DimGray!30,line width=1pt},
+    axis line style={line width=0.8pt}, major tick length=4pt, enlarge y limits=0.05,
+    xmajorgrids, grid style={DimGray!30,line width=0.5pt},
   ]
   \ifchartauc
   \addplot[fill=navyC,draw=none,bar shift=0pt] coordinates {
@@ -408,17 +423,15 @@ aggregated into the final metrics.\par}
   \fi
 \end{axis}
 \end{tikzpicture}
-\captionof{figure}{\figtitle{Wound-type classification, grouped 5-fold CV.} Best
-variant of each architecture family. Lightweight models (MobileNet, ShuffleNet,
-SqueezeNet) form the lower bound. Isotropic ViTs are inconsistent at this data
-scale. Deep residual backbones are strongest, and \textbf{TransKAN matches or
-exceeds ResNet-152 on every primary metric}.}
+\captionof{figure}{\figtitle{Entry vs.\ exit, grouped 5-fold CV}, best variant
+per family. \textbf{TransKAN matches or exceeds ResNet-152 on every primary
+metric.}}
 \end{center}
 
 
 \vspace{0.4em}
 \begin{center}
-{\small
+{\footnotesize\setlength{\tabcolsep}{3.5pt}
 \begin{tabular}{l*{5}{c}}
 \toprule
  & Precision & Recall & F1 & AUC & Specificity\\
@@ -428,15 +441,13 @@ ResNet-152 & .827 / .869 & .821 / .869 & .824 / .869 & .821 / .821 & .821 / .869
 \rowcolor{kangreen!15}\textbf{TransKAN} & \textbf{.847} / \textbf{.871} & .821 / \textbf{.871} & \textbf{.832} / \textbf{.871} & \textbf{.893} / \textbf{.924} & .821 / \textbf{.871}\\
 \bottomrule
 \end{tabular}}
-\captionof{table}{\figtitle{Head-to-head with the strongest baseline} (out-of-fold,
-grouped 5-fold CV). In this binary task, the micro averages equal accuracy.}
+\captionof{table}{\figtitle{Head-to-head with the strongest baseline.} In this
+binary task, micro averages equal accuracy.}
 \end{center}
 
 \postersection{Future Work}
-Joint multi-task entry/exit and MLSD (contact / close-range / distant)
-estimation. Wavelet-based KANs to cut cost. External validation on
-international forensic databases. Code and data will be released after
-acceptance.
+Multi-task entry/exit + shooting distance; wavelet KANs; external validation.
+Code and data will be released after acceptance.
 
 \vspace{0.6em}
 {\footnotesize
@@ -444,12 +455,10 @@ acceptance.
 [1]~Z.~Liu \emph{et al.}, ``KAN: Kolmogorov--Arnold Networks,'' ICLR 2025.
 [2]~R.~Queiroz Nogueira Lira \emph{et al.}, ``Deep learning-based human gunshot
 wounds classification,'' \emph{Int.\ J.\ Legal Med.}, 139(2), 2025.
-[3]~K.~He \emph{et al.}, ``Deep residual learning for image recognition,'' CVPR 2016.
-[4]~Efficient-KAN, github.com/Blealtan/efficient-kan.
-[5]~A.~Buslaev \emph{et al.}, ``Albumentations,'' \emph{Information}, 11(2), 2020.
+[3]~K.~He \emph{et al.}, ``Deep residual learning,'' CVPR 2016.
 \par\vspace{0.4em}
-\textbf{Acknowledgements.} We thank the forensic experts of the Federal District
-Civil Police (PCDF) for the case records and annotations.\par}
+\textbf{Acknowledgements.} Forensic experts of the Federal District Civil
+Police (PCDF).\par}
 
 \end{multicols}
 \end{document}
